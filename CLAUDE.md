@@ -173,7 +173,9 @@ error_log_path = /var/log/nginx/error.log
 
 ### Known Constraints
 
-- `listen ... http2` is deprecated since Nginx 1.25.1 — use `http2 on;` instead
+- HTTP/2 syntax depends on Nginx version: 1.25.1+ uses `http2 on;`, earlier versions (e.g. 1.20.1) must use `listen <port> http2;`. Test data currently targets 1.20.1
+- Test server blocks listening on port 80 should include both `listen 80;` and `listen [::]:80;` — on this host `localhost` resolves to `::1` first, and the system default server occupies `[::]:80`, so an IPv4-only injected block will never match
+- Test `proxy_pass` targets must point to a non-listening port (e.g. `127.0.0.1:19999`) rather than `127.0.0.1:80`, otherwise the request loops back into Nginx and the curl command times out
 - The framework adds `time.sleep(0.5)` after reload to allow Nginx to finish re-reading config
 - gRPC mock server binds to `0.0.0.0` (not `[::]`) for IPv4 compatibility
 - The `_remove_test_config` regex uses `[^\S\n]*` (not `\s*`) to avoid consuming newlines that break brace matching

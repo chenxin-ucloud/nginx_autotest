@@ -10,6 +10,7 @@ server_name_001:
   config_content: |
     server {
       listen 80;
+      listen [::]:80;
       server_name exact.example.com;
       location / {
         return 200 "Exact Match";
@@ -32,6 +33,7 @@ server_name_002:
   config_content: |
     server {
       listen 80;
+      listen [::]:80;
       server_name *.example.com;
       location / {
         return 200 "Wildcard Match";
@@ -54,6 +56,7 @@ server_name_003:
   config_content: |
     server {
       listen 80;
+      listen [::]:80;
       server_name ~^www\d+\.example\.com$;
       location / {
         return 200 "Regex Match";
@@ -76,6 +79,7 @@ server_name_004:
   config_content: |
     server {
       listen 80;
+      listen [::]:80;
       server_name ~^.+\.example\.com$;
       location / {
         return 200 "Regex Hit";
@@ -83,6 +87,7 @@ server_name_004:
     }
     server {
       listen 80;
+      listen [::]:80;
       server_name *.example.com;
       location / {
         return 200 "Wildcard Hit";
@@ -90,6 +95,7 @@ server_name_004:
     }
     server {
       listen 80;
+      listen [::]:80;
       server_name priority.example.com;
       location / {
         return 200 "Exact Hit";
@@ -114,6 +120,7 @@ server_name_005:
   config_content: |
     server {
       listen 80;
+      listen [::]:80;
       server_name ~^.+\.example\.com$;
       location / {
         return 200 "Regex Hit";
@@ -121,6 +128,7 @@ server_name_005:
     }
     server {
       listen 80;
+      listen [::]:80;
       server_name *.example.com;
       location / {
         return 200 "Wildcard Hit";
@@ -144,6 +152,7 @@ server_name_006:
   config_content: |
     server {
       listen 80;
+      listen [::]:80;
       server_name www.example.*;
       location / {
         return 200 "Suffix Wildcard Hit";
@@ -151,6 +160,7 @@ server_name_006:
     }
     server {
       listen 80;
+      listen [::]:80;
       server_name *.example.com;
       location / {
         return 200 "Prefix Wildcard Hit";
@@ -174,6 +184,7 @@ server_name_007:
   config_content: |
     server {
       listen 80;
+      listen [::]:80;
       server_name ~^www\d+\.example\.com$;
       location / {
         return 200 "First Regex Hit";
@@ -181,6 +192,7 @@ server_name_007:
     }
     server {
       listen 80;
+      listen [::]:80;
       server_name ~^www.+\.example\.com$;
       location / {
         return 200 "Second Regex Hit";
@@ -204,6 +216,7 @@ server_name_008:
   config_content: |
     server {
       listen 80;
+      listen [::]:80;
       server_name specific.example.com;
       location / {
         return 200 "Specific Hit";
@@ -211,6 +224,7 @@ server_name_008:
     }
     server {
       listen 80 default_server;
+      listen [::]:80 default_server;
       server_name _;
       location / {
         return 200 "Default Server Hit";
