@@ -87,10 +87,9 @@ def check_nginx_config():
     """
     nginx_bin = read_config("nginx", "nginx_bin_path")
     nginx_path = read_config("nginx", "nginx_path")
-    nginx_cwd = str(Path(nginx_bin).parent)
 
-    cmd = f'"{nginx_bin}" -t -c "{nginx_path}"'
-    returncode, output = run_cmd_with_code(cmd, cwd=nginx_cwd)
+    cmd = f'{nginx_bin} -t -c {nginx_path}'
+    returncode, output = run_cmd_with_code(cmd)
     return returncode == 0, output
 
 
@@ -102,10 +101,9 @@ def reload_nginx():
         tuple: (是否成功, 输出信息)
     """
     nginx_bin = read_config("nginx", "nginx_bin_path")
-    nginx_cwd = str(Path(nginx_bin).parent)
 
-    cmd = f'"{nginx_bin}" -s reload'
-    returncode, output = run_cmd_with_code(cmd, cwd=nginx_cwd)
+    cmd = f'{nginx_bin} -s reload'
+    returncode, output = run_cmd_with_code(cmd)
 
     if returncode == 0:
         time.sleep(0.5)
@@ -122,7 +120,7 @@ def restart_nginx():
     """
     try:
         nginx_bin = read_config("nginx", "nginx_bin_path")
-        cmd = f'"{nginx_bin}" -s stop && "{nginx_bin}"'
+        cmd = f'{nginx_bin} -s stop && {nginx_bin}'
     except Exception:
         cmd = "nginx -s stop && nginx"
 
@@ -236,7 +234,6 @@ def add_nginx_config(nginx_path, config_content):
     new_content = original_content[:insert_index] + test_config + original_content[insert_index:]
 
     path.write_text(new_content, encoding='utf-8')
-    time.sleep(0.1)
 
     logger.info(f"测试配置已添加至: {nginx_path}")
     return True
@@ -329,7 +326,7 @@ def read_nginx_error_log(lines=10):
 def get_nginx_version():
     """获取Nginx版本信息"""
     nginx_bin = read_config("nginx", "nginx_bin_path")
-    cmd = f'"{nginx_bin}" -v'
+    cmd = f'{nginx_bin} -v'
     try:
         return run_cmd(cmd)
     except Exception as e:

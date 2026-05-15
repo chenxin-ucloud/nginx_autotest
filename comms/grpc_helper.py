@@ -3,15 +3,15 @@ gRPC 测试辅助模块
 封装 mock gRPC Echo Server 的启停和 gRPC 客户端调用
 """
 
-import os
 import sys
 import time
 import subprocess
 import json
+from pathlib import Path
 
 
 _server_proc = None
-_GRPC_MOCK_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "grpc_mock")
+_GRPC_MOCK_DIR = str(Path(__file__).resolve().parent.parent / "grpc_mock")
 
 
 def start_grpc_server(port=19090, timeout=3):
@@ -33,7 +33,7 @@ def start_grpc_server(port=19090, timeout=3):
     if _server_proc is not None and _server_proc.poll() is None:
         stop_grpc_server()
 
-    server_script = os.path.join(_GRPC_MOCK_DIR, "server.py")
+    server_script = str(Path(_GRPC_MOCK_DIR) / "server.py")
     _server_proc = subprocess.Popen(
         [sys.executable, server_script, str(port)],
         stdout=subprocess.PIPE,

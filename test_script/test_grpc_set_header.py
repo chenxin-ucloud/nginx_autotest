@@ -3,7 +3,6 @@ grpc_set_header模块测试脚本
 负责执行grpc_set_header模块的测试用例，支持端到端gRPC功能验证
 """
 
-import os
 import pytest
 from comms.constants import get_test_data_path
 from comms.data_read import read_yaml, read_config
@@ -24,11 +23,10 @@ test_data = read_yaml(get_test_data_path("grpc_set_header.yaml"))
 try:
     nginx_path = read_config("nginx", "nginx_path")
     nginx_bin_path = read_config("nginx", "nginx_bin_path")
-    nginx_cwd = os.path.dirname(nginx_bin_path)
 except Exception as e:
     logger.warning(f"读取Nginx配置路径失败，使用默认路径。错误: {str(e)}")
     nginx_path = "/etc/nginx/nginx.conf"
-    nginx_cwd = None
+    nginx_bin_path = "/usr/sbin/nginx"
 
 
 @pytest.fixture(scope="module", autouse=True)
@@ -79,8 +77,8 @@ def test_grpc_set_header(case_id, case_info):
             logger.info(f"执行: {cmd}")
             if cmd.strip().startswith("nginx "):
                 full_nginx_bin = read_config("nginx", "nginx_bin_path")
-                cmd = cmd.replace("nginx ", f'"{full_nginx_bin}" ')
-                result = run_cmd(cmd, cwd=nginx_cwd)
+                cmd = cmd.replace("nginx ", f'{full_nginx_bin} ')
+                result = run_cmd(cmd)
             else:
                 result = run_cmd(cmd)
             all_output += result + "\n"

@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 This is a **Nginx White-box Testing Automation Framework** (Nginx白盒测试自动化框架) that follows a data-script separation design. Test cases are defined in YAML files while test scripts handle execution logic only. Currently has **29 test cases** across 7 modules.
 
-> **Platform: Windows only.** macOS / Linux are not supported and require separate adaptation work.
+> **Platform: Linux.** Nginx should be installed via package manager (apt/yum) or compiled from source.
 
 ## Common Commands
 
@@ -156,25 +156,25 @@ The `_remove_test_config()` function cleans up previous test configs before inje
 
 ### Configuration Requirements
 
-Before running tests, ensure `config/config.ini` has correct paths for your Windows Nginx installation:
+Before running tests, ensure `config/config.ini` has correct paths for your Nginx installation:
 - `nginx_path`: Path to nginx.conf
 - `nginx_bin_path`: Path to nginx binary
 - `backup_path`: Where to store config backups
 - `error_log_path`: For troubleshooting failures
 
-Default Windows configuration example:
+Default Linux configuration example:
 ```ini
 [nginx]
-nginx_path = D:\Tools\nginx-1.30.0\conf\nginx.conf
-nginx_bin_path = D:\Tools\nginx-1.30.0\nginx.exe
-backup_path = D:\Tools\nginx-1.30.0\backup\
-error_log_path = D:\Tools\nginx-1.30.0\logs\error.log
+nginx_path = /etc/nginx/nginx.conf
+nginx_bin_path = /usr/sbin/nginx
+backup_path = /tmp/nginx_backup/
+error_log_path = /var/log/nginx/error.log
 ```
 
 ### Known Constraints
 
 - `listen ... http2` is deprecated since Nginx 1.25.1 — use `http2 on;` instead
-- Windows Nginx may have reload timing issues — the framework adds `time.sleep(0.5)` after reload
-- Nginx commands require setting the working directory to the Nginx install path
+- The framework adds `time.sleep(0.5)` after reload to allow Nginx to finish re-reading config
 - gRPC mock server binds to `0.0.0.0` (not `[::]`) for IPv4 compatibility
 - The `_remove_test_config` regex uses `[^\S\n]*` (not `\s*`) to avoid consuming newlines that break brace matching
+- Tests require write permission to Nginx config files and the backup directory

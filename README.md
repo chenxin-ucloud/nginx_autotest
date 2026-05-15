@@ -6,7 +6,7 @@
 
 一款基于 Python + pytest 的 Nginx 白盒测试自动化框架，采用数据与脚本分离的设计理念。
 
-> **注意：当前框架仅支持 Windows 平台。** macOS / Linux 等其他操作系统需要另外单独适配。
+> **平台：Linux。** Nginx 应通过包管理器（apt/yum）安装或从源码编译安装。
 
 ## 特性
 
@@ -81,10 +81,10 @@ pip install pytest pyyaml grpcio grpcio-tools
 
 ```ini
 [nginx]
-nginx_path = D:\Tools\nginx-1.30.0\conf\nginx.conf
-nginx_bin_path = D:\Tools\nginx-1.30.0\nginx.exe
-backup_path = D:\Tools\nginx-1.30.0\backup\
-error_log_path = D:\Tools\nginx-1.30.0\logs\error.log
+nginx_path = /etc/nginx/nginx.conf
+nginx_bin_path = /usr/sbin/nginx
+backup_path = /tmp/nginx_backup/
+error_log_path = /var/log/nginx/error.log
 ```
 
 ### 运行测试
@@ -183,7 +183,7 @@ grpc_set_header_001:
 2. **配置备份**：框架会自动备份和恢复 Nginx 配置，但建议手动备份重要配置
 3. **Nginx 版本**：推荐 1.25.1+，HTTP/2 需使用 `http2 on;` 指令而非 `listen ... http2`
 4. **日志查看**：测试运行后查看 `logs/info.log` 获取详细执行日志
-5. **仅限 Windows**：当前框架仅支持 Windows，macOS / Linux 需另外适配
+5. **权限要求**：测试需要对 Nginx 配置文件和备份目录的写入权限，建议使用 sudo 或配置适当的文件权限
 
 ## 许可证
 
