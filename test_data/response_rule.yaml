@@ -1,0 +1,211 @@
+# response_rule响应方向规则测试数据
+# 注意：这些用例需要proxy_pass，当前自定义OpenResty构建中proxy_pass会导致nginx -t静默失败
+# 待镜像修复后方可运行
+
+response_rule_001:
+  test_purpose: 验证response_rule基础功能-response_add_http_header添加响应头
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+    - proxy_pass功能正常(当前已知问题可能导致失败)
+  config_content: |
+    multi_condition on;
+    server {
+      listen 18101;
+      location / {
+        return 200 "upstream_ok";
+      }
+    }
+    server {
+      listen 18100;
+      location /proxy {
+        proxy_pass http://127.0.0.1:18101;
+      }
+      response_rule resp_add_header {
+        response_add_http_header X-Custom-Resp added_value;
+      }
+    }
+  operate_commands:
+    - "nginx -t"
+    - "nginx -s reload"
+    - "curl -s -v http://127.0.0.1:18100/proxy 2>&1"
+  expected_result:
+    - "test is successful"
+    - "X-Custom-Resp"
+    - "added_value"
+
+response_rule_002:
+  test_purpose: 验证多个response_rule从上到下匹配且仅匹配第一个
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+    - proxy_pass功能正常
+  config_content: |
+    multi_condition on;
+    server {
+      listen 18101;
+      location / {
+        return 200 "upstream_ok";
+      }
+    }
+    server {
+      listen 18100;
+      location /proxy {
+        proxy_pass http://127.0.0.1:18101;
+      }
+      response_rule first_rule {
+        response_add_http_header X-First-Rule matched;
+      }
+      response_rule second_rule {
+        response_add_http_header X-Second-Rule matched;
+      }
+    }
+  operate_commands:
+    - "nginx -t"
+    - "nginx -s reload"
+    - "curl -s -v http://127.0.0.1:18100/proxy 2>&1"
+  expected_result:
+    - "test is successful"
+    - "X-First-Rule"
+  unexpected_result:
+    - "X-Second-Rule"
+
+response_rule_003:
+  test_purpose: 验证空response_rule(无条件)匹配所有请求
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+    - proxy_pass功能正常
+  config_content: |
+    multi_condition on;
+    server {
+      listen 18101;
+      location / {
+        return 200 "upstream_ok";
+      }
+    }
+    server {
+      listen 18100;
+      location /proxy {
+        proxy_pass http://127.0.0.1:18101;
+      }
+      response_rule empty_rule {
+        response_add_http_header X-Empty-Rule always_added;
+      }
+    }
+  operate_commands:
+    - "nginx -t"
+    - "nginx -s reload"
+    - "curl -s -v http://127.0.0.1:18100/proxy 2>&1"
+  expected_result:
+    - "test is successful"
+    - "X-Empty-Rule"
+    - "always_added"
+
+response_rule_004:
+  test_purpose: 验证match_http_status单个状态码匹配
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+    - proxy_pass功能正常
+  config_content: |
+    multi_condition on;
+    server {
+      listen 18101;
+      location / {
+        return 200 "upstream_ok";
+      }
+    }
+    server {
+      listen 18100;
+      location /proxy {
+        proxy_pass http://127.0.0.1:18101;
+      }
+      response_rule status_match {
+        match_http_status 200;
+        response_add_http_header X-Status-Match matched_200;
+      }
+    }
+  operate_commands:
+    - "nginx -t"
+    - "nginx -s reload"
+    - "curl -s -v http://127.0.0.1:18100/proxy 2>&1"
+  expected_result:
+    - "test is successful"
+    - "X-Status-Match"
+    - "matched_200"
+
+response_rule_005:
+  test_purpose: 验证match_http_status状态码范围匹配(200-299)
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+    - proxy_pass功能正常
+  config_content: |
+    multi_condition on;
+    server {
+      listen 18101;
+      location / {
+        return 200 "upstream_ok";
+      }
+    }
+    server {
+      listen 18100;
+      location /proxy {
+        proxy_pass http://127.0.0.1:18101;
+      }
+      response_rule status_range {
+        match_http_status 200-299;
+        response_add_http_header X-Status-Range matched_range;
+      }
+    }
+  operate_commands:
+    - "nginx -t"
+    - "nginx -s reload"
+    - "curl -s -v http://127.0.0.1:18100/proxy 2>&1"
+  expected_result:
+    - "test is successful"
+    - "X-Status-Range"
+    - "matched_range"
+
+response_rule_006:
+  test_purpose: 验证response_delete_http_header删除上游响应头
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+    - proxy_pass功能正常
+  config_content: |
+    multi_condition on;
+    server {
+      listen 18101;
+      location / {
+        add_header X-To-Delete "should_be_removed";
+        add_header X-Keep "should_remain";
+        return 200 "upstream_ok";
+      }
+    }
+    server {
+      listen 18100;
+      location /proxy {
+        proxy_pass http://127.0.0.1:18101;
+      }
+      response_rule delete_header {
+        response_delete_http_header X-To-Delete;
+      }
+    }
+  operate_commands:
+    - "nginx -t"
+    - "nginx -s reload"
+    - "curl -s -v http://127.0.0.1:18100/proxy 2>&1"
+  expected_result:
+    - "test is successful"
+    - "X-Keep"
+    - "should_remain"
+  unexpected_result:
+    - "X-To-Delete"

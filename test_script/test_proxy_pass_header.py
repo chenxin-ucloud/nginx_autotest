@@ -12,6 +12,7 @@ from comms.nginx_operate import (
     reload_nginx,
     restart_nginx,
     read_nginx_error_log,
+    run_nginx_cmd,
 )
 from comms.cmd_operate import run_cmd
 from comms.log_utils import logger
@@ -71,13 +72,7 @@ def test_proxy_pass_header(case_id, case_info):
         all_output = ""
         for cmd in case_info["operate_commands"]:
             logger.info(f"执行: {cmd}")
-            # Nginx命令需要使用完整路径并在Nginx目录下执行
-            if cmd.strip().startswith("nginx "):
-                full_nginx_bin = read_config("nginx", "nginx_bin_path")
-                cmd = cmd.replace("nginx ", f'{full_nginx_bin} ')
-                result = run_cmd(cmd)
-            else:
-                result = run_cmd(cmd)
+            result = run_nginx_cmd(cmd)
             all_output += result + "\n"
             logger.info(f"输出: {result[:200]}..." if len(result) > 200 else f"输出: {result}")
 

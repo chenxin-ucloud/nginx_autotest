@@ -11,7 +11,8 @@ grpc_set_header_001:
     - gRPC mock server已启动
   config_content: |
     server {
-      listen 19080 http2;
+      listen 19080;
+      http2 on;
       server_name localhost;
       location / {
         grpc_pass grpc://127.0.0.1:19090;
@@ -38,7 +39,8 @@ grpc_set_header_002:
     - gRPC mock server已启动
   config_content: |
     server {
-      listen 19080 http2;
+      listen 19080;
+      http2 on;
       server_name localhost;
       location / {
         grpc_pass grpc://127.0.0.1:19090;
@@ -67,7 +69,8 @@ grpc_set_header_003:
     - gRPC mock server已启动
   config_content: |
     server {
-      listen 19080 http2;
+      listen 19080;
+      http2 on;
       server_name localhost;
       location / {
         grpc_pass grpc://127.0.0.1:19090;
@@ -94,7 +97,8 @@ grpc_set_header_004:
     - gRPC mock server已启动
   config_content: |
     server {
-      listen 19080 http2;
+      listen 19080;
+      http2 on;
       server_name localhost;
       location / {
         grpc_pass grpc://127.0.0.1:19090;
@@ -125,7 +129,8 @@ grpc_set_header_005:
     - gRPC mock server已启动
   config_content: |
     server {
-      listen 19080 http2;
+      listen 19080;
+      http2 on;
       server_name localhost;
       location / {
         grpc_pass grpc://127.0.0.1:19090;
@@ -153,7 +158,8 @@ grpc_set_header_006:
     - Nginx支持gRPC模块(http_v2_module)
   config_content: |
     server {
-      listen 19080 http2;
+      listen 19080;
+      http2 on;
       server_name localhost;
       location / {
         grpc_pass grpc://127.0.0.1:19090;

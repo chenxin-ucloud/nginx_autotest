@@ -16,6 +16,40 @@ from .log_utils import logger
 _backup_file_path = None
 
 
+def _is_docker_mode():
+    try:
+        mode = read_config("nginx", "mode")
+        return mode.strip().lower() == "docker"
+    except Exception:
+        return False
+
+
+def _get_container_name():
+    return read_config("nginx", "container_name")
+
+
+def _build_nginx_cmd(cmd_str):
+    if _is_docker_mode():
+        container = _get_container_name()
+        return f'docker exec {container} {cmd_str}'
+    return cmd_str
+
+
+def run_nginx_cmd(cmd_str):
+    """
+    执行命令，自动处理 nginx 命令的路径替换和 Docker 包裹。
+    非 nginx 命令直接执行。
+    """
+    if cmd_str.strip().startswith("nginx "):
+        nginx_bin = read_config("nginx", "nginx_bin_path")
+        cmd_str = cmd_str.replace("nginx ", f'{nginx_bin} ', 1)
+        if _is_docker_mode():
+            config_path = read_config("nginx", "nginx_container_path")
+            cmd_str = f'{cmd_str} -c {config_path}'
+        cmd_str = _build_nginx_cmd(cmd_str)
+    return run_cmd(cmd_str)
+
+
 def backup_nginx_config():
     """
     备份Nginx原始配置（测试前置操作）
@@ -86,9 +120,13 @@ def check_nginx_config():
         tuple: (是否成功, 输出信息)
     """
     nginx_bin = read_config("nginx", "nginx_bin_path")
-    nginx_path = read_config("nginx", "nginx_path")
 
-    cmd = f'{nginx_bin} -t -c {nginx_path}'
+    if _is_docker_mode():
+        config_path = read_config("nginx", "nginx_container_path")
+    else:
+        config_path = read_config("nginx", "nginx_path")
+
+    cmd = _build_nginx_cmd(f'{nginx_bin} -t -c {config_path}')
     returncode, output = run_cmd_with_code(cmd)
     return returncode == 0, output
 
@@ -102,7 +140,11 @@ def reload_nginx():
     """
     nginx_bin = read_config("nginx", "nginx_bin_path")
 
-    cmd = f'{nginx_bin} -s reload'
+    if _is_docker_mode():
+        config_path = read_config("nginx", "nginx_container_path")
+        cmd = _build_nginx_cmd(f'{nginx_bin} -s reload -c {config_path}')
+    else:
+        cmd = f'{nginx_bin} -s reload'
     returncode, output = run_cmd_with_code(cmd)
 
     if returncode == 0:
@@ -118,6 +160,15 @@ def restart_nginx():
     Returns:
         tuple: (是否成功, 输出信息)
     """
+    if _is_docker_mode():
+        container = _get_container_name()
+        cmd = f'docker restart {container}'
+        returncode, output = run_cmd_with_code(cmd, timeout=30)
+        if returncode == 0:
+            time.sleep(2)
+            return True, output
+        return False, f"Docker容器重启失败: {output}"
+
     try:
         nginx_bin = read_config("nginx", "nginx_bin_path")
         cmd = f'{nginx_bin} -s stop && {nginx_bin}'
@@ -132,11 +183,12 @@ def restart_nginx():
 
 
 def _is_server_block_config(config_content):
-    """判断配置内容是否是 server 块"""
+    """判断配置内容是否包含 server 块"""
     for line in config_content.strip().split('\n'):
         stripped = line.strip()
         if stripped and not stripped.startswith('#'):
-            return re.match(r'^[\s]*server\s*\{', stripped) is not None
+            if re.match(r'^[\s]*server\s*\{', stripped):
+                return True
     return False
 
 
@@ -236,6 +288,8 @@ def add_nginx_config(nginx_path, config_content):
     path.write_text(new_content, encoding='utf-8')
 
     logger.info(f"测试配置已添加至: {nginx_path}")
+    logger.info(f"注入的测试配置内容:\n{config_content}")
+    logger.info(f"注入后完整配置:\n{new_content}")
     return True
 
 
@@ -326,7 +380,7 @@ def read_nginx_error_log(lines=10):
 def get_nginx_version():
     """获取Nginx版本信息"""
     nginx_bin = read_config("nginx", "nginx_bin_path")
-    cmd = f'{nginx_bin} -v'
+    cmd = _build_nginx_cmd(f'{nginx_bin} -v')
     try:
         return run_cmd(cmd)
     except Exception as e:

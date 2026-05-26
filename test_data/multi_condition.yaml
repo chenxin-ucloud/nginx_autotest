@@ -1,0 +1,55 @@
+# multi_condition开关测试数据
+
+multi_condition_001:
+  test_purpose: 验证multi_condition关闭时原生location匹配正常工作
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    server {
+      listen 18100;
+      location = /exact {
+        return 200 "exact_match";
+      }
+      location / {
+        return 200 "default_match";
+      }
+    }
+  operate_commands:
+    - "nginx -t"
+    - "nginx -s reload"
+    - "curl -s http://127.0.0.1:18100/exact"
+  expected_result:
+    - "test is successful"
+    - "exact_match"
+  unexpected_result:
+    - "default_match"
+
+multi_condition_002:
+  test_purpose: 验证multi_condition开启后自定义规则匹配生效
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    multi_condition on;
+    server {
+      listen 18100;
+      location /rule_host {
+        match_http_host www.test.com;
+        return 200 "host_rule_matched";
+      }
+      location /catch_all {
+        return 200 "no_match";
+      }
+    }
+  operate_commands:
+    - "nginx -t"
+    - "nginx -s reload"
+    - "curl -s -H \"Host: www.test.com\" http://127.0.0.1:18100/anything"
+    - "curl -s -H \"Host: other.com\" http://127.0.0.1:18100/anything"
+  expected_result:
+    - "test is successful"
+    - "host_rule_matched"
+    - "no_match"

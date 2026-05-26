@@ -7,13 +7,17 @@ location_001:
     - Nginx配置文件路径已知
     - 已备份原始配置文件
   config_content: |
-    location = /exact {
-      return 200 "Exact Location";
+    server {
+      listen 18090;
+      server_name localhost;
+      location = /exact {
+        return 200 "Exact Location";
+      }
     }
   operate_commands:
     - "nginx -t"
     - "nginx -s reload"
-    - "curl http://localhost/exact"
+    - "curl http://localhost:18090/exact"
   expected_result:
     - "configuration file"
     - "test is successful"
@@ -25,13 +29,17 @@ location_002:
     - Nginx配置文件路径已知
     - 已备份原始配置文件
   config_content: |
-    location /prefix {
-      return 200 "Prefix Match";
+    server {
+      listen 18090;
+      server_name localhost;
+      location /prefix {
+        return 200 "Prefix Match";
+      }
     }
   operate_commands:
     - "nginx -t"
     - "nginx -s reload"
-    - "curl http://localhost/prefix/path"
+    - "curl http://localhost:18090/prefix/path"
   expected_result:
     - "configuration file"
     - "test is successful"
@@ -43,13 +51,17 @@ location_003:
     - Nginx配置文件路径已知
     - 已备份原始配置文件
   config_content: |
-    location ~ \.(gif|jpg|png)$ {
-      return 200 "Image Regex Match";
+    server {
+      listen 18090;
+      server_name localhost;
+      location ~ \.(gif|jpg|png)$ {
+        return 200 "Image Regex Match";
+      }
     }
   operate_commands:
     - "nginx -t"
     - "nginx -s reload"
-    - "curl http://localhost/test.png"
+    - "curl http://localhost:18090/test.png"
   expected_result:
     - "configuration file"
     - "test is successful"
@@ -61,13 +73,17 @@ location_004:
     - Nginx配置文件路径已知
     - 已备份原始配置文件
   config_content: |
-    location ~* \.(jpg|jpeg|png|gif)$ {
-      return 200 "Case Insensitive Regex";
+    server {
+      listen 18090;
+      server_name localhost;
+      location ~* \.(jpg|jpeg|png|gif)$ {
+        return 200 "Case Insensitive Regex";
+      }
     }
   operate_commands:
     - "nginx -t"
     - "nginx -s reload"
-    - "curl http://localhost/test.JPG"
+    - "curl http://localhost:18090/test.JPG"
   expected_result:
     - "configuration file"
     - "test is successful"
@@ -79,13 +95,17 @@ location_005:
     - Nginx配置文件路径已知
     - 已备份原始配置文件
   config_content: |
-    location ^~ /static {
-      return 200 "Prefix Priority Match";
+    server {
+      listen 18090;
+      server_name localhost;
+      location ^~ /static {
+        return 200 "Prefix Priority Match";
+      }
     }
   operate_commands:
     - "nginx -t"
     - "nginx -s reload"
-    - "curl http://localhost/static/file.txt"
+    - "curl http://localhost:18090/static/file.txt"
   expected_result:
     - "configuration file"
     - "test is successful"

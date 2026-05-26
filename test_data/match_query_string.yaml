@@ -1,0 +1,111 @@
+# match_query_string查询字符串匹配测试数据
+
+match_qs_001:
+  test_purpose: 验证match_query_string精确键值匹配
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    multi_condition on;
+    server {
+      listen 18100;
+      location /rule_exact {
+        match_query_string key test_value;
+        return 200 "qs_exact_matched";
+      }
+      location /catch_all {
+        return 200 "no_match";
+      }
+    }
+  operate_commands:
+    - "nginx -t"
+    - "nginx -s reload"
+    - "curl -s \"http://127.0.0.1:18100/?key=test_value\""
+    - "curl -s \"http://127.0.0.1:18100/?key=wrong\""
+  expected_result:
+    - "test is successful"
+    - "qs_exact_matched"
+    - "no_match"
+
+match_qs_002:
+  test_purpose: 验证match_query_string正则值匹配
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    multi_condition on;
+    server {
+      listen 18100;
+      location /rule_regex {
+        match_query_string id ~^[0-9]+$;
+        return 200 "qs_regex_matched";
+      }
+      location /catch_all {
+        return 200 "no_match";
+      }
+    }
+  operate_commands:
+    - "nginx -t"
+    - "nginx -s reload"
+    - "curl -s \"http://127.0.0.1:18100/?id=12345\""
+    - "curl -s \"http://127.0.0.1:18100/?id=abc\""
+  expected_result:
+    - "test is successful"
+    - "qs_regex_matched"
+    - "no_match"
+
+match_qs_003:
+  test_purpose: 验证match_query_string单条多KV为OR关系且多条之间为AND关系
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    multi_condition on;
+    server {
+      listen 18100;
+      location /rule_and_or {
+        match_query_string page 1 page 2;
+        match_query_string lang en;
+        return 200 "qs_and_or_matched";
+      }
+      location /catch_all {
+        return 200 "no_match";
+      }
+    }
+  operate_commands:
+    - "nginx -t"
+    - "nginx -s reload"
+    - "curl -s \"http://127.0.0.1:18100/?page=1&lang=en\""
+    - "curl -s \"http://127.0.0.1:18100/?page=1\""
+  expected_result:
+    - "test is successful"
+    - "qs_and_or_matched"
+    - "no_match"
+
+match_qs_004:
+  test_purpose: 验证match_query_string仅配置key不配置value时语法检查拒绝
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    multi_condition on;
+    server {
+      listen 18100;
+      location /rule_key_only {
+        match_query_string debug;
+        return 200 "qs_key_only_matched";
+      }
+      location /catch_all {
+        return 200 "no_match";
+      }
+    }
+  operate_commands:
+    - "nginx -t"
+  expect_syntax_fail: true
+  expected_result:
+    - "invalid number of arguments"
+    - "test failed"

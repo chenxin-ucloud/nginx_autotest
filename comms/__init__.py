@@ -20,6 +20,7 @@ from comms.nginx_operate import (
     read_nginx_error_log,
     backup_nginx_config,
     restore_nginx_config,
+    run_nginx_cmd,
 )
 from comms.cmd_operate import run_cmd
 from comms.log_utils import logger
@@ -40,6 +41,7 @@ __all__ = [
     'read_nginx_error_log',
     'backup_nginx_config',
     'restore_nginx_config',
+    'run_nginx_cmd',
     'run_cmd',
     'logger',
 ]
