@@ -5,3 +5,4 @@ backup/
 logs/
 .claude
 server.pid
+ngx_http_custom_rule_module/
