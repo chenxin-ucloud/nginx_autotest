@@ -1,0 +1,308 @@
+# response_rule响应方向高级用例
+# 覆盖：match_response_http_header、$custom_rule_response_rule_name变量、
+#       response_rule内请求条件、always标志、safe_status机制、
+#       complex_value变量、match_http_status多值OR、add_header交叉配置
+
+resp_adv_001:
+  test_purpose: 验证match_response_http_header精确匹配上游响应头
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    multi_condition on;
+    server {
+      listen 18101;
+      location / {
+        add_header X-Upstream-Header backend_value;
+        return 200 "upstream_ok";
+      }
+    }
+    server {
+      listen 18100;
+      location /proxy {
+        proxy_pass http://127.0.0.1:18101;
+      }
+      response_rule match_resp_hdr_exact {
+        match_response_http_header X-Upstream-Header backend_value;
+        response_add_http_header X-Resp-Matched yes;
+      }
+    }
+  operate_commands:
+    - "nginx -t"
+    - "nginx -s reload"
+    - "curl -s -v http://127.0.0.1:18100/proxy 2>&1"
+  expected_result:
+    - "test is successful"
+    - "X-Resp-Matched"
+    - "yes"
+
+resp_adv_002:
+  test_purpose: 验证match_response_http_header正则值匹配
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    multi_condition on;
+    server {
+      listen 18101;
+      location / {
+        add_header X-Upstream-Header val_123;
+        return 200 "upstream_ok";
+      }
+    }
+    server {
+      listen 18100;
+      location /proxy {
+        proxy_pass http://127.0.0.1:18101;
+      }
+      response_rule match_resp_hdr_regex {
+        match_response_http_header X-Upstream-Header ~^val_[0-9]+$;
+        response_add_http_header X-Resp-Matched yes;
+      }
+    }
+  operate_commands:
+    - "nginx -t"
+    - "nginx -s reload"
+    - "curl -s -v http://127.0.0.1:18100/proxy 2>&1"
+  expected_result:
+    - "test is successful"
+    - "X-Resp-Matched"
+    - "yes"
+
+resp_adv_003:
+  test_purpose: 验证$custom_rule_response_rule_name变量返回命中的响应规则名称
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    multi_condition on;
+    server {
+      listen 18101;
+      location / {
+        return 200 "upstream_ok";
+      }
+    }
+    server {
+      listen 18100;
+      location /proxy {
+        proxy_pass http://127.0.0.1:18101;
+      }
+      response_rule my_resp_rule {
+        response_add_http_header X-Rule-Name $custom_rule_response_rule_name;
+      }
+    }
+  operate_commands:
+    - "nginx -t"
+    - "nginx -s reload"
+    - "curl -s -v http://127.0.0.1:18100/proxy 2>&1"
+  expected_result:
+    - "test is successful"
+    - "X-Rule-Name"
+    - "my_resp_rule"
+
+resp_adv_004:
+  test_purpose: 验证response_rule块内配置match_http_host请求条件(请求条件与响应条件AND)
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    multi_condition on;
+    server {
+      listen 18101;
+      location / {
+        return 200 "upstream_ok";
+      }
+    }
+    server {
+      listen 18100;
+      location /proxy {
+        proxy_pass http://127.0.0.1:18101;
+      }
+      response_rule req_cond_in_resp {
+        match_http_host www.test.com;
+        response_add_http_header X-Req-In-Resp matched;
+      }
+    }
+  operate_commands:
+    - "nginx -t"
+    - "nginx -s reload"
+    - "curl -s -v -H \"Host: www.test.com\" http://127.0.0.1:18100/proxy 2>&1"
+  expected_result:
+    - "test is successful"
+    - "X-Req-In-Resp"
+    - "matched"
+  unexpected_result:
+    - "X-Req-In-Resp-Not-Added"
+
+resp_adv_005:
+  test_purpose: 验证response_add_http_header的always标志在非safe状态码(404)下添加响应头
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    multi_condition on;
+    server {
+      listen 18101;
+      location / {
+        return 404 "not_found";
+      }
+    }
+    server {
+      listen 18100;
+      location /proxy {
+        proxy_pass http://127.0.0.1:18101;
+      }
+      response_rule always_rule {
+        response_add_http_header X-Always-Header added_with_always always;
+      }
+    }
+  operate_commands:
+    - "nginx -t"
+    - "nginx -s reload"
+    - "curl -s -v http://127.0.0.1:18100/proxy 2>&1"
+  expected_result:
+    - "test is successful"
+    - "X-Always-Header"
+    - "added_with_always"
+
+resp_adv_006:
+  test_purpose: 验证safe_status机制-不带always时非safe状态码(404)不添加响应头
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    multi_condition on;
+    server {
+      listen 18101;
+      location / {
+        return 404 "not_found";
+      }
+    }
+    server {
+      listen 18100;
+      location /proxy {
+        proxy_pass http://127.0.0.1:18101;
+      }
+      response_rule no_always_rule {
+        response_add_http_header X-No-Always added_without_always;
+      }
+    }
+  operate_commands:
+    - "nginx -t"
+    - "nginx -s reload"
+    - "curl -s -v http://127.0.0.1:18100/proxy 2>&1"
+  expected_result:
+    - "test is successful"
+    - "404"
+  unexpected_result:
+    - "X-No-Always"
+
+resp_adv_007:
+  test_purpose: 验证response_add_http_header的value支持变量(complex_value)
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    multi_condition on;
+    server {
+      listen 18101;
+      location / {
+        return 200 "upstream_ok";
+      }
+    }
+    server {
+      listen 18100;
+      location /proxy {
+        proxy_pass http://127.0.0.1:18101;
+      }
+      response_rule var_value_rule {
+        response_add_http_header X-Var-Value $remote_addr;
+      }
+    }
+  operate_commands:
+    - "nginx -t"
+    - "nginx -s reload"
+    - "curl -s -v http://127.0.0.1:18100/proxy 2>&1"
+  expected_result:
+    - "test is successful"
+    - "X-Var-Value"
+    - "127.0.0.1"
+
+resp_adv_008:
+  test_purpose: 验证match_http_status多值OR关系(单状态码+范围混合)
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    multi_condition on;
+    server {
+      listen 18101;
+      location /200 { return 200 "ok200"; }
+      location /404 { return 404 "ok404"; }
+      location /500 { return 500 "ok500"; }
+    }
+    server {
+      listen 18100;
+      location ~ ^/proxy/(.*)$ { proxy_pass http://127.0.0.1:18101/$1; }
+      response_rule multi_status_rule {
+        match_http_status 200 404 500-502;
+        response_add_http_header X-Status-Matched yes always;
+      }
+    }
+  operate_commands:
+    - "nginx -t"
+    - "nginx -s reload"
+    - "curl -s -v http://127.0.0.1:18100/proxy/200 2>&1"
+    - "curl -s -v http://127.0.0.1:18100/proxy/404 2>&1"
+    - "curl -s -v http://127.0.0.1:18100/proxy/500 2>&1"
+  expected_result:
+    - "test is successful"
+    - "X-Status-Matched"
+    - "yes"
+
+resp_adv_009:
+  test_purpose: 验证add_header与response_add_http_header/response_delete_http_header交叉配置共存
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    multi_condition on;
+    server {
+      listen 18101;
+      location / {
+        add_header X-Upstream "from_backend";
+        return 200 "upstream_ok";
+      }
+    }
+    server {
+      listen 18100;
+      location /proxy {
+        proxy_pass http://127.0.0.1:18101;
+        add_header X-Native-Add native_value;
+      }
+      response_rule cross_rule {
+        response_add_http_header X-Rule-Add rule_value;
+        response_delete_http_header X-Upstream;
+      }
+    }
+  operate_commands:
+    - "nginx -t"
+    - "nginx -s reload"
+    - "curl -s -v http://127.0.0.1:18100/proxy 2>&1"
+  expected_result:
+    - "test is successful"
+    - "X-Native-Add"
+    - "native_value"
+    - "X-Rule-Add"
+    - "rule_value"
+  unexpected_result:
+    - "from_backend"
