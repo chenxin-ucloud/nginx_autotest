@@ -1,4 +1,5 @@
-__pycache__/
+*__pycache__*
+.vscode/
 .pytest_cache/
 reports/
 backup/
@@ -8,3 +9,4 @@ server.pid
 ngx_http_custom_rule_module/
 docs/
 Nginx白盒测试自动化框架设计文档（数据与脚本分离版）.md
+docs/
