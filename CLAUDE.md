@@ -129,15 +129,16 @@ Use constants from `comms.constants` instead of hardcoded paths:
 ```python
 from comms.constants import DATA_DIR, get_test_data_path
 
-test_data_path = get_test_data_path("proxy_set_header.yaml")  # Returns absolute path
+test_data_path = get_test_data_path("test_data.yaml")  # Returns absolute path
 ```
 
-### Adding New Test Modules
+### Adding New Test Cases
 
-1. Create YAML file in `test_data/{module_name}.yaml`
-2. Create test script in `test_script/test_{module_name}.py` (copy from existing test and modify the YAML filename)
-3. Import from `comms` package, not individual modules directly
-4. Use `from comms.log_utils import logger` for all logging
+1. Append the new case (with a unique case ID) to `test_data/test_data.yaml` — all non-gRPC cases live in this single merged file, organized under section-header comments
+2. For gRPC end-to-end cases that need the `grpc_verify` field, add them to `test_data/grpc_set_header.yaml` (the corresponding script `test_script/test_grpc_set_header.py` owns the module-scoped gRPC mock server fixture)
+3. No new test script is needed for non-gRPC cases — `test_script/test_all.py` is a single parametrized function (`test_case`) that reads the merged YAML and handles both `expect_syntax_fail` and `unexpected_result` fields
+4. Import from `comms` package, not individual modules directly
+5. Use `from comms.log_utils import logger` for all logging
 
 ### Nginx Config Injection
 

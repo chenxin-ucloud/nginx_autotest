@@ -1,0 +1,2333 @@
+
+# ============================================================
+# 回归用例 - add_header
+# ============================================================
+
+add_header_001:
+  test_purpose: 验证基础功能-添加自定义响应头
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+  config_content: |
+    server {
+      listen 18090;
+      server_name localhost;
+      location /test_add_response_header {
+        add_header X-Custom-Response "custom_value";
+        return 200 "OK";
+      }
+    }
+  operate_commands:
+    - "nginx -t"
+    - "nginx -s reload"
+    - "curl -v http://localhost:18090/test_add_response_header"
+  expected_result:
+    - "configuration file"
+    - "test is successful"
+    - "X-Custom-Response: custom_value"
+
+
+# ============================================================
+# 回归用例 - location
+# ============================================================
+
+location_001:
+  test_purpose: 验证基础功能-精确匹配location
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+  config_content: |
+    server {
+      listen 18090;
+      server_name localhost;
+      location = /exact {
+        return 200 "Exact Location";
+      }
+    }
+  operate_commands:
+    - "nginx -t"
+    - "nginx -s reload"
+    - "curl http://localhost:18090/exact"
+  expected_result:
+    - "configuration file"
+    - "test is successful"
+    - "Exact Location"
+
+location_002:
+  test_purpose: 验证基础功能-前缀匹配location
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+  config_content: |
+    server {
+      listen 18090;
+      server_name localhost;
+      location /prefix {
+        return 200 "Prefix Match";
+      }
+    }
+  operate_commands:
+    - "nginx -t"
+    - "nginx -s reload"
+    - "curl http://localhost:18090/prefix/path"
+  expected_result:
+    - "configuration file"
+    - "test is successful"
+    - "Prefix Match"
+
+location_003:
+  test_purpose: 验证基础功能-正则匹配location
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+  config_content: |
+    server {
+      listen 18090;
+      server_name localhost;
+      location ~ \.(gif|jpg|png)$ {
+        return 200 "Image Regex Match";
+      }
+    }
+  operate_commands:
+    - "nginx -t"
+    - "nginx -s reload"
+    - "curl http://localhost:18090/test.png"
+  expected_result:
+    - "configuration file"
+    - "test is successful"
+    - "Image Regex Match"
+
+location_004:
+  test_purpose: 验证基础功能-不区分大小写正则匹配
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+  config_content: |
+    server {
+      listen 18090;
+      server_name localhost;
+      location ~* \.(jpg|jpeg|png|gif)$ {
+        return 200 "Case Insensitive Regex";
+      }
+    }
+  operate_commands:
+    - "nginx -t"
+    - "nginx -s reload"
+    - "curl http://localhost:18090/test.JPG"
+  expected_result:
+    - "configuration file"
+    - "test is successful"
+    - "Case Insensitive Regex"
+
+location_005:
+  test_purpose: 验证基础功能-优先匹配location ^~
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+  config_content: |
+    server {
+      listen 18090;
+      server_name localhost;
+      location ^~ /static {
+        return 200 "Prefix Priority Match";
+      }
+    }
+  operate_commands:
+    - "nginx -t"
+    - "nginx -s reload"
+    - "curl http://localhost:18090/static/file.txt"
+  expected_result:
+    - "configuration file"
+    - "test is successful"
+    - "Prefix Priority Match"
+
+location_006:
+  test_purpose: 验证匹配优先级-精确匹配(=)优先于正则和前缀匹配
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+  config_content: |
+    server {
+      listen 18090;
+      server_name localhost;
+      location / {
+        return 200 "General Prefix Hit";
+      }
+      location ~* ^/api {
+        return 200 "Regex Hit";
+      }
+      location = /api/exact {
+        return 200 "Exact Hit";
+      }
+    }
+  operate_commands:
+    - "nginx -t"
+    - "nginx -s reload"
+    - "curl http://localhost:18090/api/exact"
+  expected_result:
+    - "test is successful"
+    - "Exact Hit"
+  unexpected_result:
+    - "Regex Hit"
+    - "General Prefix Hit"
+
+location_007:
+  test_purpose: 验证匹配优先级-^~前缀匹配优先于正则匹配
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+  config_content: |
+    server {
+      listen 18090;
+      server_name localhost;
+      location / {
+        return 200 "General Prefix Hit";
+      }
+      location ~* \.html$ {
+        return 200 "Regex Hit";
+      }
+      location ^~ /static/ {
+        return 200 "Priority Prefix Hit";
+      }
+    }
+  operate_commands:
+    - "nginx -t"
+    - "nginx -s reload"
+    - "curl http://localhost:18090/static/page.html"
+  expected_result:
+    - "test is successful"
+    - "Priority Prefix Hit"
+  unexpected_result:
+    - "Regex Hit"
+    - "General Prefix Hit"
+
+location_008:
+  test_purpose: 验证匹配优先级-正则匹配优先于普通前缀匹配
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+  config_content: |
+    server {
+      listen 18090;
+      server_name localhost;
+      location / {
+        return 200 "General Prefix Hit";
+      }
+      location /images/ {
+        return 200 "Prefix Hit";
+      }
+      location ~* \.(png|jpg|gif)$ {
+        return 200 "Regex Hit";
+      }
+    }
+  operate_commands:
+    - "nginx -t"
+    - "nginx -s reload"
+    - "curl http://localhost:18090/images/logo.png"
+  expected_result:
+    - "test is successful"
+    - "Regex Hit"
+  unexpected_result:
+    - "Prefix Hit"
+    - "General Prefix Hit"
+
+location_009:
+  test_purpose: 验证匹配优先级-普通前缀匹配优先于通用/匹配
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+  config_content: |
+    server {
+      listen 18090;
+      server_name localhost;
+      location / {
+        return 200 "General Prefix Hit";
+      }
+      location /api/ {
+        return 200 "Prefix Hit";
+      }
+    }
+  operate_commands:
+    - "nginx -t"
+    - "nginx -s reload"
+    - "curl http://localhost:18090/api/users"
+  expected_result:
+    - "test is successful"
+    - "Prefix Hit"
+  unexpected_result:
+    - "General Prefix Hit"
+
+location_010:
+  test_purpose: 验证匹配优先级-全部共存时完整优先级链(= > ^~ > 正则 > 普通前缀 > /)
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+  config_content: |
+    server {
+      listen 18090;
+      server_name localhost;
+      location / {
+        return 200 "General Prefix Hit";
+      }
+      location /app {
+        return 200 "Prefix Hit";
+      }
+      location ~* ^/app {
+        return 200 "Regex Hit";
+      }
+      location ^~ /app/static {
+        return 200 "Priority Prefix Hit";
+      }
+      location = /app/static/main.js {
+        return 200 "Exact Hit";
+      }
+    }
+  operate_commands:
+    - "nginx -t"
+    - "nginx -s reload"
+    - "curl http://localhost:18090/app/static/main.js"
+    - "curl http://localhost:18090/app/static/other.js"
+    - "curl http://localhost:18090/app/page"
+    - "curl http://localhost:18090/other"
+  expected_result:
+    - "test is successful"
+    - "Exact Hit"
+    - "Priority Prefix Hit"
+    - "Regex Hit"
+    - "General Prefix Hit"
+
+
+# ============================================================
+# 回归用例 - server_name
+# ============================================================
+
+server_name_001:
+  test_purpose: 验证基础功能-精确匹配server_name
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - hosts配置正确
+  config_content: |
+    server {
+      listen 80;
+      listen [::]:80;
+      server_name exact.example.com;
+      location / {
+        return 200 "Exact Match";
+      }
+    }
+  operate_commands:
+    - "nginx -t"
+    - "nginx -s reload"
+    - "curl -H \"Host: exact.example.com\" http://localhost/"
+  expected_result:
+    - "configuration file"
+    - "test is successful"
+    - "Exact Match"
+
+server_name_002:
+  test_purpose: 验证基础功能-通配符匹配server_name
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+  config_content: |
+    server {
+      listen 80;
+      listen [::]:80;
+      server_name *.example.com;
+      location / {
+        return 200 "Wildcard Match";
+      }
+    }
+  operate_commands:
+    - "nginx -t"
+    - "nginx -s reload"
+    - "curl -H \"Host: sub.example.com\" http://localhost/"
+  expected_result:
+    - "configuration file"
+    - "test is successful"
+    - "Wildcard Match"
+
+server_name_003:
+  test_purpose: 验证基础功能-正则匹配server_name
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+  config_content: |
+    server {
+      listen 80;
+      listen [::]:80;
+      server_name ~^www\d+\.example\.com$;
+      location / {
+        return 200 "Regex Match";
+      }
+    }
+  operate_commands:
+    - "nginx -t"
+    - "nginx -s reload"
+    - "curl -H \"Host: www123.example.com\" http://localhost/"
+  expected_result:
+    - "configuration file"
+    - "test is successful"
+    - "Regex Match"
+
+server_name_004:
+  test_purpose: 验证匹配优先级-精确匹配优先于通配符和正则
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+  config_content: |
+    server {
+      listen 80;
+      listen [::]:80;
+      server_name ~^.+\.example\.com$;
+      location / {
+        return 200 "Regex Hit";
+      }
+    }
+    server {
+      listen 80;
+      listen [::]:80;
+      server_name *.example.com;
+      location / {
+        return 200 "Wildcard Hit";
+      }
+    }
+    server {
+      listen 80;
+      listen [::]:80;
+      server_name priority.example.com;
+      location / {
+        return 200 "Exact Hit";
+      }
+    }
+  operate_commands:
+    - "nginx -t"
+    - "nginx -s reload"
+    - "curl -H \"Host: priority.example.com\" http://localhost/"
+  expected_result:
+    - "test is successful"
+    - "Exact Hit"
+  unexpected_result:
+    - "Wildcard Hit"
+    - "Regex Hit"
+
+server_name_005:
+  test_purpose: 验证匹配优先级-前缀通配符(*.x)优先于正则匹配
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+  config_content: |
+    server {
+      listen 80;
+      listen [::]:80;
+      server_name ~^.+\.example\.com$;
+      location / {
+        return 200 "Regex Hit";
+      }
+    }
+    server {
+      listen 80;
+      listen [::]:80;
+      server_name *.example.com;
+      location / {
+        return 200 "Wildcard Hit";
+      }
+    }
+  operate_commands:
+    - "nginx -t"
+    - "nginx -s reload"
+    - "curl -H \"Host: any.example.com\" http://localhost/"
+  expected_result:
+    - "test is successful"
+    - "Wildcard Hit"
+  unexpected_result:
+    - "Regex Hit"
+
+server_name_006:
+  test_purpose: 验证匹配优先级-前缀通配符(*.x)优先于后缀通配符(x.*)
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+  config_content: |
+    server {
+      listen 80;
+      listen [::]:80;
+      server_name www.example.*;
+      location / {
+        return 200 "Suffix Wildcard Hit";
+      }
+    }
+    server {
+      listen 80;
+      listen [::]:80;
+      server_name *.example.com;
+      location / {
+        return 200 "Prefix Wildcard Hit";
+      }
+    }
+  operate_commands:
+    - "nginx -t"
+    - "nginx -s reload"
+    - "curl -H \"Host: www.example.com\" http://localhost/"
+  expected_result:
+    - "test is successful"
+    - "Prefix Wildcard Hit"
+  unexpected_result:
+    - "Suffix Wildcard Hit"
+
+server_name_007:
+  test_purpose: 验证匹配优先级-正则按配置顺序匹配第一个
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+  config_content: |
+    server {
+      listen 80;
+      listen [::]:80;
+      server_name ~^www\d+\.example\.com$;
+      location / {
+        return 200 "First Regex Hit";
+      }
+    }
+    server {
+      listen 80;
+      listen [::]:80;
+      server_name ~^www.+\.example\.com$;
+      location / {
+        return 200 "Second Regex Hit";
+      }
+    }
+  operate_commands:
+    - "nginx -t"
+    - "nginx -s reload"
+    - "curl -H \"Host: www123.example.com\" http://localhost/"
+  expected_result:
+    - "test is successful"
+    - "First Regex Hit"
+  unexpected_result:
+    - "Second Regex Hit"
+
+server_name_008:
+  test_purpose: 验证匹配优先级-未匹配任何server_name时由default_server处理
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+  config_content: |
+    server {
+      listen 80;
+      listen [::]:80;
+      server_name specific.example.com;
+      location / {
+        return 200 "Specific Hit";
+      }
+    }
+    server {
+      listen 80 default_server;
+      listen [::]:80 default_server;
+      server_name _;
+      location / {
+        return 200 "Default Server Hit";
+      }
+    }
+  operate_commands:
+    - "nginx -t"
+    - "nginx -s reload"
+    - "curl -H \"Host: nomatch.other.com\" http://localhost/"
+  expected_result:
+    - "test is successful"
+    - "Default Server Hit"
+  unexpected_result:
+    - "Specific Hit"
+
+
+# ============================================================
+# 回归用例 - proxy_set_header
+# ============================================================
+
+proxy_set_header_001:
+  test_purpose: 验证基础功能-添加自定义请求头
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    location /test_add_header {
+      proxy_pass http://127.0.0.1:19999;
+      proxy_set_header X-Test-Header "test123";
+    }
+  operate_commands:
+    - "nginx -t"
+    - "nginx -s reload"
+    - "curl -v http://localhost/test_add_header"
+  expected_result:
+    - "configuration file"
+    - "test is successful"
+
+proxy_set_header_002:
+  test_purpose: 验证基础功能-修改Host请求头
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    location /test_modify_host {
+      proxy_pass http://127.0.0.1:19999;
+      proxy_set_header Host "modified.host.com";
+    }
+  operate_commands:
+    - "nginx -t"
+    - "nginx -s reload"
+    - "curl -v -H \"Host: original.host.com\" http://localhost/test_modify_host"
+  expected_result:
+    - "configuration file"
+    - "test is successful"
+
+
+# ============================================================
+# 回归用例 - proxy_pass_header
+# ============================================================
+
+proxy_pass_header_001:
+  test_purpose: 验证基础功能-传递自定义响应头
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - 后端服务可访问
+  config_content: |
+    location /test_pass_header {
+      proxy_pass http://127.0.0.1:19999;
+      proxy_pass_header X-Custom-Response;
+    }
+  operate_commands:
+    - "nginx -t"
+    - "nginx -s reload"
+    - "curl -v http://localhost/test_pass_header"
+  expected_result:
+    - "configuration file"
+    - "test is successful"
+
+
+# ============================================================
+# 回归用例 - proxy_hide_header
+# ============================================================
+
+proxy_hide_header_001:
+  test_purpose: 验证基础功能-隐藏单个自定义响应头
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    server {
+      listen 18081;
+      server_name localhost;
+      location / {
+        add_header X-Secret-Info "sensitive_data";
+        add_header X-Public-Info "public_data";
+        return 200 "upstream ok";
+      }
+    }
+    server {
+      listen 18080;
+      server_name localhost;
+      location /test_hide_single {
+        proxy_pass http://127.0.0.1:18081/;
+        proxy_hide_header X-Secret-Info;
+      }
+    }
+  operate_commands:
+    - "nginx -t"
+    - "nginx -s reload"
+    - "curl -v http://localhost:18080/test_hide_single"
+  expected_result:
+    - "test is successful"
+    - "upstream ok"
+    - "X-Public-Info: public_data"
+  unexpected_result:
+    - "X-Secret-Info"
+
+
+# ============================================================
+# 自定义规则模块 - multi_condition 开关
+# ============================================================
+
+multi_condition_001:
+  test_purpose: 验证multi_condition关闭时原生location匹配正常工作
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    server {
+      listen 18100;
+      location = /exact {
+        return 200 "exact_match";
+      }
+      location / {
+        return 200 "default_match";
+      }
+    }
+  operate_commands:
+    - "nginx -t"
+    - "nginx -s reload"
+    - "curl -s http://127.0.0.1:18100/exact"
+  expected_result:
+    - "test is successful"
+    - "exact_match"
+  unexpected_result:
+    - "default_match"
+
+multi_condition_002:
+  test_purpose: 验证multi_condition开启后自定义规则匹配生效
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    multi_condition on;
+    server {
+      listen 18100;
+      location /rule_host {
+        match_http_host www.test.com;
+        return 200 "host_rule_matched";
+      }
+      location /catch_all {
+        return 200 "no_match";
+      }
+    }
+  operate_commands:
+    - "nginx -t"
+    - "nginx -s reload"
+    - "curl -s -H \"Host: www.test.com\" http://127.0.0.1:18100/anything"
+    - "curl -s -H \"Host: other.com\" http://127.0.0.1:18100/anything"
+  expected_result:
+    - "test is successful"
+    - "host_rule_matched"
+    - "no_match"
+
+
+# ============================================================
+# 自定义规则模块 - match_http_host
+# ============================================================
+
+match_host_001:
+  test_purpose: 验证match_http_host精确匹配
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    multi_condition on;
+    server {
+      listen 18100;
+      location /rule_exact {
+        match_http_host www.test.com;
+        return 200 "exact_host_matched";
+      }
+      location /catch_all {
+        return 200 "no_match";
+      }
+    }
+  operate_commands:
+    - "nginx -t"
+    - "nginx -s reload"
+    - "curl -s -H \"Host: www.test.com\" http://127.0.0.1:18100/"
+  expected_result:
+    - "test is successful"
+    - "exact_host_matched"
+
+match_host_002:
+  test_purpose: 验证match_http_host前缀通配符匹配(*.example.com)
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    multi_condition on;
+    server {
+      listen 18100;
+      location /rule_wildcard {
+        match_http_host *.example.com;
+        return 200 "wildcard_prefix_matched";
+      }
+      location /catch_all {
+        return 200 "no_match";
+      }
+    }
+  operate_commands:
+    - "nginx -t"
+    - "nginx -s reload"
+    - "curl -s -H \"Host: sub.example.com\" http://127.0.0.1:18100/"
+  expected_result:
+    - "test is successful"
+    - "wildcard_prefix_matched"
+
+match_host_003:
+  test_purpose: 验证match_http_host后缀通配符匹配(www.example.*)
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    multi_condition on;
+    server {
+      listen 18100;
+      location /rule_suffix {
+        match_http_host www.example.*;
+        return 200 "wildcard_suffix_matched";
+      }
+      location /catch_all {
+        return 200 "no_match";
+      }
+    }
+  operate_commands:
+    - "nginx -t"
+    - "nginx -s reload"
+    - "curl -s -H \"Host: www.example.org\" http://127.0.0.1:18100/"
+  expected_result:
+    - "test is successful"
+    - "wildcard_suffix_matched"
+
+match_host_004:
+  test_purpose: 验证match_http_host正则匹配
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    multi_condition on;
+    server {
+      listen 18100;
+      location /rule_regex {
+        match_http_host ~^www\d+\.test\.com$;
+        return 200 "regex_host_matched";
+      }
+      location /catch_all {
+        return 200 "no_match";
+      }
+    }
+  operate_commands:
+    - "nginx -t"
+    - "nginx -s reload"
+    - "curl -s -H \"Host: www123.test.com\" http://127.0.0.1:18100/"
+  expected_result:
+    - "test is successful"
+    - "regex_host_matched"
+
+match_host_005:
+  test_purpose: 验证match_http_host多值OR关系(任一匹配即成功)
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    multi_condition on;
+    server {
+      listen 18100;
+      location /rule_multi {
+        match_http_host www.first.com www.second.com;
+        return 200 "multi_host_matched";
+      }
+      location /catch_all {
+        return 200 "no_match";
+      }
+    }
+  operate_commands:
+    - "nginx -t"
+    - "nginx -s reload"
+    - "curl -s -H \"Host: www.first.com\" http://127.0.0.1:18100/"
+    - "curl -s -H \"Host: www.second.com\" http://127.0.0.1:18100/"
+    - "curl -s -H \"Host: www.third.com\" http://127.0.0.1:18100/"
+  expected_result:
+    - "test is successful"
+    - "multi_host_matched"
+    - "no_match"
+
+
+# ============================================================
+# 自定义规则模块 - match_http_path
+# ============================================================
+
+match_path_001:
+  test_purpose: 验证match_http_path精确匹配(=)
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    multi_condition on;
+    server {
+      listen 18100;
+      location /rule_exact {
+        match_http_path =/exact/path;
+        return 200 "exact_path_matched";
+      }
+      location /catch_all {
+        return 200 "no_match";
+      }
+    }
+  operate_commands:
+    - "nginx -t"
+    - "nginx -s reload"
+    - "curl -s http://127.0.0.1:18100/exact/path"
+  expected_result:
+    - "test is successful"
+    - "exact_path_matched"
+
+match_path_002:
+  test_purpose: 验证match_http_path前缀匹配
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    multi_condition on;
+    server {
+      listen 18100;
+      location /rule_prefix {
+        match_http_path /prefix/;
+        return 200 "prefix_path_matched";
+      }
+      location /catch_all {
+        return 200 "no_match";
+      }
+    }
+  operate_commands:
+    - "nginx -t"
+    - "nginx -s reload"
+    - "curl -s http://127.0.0.1:18100/prefix/subpath"
+  expected_result:
+    - "test is successful"
+    - "prefix_path_matched"
+
+match_path_003:
+  test_purpose: 验证match_http_path优先前缀匹配(^~)
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    multi_condition on;
+    server {
+      listen 18100;
+      location /rule_priority {
+        match_http_path ^~/static/;
+        return 200 "priority_prefix_matched";
+      }
+      location /catch_all {
+        return 200 "no_match";
+      }
+    }
+  operate_commands:
+    - "nginx -t"
+    - "nginx -s reload"
+    - "curl -s http://127.0.0.1:18100/static/file.js"
+  expected_result:
+    - "test is successful"
+    - "priority_prefix_matched"
+
+match_path_004:
+  test_purpose: 验证match_http_path正则匹配(~)
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    multi_condition on;
+    server {
+      listen 18100;
+      location /rule_regex {
+        match_http_path ~\.html$;
+        return 200 "regex_path_matched";
+      }
+      location /catch_all {
+        return 200 "no_match";
+      }
+    }
+  operate_commands:
+    - "nginx -t"
+    - "nginx -s reload"
+    - "curl -s http://127.0.0.1:18100/page.html"
+  expected_result:
+    - "test is successful"
+    - "regex_path_matched"
+
+match_path_005:
+  test_purpose: 验证match_http_path大小写不敏感正则匹配(~*)
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    multi_condition on;
+    server {
+      listen 18100;
+      location /rule_iregex {
+        match_http_path ~*\.jpg$;
+        return 200 "iregex_path_matched";
+      }
+      location /catch_all {
+        return 200 "no_match";
+      }
+    }
+  operate_commands:
+    - "nginx -t"
+    - "nginx -s reload"
+    - "curl -s http://127.0.0.1:18100/image.JPG"
+  expected_result:
+    - "test is successful"
+    - "iregex_path_matched"
+
+match_path_006:
+  test_purpose: 验证match_http_path多值OR关系
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    multi_condition on;
+    server {
+      listen 18100;
+      location /rule_multi {
+        match_http_path /path_a /path_b;
+        return 200 "multi_path_matched";
+      }
+      location /catch_all {
+        return 200 "no_match";
+      }
+    }
+  operate_commands:
+    - "nginx -t"
+    - "nginx -s reload"
+    - "curl -s http://127.0.0.1:18100/path_a"
+    - "curl -s http://127.0.0.1:18100/path_b"
+    - "curl -s http://127.0.0.1:18100/path_c"
+  expected_result:
+    - "test is successful"
+    - "multi_path_matched"
+    - "no_match"
+
+
+# ============================================================
+# 自定义规则模块 - match_http_header
+# ============================================================
+
+match_header_001:
+  test_purpose: 验证match_http_header精确键值匹配
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    multi_condition on;
+    server {
+      listen 18100;
+      location /rule_exact {
+        match_http_header X-Test-Key test_value;
+        return 200 "header_exact_matched";
+      }
+      location /catch_all {
+        return 200 "no_match";
+      }
+    }
+  operate_commands:
+    - "nginx -t"
+    - "nginx -s reload"
+    - "curl -s -H \"X-Test-Key: test_value\" http://127.0.0.1:18100/"
+    - "curl -s -H \"X-Test-Key: wrong_value\" http://127.0.0.1:18100/"
+  expected_result:
+    - "test is successful"
+    - "header_exact_matched"
+    - "no_match"
+
+match_header_002:
+  test_purpose: 验证match_http_header正则值匹配
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    multi_condition on;
+    server {
+      listen 18100;
+      location /rule_regex {
+        match_http_header X-Test-Key ~^val_[0-9]+$;
+        return 200 "header_regex_matched";
+      }
+      location /catch_all {
+        return 200 "no_match";
+      }
+    }
+  operate_commands:
+    - "nginx -t"
+    - "nginx -s reload"
+    - "curl -s -H \"X-Test-Key: val_123\" http://127.0.0.1:18100/"
+    - "curl -s -H \"X-Test-Key: val_abc\" http://127.0.0.1:18100/"
+  expected_result:
+    - "test is successful"
+    - "header_regex_matched"
+    - "no_match"
+
+match_header_003:
+  test_purpose: 验证match_http_header单条多KV为OR关系且多条之间为AND关系
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    multi_condition on;
+    server {
+      listen 18100;
+      location /rule_and_or {
+        match_http_header X-Group-A val_a1 X-Group-A2 val_a2;
+        match_http_header X-Group-B val_b1;
+        return 200 "header_and_or_matched";
+      }
+      location /catch_all {
+        return 200 "no_match";
+      }
+    }
+  operate_commands:
+    - "nginx -t"
+    - "nginx -s reload"
+    - "curl -s -H \"X-Group-A: val_a1\" -H \"X-Group-B: val_b1\" http://127.0.0.1:18100/"
+    - "curl -s -H \"X-Group-A: val_a1\" http://127.0.0.1:18100/"
+  expected_result:
+    - "test is successful"
+    - "header_and_or_matched"
+    - "no_match"
+
+match_header_004:
+  test_purpose: 验证match_http_header仅配置key不配置value时语法检查拒绝
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    multi_condition on;
+    server {
+      listen 18100;
+      location /rule_key_only {
+        match_http_header X-Exists;
+        return 200 "header_key_only_matched";
+      }
+      location /catch_all {
+        return 200 "no_match";
+      }
+    }
+  operate_commands:
+    - "nginx -t"
+  expect_syntax_fail: true
+  expected_result:
+    - "invalid number of arguments"
+    - "test failed"
+
+
+# ============================================================
+# 自定义规则模块 - match_cookie
+# ============================================================
+
+match_cookie_001:
+  test_purpose: 验证match_cookie精确键值匹配
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    multi_condition on;
+    server {
+      listen 18100;
+      location /rule_exact {
+        match_cookie token abc123;
+        return 200 "cookie_exact_matched";
+      }
+      location /catch_all {
+        return 200 "no_match";
+      }
+    }
+  operate_commands:
+    - "nginx -t"
+    - "nginx -s reload"
+    - "curl -s -b \"token=abc123\" http://127.0.0.1:18100/"
+    - "curl -s -b \"token=wrong\" http://127.0.0.1:18100/"
+  expected_result:
+    - "test is successful"
+    - "cookie_exact_matched"
+    - "no_match"
+
+match_cookie_002:
+  test_purpose: 验证match_cookie正则值匹配
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    multi_condition on;
+    server {
+      listen 18100;
+      location /rule_regex {
+        match_cookie session ~^sess_[a-z0-9]+$;
+        return 200 "cookie_regex_matched";
+      }
+      location /catch_all {
+        return 200 "no_match";
+      }
+    }
+  operate_commands:
+    - "nginx -t"
+    - "nginx -s reload"
+    - "curl -s -b \"session=sess_abc123\" http://127.0.0.1:18100/"
+    - "curl -s -b \"session=invalid\" http://127.0.0.1:18100/"
+  expected_result:
+    - "test is successful"
+    - "cookie_regex_matched"
+    - "no_match"
+
+match_cookie_003:
+  test_purpose: 验证match_cookie单条多KV为OR关系且多条之间为AND关系
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    multi_condition on;
+    server {
+      listen 18100;
+      location /rule_and_or {
+        match_cookie user_a val_a user_b val_b;
+        match_cookie role admin;
+        return 200 "cookie_and_or_matched";
+      }
+      location /catch_all {
+        return 200 "no_match";
+      }
+    }
+  operate_commands:
+    - "nginx -t"
+    - "nginx -s reload"
+    - "curl -s -b \"user_a=val_a; role=admin\" http://127.0.0.1:18100/"
+    - "curl -s -b \"user_a=val_a\" http://127.0.0.1:18100/"
+  expected_result:
+    - "test is successful"
+    - "cookie_and_or_matched"
+    - "no_match"
+
+match_cookie_004:
+  test_purpose: 验证match_cookie仅配置key不配置value时语法检查拒绝
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    multi_condition on;
+    server {
+      listen 18100;
+      location /rule_key_only {
+        match_cookie flag;
+        return 200 "cookie_key_only_matched";
+      }
+      location /catch_all {
+        return 200 "no_match";
+      }
+    }
+  operate_commands:
+    - "nginx -t"
+  expect_syntax_fail: true
+  expected_result:
+    - "invalid number of arguments"
+    - "test failed"
+
+
+# ============================================================
+# 自定义规则模块 - match_request_method
+# ============================================================
+
+match_method_001:
+  test_purpose: 验证match_request_method单方法匹配(GET)
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    multi_condition on;
+    server {
+      listen 18100;
+      location /rule_get {
+        match_request_method GET;
+        return 200 "get_method_matched";
+      }
+      location /catch_all {
+        return 200 "no_match";
+      }
+    }
+  operate_commands:
+    - "nginx -t"
+    - "nginx -s reload"
+    - "curl -s http://127.0.0.1:18100/"
+  expected_result:
+    - "test is successful"
+    - "get_method_matched"
+
+match_method_002:
+  test_purpose: 验证match_request_method多方法OR关系(GET POST)
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    multi_condition on;
+    server {
+      listen 18100;
+      location /rule_multi {
+        match_request_method GET POST;
+        return 200 "multi_method_matched";
+      }
+      location /catch_all {
+        return 200 "no_match";
+      }
+    }
+  operate_commands:
+    - "nginx -t"
+    - "nginx -s reload"
+    - "curl -s -X POST http://127.0.0.1:18100/"
+  expected_result:
+    - "test is successful"
+    - "multi_method_matched"
+
+match_method_003:
+  test_purpose: 验证match_request_method不匹配时回退到兜底规则
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    multi_condition on;
+    server {
+      listen 18100;
+      location /rule_get_only {
+        match_request_method GET;
+        return 200 "get_only_matched";
+      }
+      location /catch_all {
+        return 200 "no_match";
+      }
+    }
+  operate_commands:
+    - "nginx -t"
+    - "nginx -s reload"
+    - "curl -s -X DELETE http://127.0.0.1:18100/"
+  expected_result:
+    - "test is successful"
+    - "no_match"
+  unexpected_result:
+    - "get_only_matched"
+
+
+# ============================================================
+# 自定义规则模块 - match_source_ip
+# ============================================================
+
+match_ip_001:
+  test_purpose: 验证match_source_ip精确IP匹配(127.0.0.1)
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    multi_condition on;
+    server {
+      listen 18100;
+      location /rule_exact_ip {
+        match_source_ip 127.0.0.1;
+        return 200 "exact_ip_matched";
+      }
+      location /catch_all {
+        return 200 "no_match";
+      }
+    }
+  operate_commands:
+    - "nginx -t"
+    - "nginx -s reload"
+    - "curl -s http://127.0.0.1:18100/"
+  expected_result:
+    - "test is successful"
+    - "exact_ip_matched"
+
+match_ip_002:
+  test_purpose: 验证match_source_ip CIDR网段匹配(127.0.0.0/8)
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    multi_condition on;
+    server {
+      listen 18100;
+      location /rule_cidr {
+        match_source_ip 127.0.0.0/8;
+        return 200 "cidr_ip_matched";
+      }
+      location /catch_all {
+        return 200 "no_match";
+      }
+    }
+  operate_commands:
+    - "nginx -t"
+    - "nginx -s reload"
+    - "curl -s http://127.0.0.1:18100/"
+  expected_result:
+    - "test is successful"
+    - "cidr_ip_matched"
+
+match_ip_003:
+  test_purpose: 验证match_source_ip不匹配时回退到兜底规则
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    multi_condition on;
+    server {
+      listen 18100;
+      location /rule_other_ip {
+        match_source_ip 1.1.1.1 2.2.2.2;
+        return 200 "other_ip_matched";
+      }
+      location /catch_all {
+        return 200 "no_match";
+      }
+    }
+  operate_commands:
+    - "nginx -t"
+    - "nginx -s reload"
+    - "curl -s http://127.0.0.1:18100/"
+  expected_result:
+    - "test is successful"
+    - "no_match"
+  unexpected_result:
+    - "other_ip_matched"
+
+
+# ============================================================
+# 自定义规则模块 - match_query_string
+# ============================================================
+
+match_qs_001:
+  test_purpose: 验证match_query_string精确键值匹配
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    multi_condition on;
+    server {
+      listen 18100;
+      location /rule_exact {
+        match_query_string key test_value;
+        return 200 "qs_exact_matched";
+      }
+      location /catch_all {
+        return 200 "no_match";
+      }
+    }
+  operate_commands:
+    - "nginx -t"
+    - "nginx -s reload"
+    - "curl -s \"http://127.0.0.1:18100/?key=test_value\""
+    - "curl -s \"http://127.0.0.1:18100/?key=wrong\""
+  expected_result:
+    - "test is successful"
+    - "qs_exact_matched"
+    - "no_match"
+
+match_qs_002:
+  test_purpose: 验证match_query_string正则值匹配
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    multi_condition on;
+    server {
+      listen 18100;
+      location /rule_regex {
+        match_query_string id ~^[0-9]+$;
+        return 200 "qs_regex_matched";
+      }
+      location /catch_all {
+        return 200 "no_match";
+      }
+    }
+  operate_commands:
+    - "nginx -t"
+    - "nginx -s reload"
+    - "curl -s \"http://127.0.0.1:18100/?id=12345\""
+    - "curl -s \"http://127.0.0.1:18100/?id=abc\""
+  expected_result:
+    - "test is successful"
+    - "qs_regex_matched"
+    - "no_match"
+
+match_qs_003:
+  test_purpose: 验证match_query_string单条多KV为OR关系且多条之间为AND关系
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    multi_condition on;
+    server {
+      listen 18100;
+      location /rule_and_or {
+        match_query_string page 1 page 2;
+        match_query_string lang en;
+        return 200 "qs_and_or_matched";
+      }
+      location /catch_all {
+        return 200 "no_match";
+      }
+    }
+  operate_commands:
+    - "nginx -t"
+    - "nginx -s reload"
+    - "curl -s \"http://127.0.0.1:18100/?page=1&lang=en\""
+    - "curl -s \"http://127.0.0.1:18100/?page=1\""
+  expected_result:
+    - "test is successful"
+    - "qs_and_or_matched"
+    - "no_match"
+
+match_qs_004:
+  test_purpose: 验证match_query_string仅配置key不配置value时语法检查拒绝
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    multi_condition on;
+    server {
+      listen 18100;
+      location /rule_key_only {
+        match_query_string debug;
+        return 200 "qs_key_only_matched";
+      }
+      location /catch_all {
+        return 200 "no_match";
+      }
+    }
+  operate_commands:
+    - "nginx -t"
+  expect_syntax_fail: true
+  expected_result:
+    - "invalid number of arguments"
+    - "test failed"
+
+
+# ============================================================
+# 自定义规则模块 - 请求方向组合条件与变量
+# ============================================================
+
+combined_001:
+  test_purpose: 验证所有请求条件同时配置的AND关系(全部满足时命中)
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    multi_condition on;
+    server {
+      listen 18100;
+      location /rule_all {
+        match_http_host www.test.com;
+        match_http_path /api/test;
+        match_http_header X-Auth token123;
+        match_cookie session sess_abc;
+        match_request_method GET;
+        match_query_string version v1;
+        return 200 "all_conditions_matched";
+      }
+      location /catch_all {
+        return 200 "no_match";
+      }
+    }
+  operate_commands:
+    - "nginx -t"
+    - "nginx -s reload"
+    - "curl -s -H \"Host: www.test.com\" -H \"X-Auth: token123\" -b \"session=sess_abc\" \"http://127.0.0.1:18100/api/test?version=v1\""
+  expected_result:
+    - "test is successful"
+    - "all_conditions_matched"
+
+combined_002:
+  test_purpose: 验证部分条件不匹配时规则不命中(AND关系验证)
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    multi_condition on;
+    server {
+      listen 18100;
+      location /rule_all {
+        match_http_host www.test.com;
+        match_http_path /api/test;
+        match_http_header X-Auth token123;
+        return 200 "all_conditions_matched";
+      }
+      location /catch_all {
+        return 200 "no_match";
+      }
+    }
+  operate_commands:
+    - "nginx -t"
+    - "nginx -s reload"
+    - "curl -s -H \"Host: www.test.com\" -H \"X-Auth: wrong_token\" http://127.0.0.1:18100/api/test"
+  expected_result:
+    - "test is successful"
+    - "no_match"
+  unexpected_result:
+    - "all_conditions_matched"
+
+combined_003:
+  test_purpose: 验证$custom_rule_request_rule_name变量记录命中的请求规则名称
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    multi_condition on;
+    server {
+      listen 18100;
+      location /my_named_rule {
+        match_http_host www.test.com;
+        add_header X-Rule-Name $custom_rule_request_rule_name;
+        return 200 "variable_test";
+      }
+      location /catch_all {
+        return 200 "no_match";
+      }
+    }
+  operate_commands:
+    - "nginx -t"
+    - "nginx -s reload"
+    - "curl -s -v -H \"Host: www.test.com\" http://127.0.0.1:18100/ 2>&1"
+  expected_result:
+    - "test is successful"
+    - "variable_test"
+    - "X-Rule-Name"
+
+
+# ============================================================
+# 自定义规则模块 - response_rule 响应方向规则
+# ============================================================
+
+response_rule_001:
+  test_purpose: 验证response_rule基础功能-response_add_http_header添加响应头
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+    - proxy_pass功能正常(当前已知问题可能导致失败)
+  config_content: |
+    multi_condition on;
+    server {
+      listen 18101;
+      location / {
+        return 200 "upstream_ok";
+      }
+    }
+    server {
+      listen 18100;
+      location /proxy {
+        proxy_pass http://127.0.0.1:18101;
+      }
+      response_rule resp_add_header {
+        response_add_http_header X-Custom-Resp added_value;
+      }
+    }
+  operate_commands:
+    - "nginx -t"
+    - "nginx -s reload"
+    - "curl -s -v http://127.0.0.1:18100/proxy 2>&1"
+  expected_result:
+    - "test is successful"
+    - "X-Custom-Resp"
+    - "added_value"
+
+response_rule_002:
+  test_purpose: 验证多个response_rule从上到下匹配且仅匹配第一个
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+    - proxy_pass功能正常
+  config_content: |
+    multi_condition on;
+    server {
+      listen 18101;
+      location / {
+        return 200 "upstream_ok";
+      }
+    }
+    server {
+      listen 18100;
+      location /proxy {
+        proxy_pass http://127.0.0.1:18101;
+      }
+      response_rule first_rule {
+        response_add_http_header X-First-Rule matched;
+      }
+      response_rule second_rule {
+        response_add_http_header X-Second-Rule matched;
+      }
+    }
+  operate_commands:
+    - "nginx -t"
+    - "nginx -s reload"
+    - "curl -s -v http://127.0.0.1:18100/proxy 2>&1"
+  expected_result:
+    - "test is successful"
+    - "X-First-Rule"
+  unexpected_result:
+    - "X-Second-Rule"
+
+response_rule_003:
+  test_purpose: 验证空response_rule(无条件)匹配所有请求
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+    - proxy_pass功能正常
+  config_content: |
+    multi_condition on;
+    server {
+      listen 18101;
+      location / {
+        return 200 "upstream_ok";
+      }
+    }
+    server {
+      listen 18100;
+      location /proxy {
+        proxy_pass http://127.0.0.1:18101;
+      }
+      response_rule empty_rule {
+        response_add_http_header X-Empty-Rule always_added;
+      }
+    }
+  operate_commands:
+    - "nginx -t"
+    - "nginx -s reload"
+    - "curl -s -v http://127.0.0.1:18100/proxy 2>&1"
+  expected_result:
+    - "test is successful"
+    - "X-Empty-Rule"
+    - "always_added"
+
+response_rule_004:
+  test_purpose: 验证match_http_status单个状态码匹配
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+    - proxy_pass功能正常
+  config_content: |
+    multi_condition on;
+    server {
+      listen 18101;
+      location / {
+        return 200 "upstream_ok";
+      }
+    }
+    server {
+      listen 18100;
+      location /proxy {
+        proxy_pass http://127.0.0.1:18101;
+      }
+      response_rule status_match {
+        match_http_status 200;
+        response_add_http_header X-Status-Match matched_200;
+      }
+    }
+  operate_commands:
+    - "nginx -t"
+    - "nginx -s reload"
+    - "curl -s -v http://127.0.0.1:18100/proxy 2>&1"
+  expected_result:
+    - "test is successful"
+    - "X-Status-Match"
+    - "matched_200"
+
+response_rule_005:
+  test_purpose: 验证match_http_status状态码范围匹配(200-299)
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+    - proxy_pass功能正常
+  config_content: |
+    multi_condition on;
+    server {
+      listen 18101;
+      location / {
+        return 200 "upstream_ok";
+      }
+    }
+    server {
+      listen 18100;
+      location /proxy {
+        proxy_pass http://127.0.0.1:18101;
+      }
+      response_rule status_range {
+        match_http_status 200-299;
+        response_add_http_header X-Status-Range matched_range;
+      }
+    }
+  operate_commands:
+    - "nginx -t"
+    - "nginx -s reload"
+    - "curl -s -v http://127.0.0.1:18100/proxy 2>&1"
+  expected_result:
+    - "test is successful"
+    - "X-Status-Range"
+    - "matched_range"
+
+response_rule_006:
+  test_purpose: 验证response_delete_http_header删除上游响应头
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+    - proxy_pass功能正常
+  config_content: |
+    multi_condition on;
+    server {
+      listen 18101;
+      location / {
+        add_header X-To-Delete "should_be_removed";
+        add_header X-Keep "should_remain";
+        return 200 "upstream_ok";
+      }
+    }
+    server {
+      listen 18100;
+      location /proxy {
+        proxy_pass http://127.0.0.1:18101;
+      }
+      response_rule delete_header {
+        response_delete_http_header X-To-Delete;
+      }
+    }
+  operate_commands:
+    - "nginx -t"
+    - "nginx -s reload"
+    - "curl -s -v http://127.0.0.1:18100/proxy 2>&1"
+  expected_result:
+    - "test is successful"
+    - "X-Keep"
+    - "should_remain"
+  unexpected_result:
+    - "X-To-Delete"
+
+
+# ============================================================
+# 自定义规则模块 - response_rule 高级用例
+# ============================================================
+
+resp_adv_001:
+  test_purpose: 验证match_response_http_header精确匹配上游响应头
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    multi_condition on;
+    server {
+      listen 18101;
+      location / {
+        add_header X-Upstream-Header backend_value;
+        return 200 "upstream_ok";
+      }
+    }
+    server {
+      listen 18100;
+      location /proxy {
+        proxy_pass http://127.0.0.1:18101;
+      }
+      response_rule match_resp_hdr_exact {
+        match_response_http_header X-Upstream-Header backend_value;
+        response_add_http_header X-Resp-Matched yes;
+      }
+    }
+  operate_commands:
+    - "nginx -t"
+    - "nginx -s reload"
+    - "curl -s -v http://127.0.0.1:18100/proxy 2>&1"
+  expected_result:
+    - "test is successful"
+    - "X-Resp-Matched"
+    - "yes"
+
+resp_adv_002:
+  test_purpose: 验证match_response_http_header正则值匹配
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    multi_condition on;
+    server {
+      listen 18101;
+      location / {
+        add_header X-Upstream-Header val_123;
+        return 200 "upstream_ok";
+      }
+    }
+    server {
+      listen 18100;
+      location /proxy {
+        proxy_pass http://127.0.0.1:18101;
+      }
+      response_rule match_resp_hdr_regex {
+        match_response_http_header X-Upstream-Header ~^val_[0-9]+$;
+        response_add_http_header X-Resp-Matched yes;
+      }
+    }
+  operate_commands:
+    - "nginx -t"
+    - "nginx -s reload"
+    - "curl -s -v http://127.0.0.1:18100/proxy 2>&1"
+  expected_result:
+    - "test is successful"
+    - "X-Resp-Matched"
+    - "yes"
+
+resp_adv_003:
+  test_purpose: 验证$custom_rule_response_rule_name变量返回命中的响应规则名称
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    multi_condition on;
+    server {
+      listen 18101;
+      location / {
+        return 200 "upstream_ok";
+      }
+    }
+    server {
+      listen 18100;
+      location /proxy {
+        proxy_pass http://127.0.0.1:18101;
+      }
+      response_rule my_resp_rule {
+        response_add_http_header X-Rule-Name $custom_rule_response_rule_name;
+      }
+    }
+  operate_commands:
+    - "nginx -t"
+    - "nginx -s reload"
+    - "curl -s -v http://127.0.0.1:18100/proxy 2>&1"
+  expected_result:
+    - "test is successful"
+    - "X-Rule-Name"
+    - "my_resp_rule"
+
+resp_adv_004:
+  test_purpose: 验证response_rule块内配置match_http_host请求条件(请求条件与响应条件AND)
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    multi_condition on;
+    server {
+      listen 18101;
+      location / {
+        return 200 "upstream_ok";
+      }
+    }
+    server {
+      listen 18100;
+      location /proxy {
+        proxy_pass http://127.0.0.1:18101;
+      }
+      response_rule req_cond_in_resp {
+        match_http_host www.test.com;
+        response_add_http_header X-Req-In-Resp matched;
+      }
+    }
+  operate_commands:
+    - "nginx -t"
+    - "nginx -s reload"
+    - "curl -s -v -H \"Host: www.test.com\" http://127.0.0.1:18100/proxy 2>&1"
+  expected_result:
+    - "test is successful"
+    - "X-Req-In-Resp"
+    - "matched"
+  unexpected_result:
+    - "X-Req-In-Resp-Not-Added"
+
+resp_adv_005:
+  test_purpose: 验证response_add_http_header的always标志在非safe状态码(404)下添加响应头
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    multi_condition on;
+    server {
+      listen 18101;
+      location / {
+        return 404 "not_found";
+      }
+    }
+    server {
+      listen 18100;
+      location /proxy {
+        proxy_pass http://127.0.0.1:18101;
+      }
+      response_rule always_rule {
+        response_add_http_header X-Always-Header added_with_always always;
+      }
+    }
+  operate_commands:
+    - "nginx -t"
+    - "nginx -s reload"
+    - "curl -s -v http://127.0.0.1:18100/proxy 2>&1"
+  expected_result:
+    - "test is successful"
+    - "X-Always-Header"
+    - "added_with_always"
+
+resp_adv_006:
+  test_purpose: 验证safe_status机制-不带always时非safe状态码(404)不添加响应头
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    multi_condition on;
+    server {
+      listen 18101;
+      location / {
+        return 404 "not_found";
+      }
+    }
+    server {
+      listen 18100;
+      location /proxy {
+        proxy_pass http://127.0.0.1:18101;
+      }
+      response_rule no_always_rule {
+        response_add_http_header X-No-Always added_without_always;
+      }
+    }
+  operate_commands:
+    - "nginx -t"
+    - "nginx -s reload"
+    - "curl -s -v http://127.0.0.1:18100/proxy 2>&1"
+  expected_result:
+    - "test is successful"
+    - "404"
+  unexpected_result:
+    - "X-No-Always"
+
+resp_adv_007:
+  test_purpose: 验证response_add_http_header的value支持变量(complex_value)
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    multi_condition on;
+    server {
+      listen 18101;
+      location / {
+        return 200 "upstream_ok";
+      }
+    }
+    server {
+      listen 18100;
+      location /proxy {
+        proxy_pass http://127.0.0.1:18101;
+      }
+      response_rule var_value_rule {
+        response_add_http_header X-Var-Value $remote_addr;
+      }
+    }
+  operate_commands:
+    - "nginx -t"
+    - "nginx -s reload"
+    - "curl -s -v http://127.0.0.1:18100/proxy 2>&1"
+  expected_result:
+    - "test is successful"
+    - "X-Var-Value"
+    - "127.0.0.1"
+
+resp_adv_008:
+  test_purpose: 验证match_http_status多值OR关系(单状态码+范围混合)
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    multi_condition on;
+    server {
+      listen 18101;
+      location /200 { return 200 "ok200"; }
+      location /404 { return 404 "ok404"; }
+      location /500 { return 500 "ok500"; }
+    }
+    server {
+      listen 18100;
+      location ~ ^/proxy/(.*)$ { proxy_pass http://127.0.0.1:18101/$1; }
+      response_rule multi_status_rule {
+        match_http_status 200 404 500-502;
+        response_add_http_header X-Status-Matched yes always;
+      }
+    }
+  operate_commands:
+    - "nginx -t"
+    - "nginx -s reload"
+    - "curl -s -v http://127.0.0.1:18100/proxy/200 2>&1"
+    - "curl -s -v http://127.0.0.1:18100/proxy/404 2>&1"
+    - "curl -s -v http://127.0.0.1:18100/proxy/500 2>&1"
+  expected_result:
+    - "test is successful"
+    - "X-Status-Matched"
+    - "yes"
+
+resp_adv_009:
+  test_purpose: 验证add_header与response_add_http_header/response_delete_http_header交叉配置共存
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    multi_condition on;
+    server {
+      listen 18101;
+      location / {
+        add_header X-Upstream "from_backend";
+        return 200 "upstream_ok";
+      }
+    }
+    server {
+      listen 18100;
+      location /proxy {
+        proxy_pass http://127.0.0.1:18101;
+        add_header X-Native-Add native_value;
+      }
+      response_rule cross_rule {
+        response_add_http_header X-Rule-Add rule_value;
+        response_delete_http_header X-Upstream;
+      }
+    }
+  operate_commands:
+    - "nginx -t"
+    - "nginx -s reload"
+    - "curl -s -v http://127.0.0.1:18100/proxy 2>&1"
+  expected_result:
+    - "test is successful"
+    - "X-Native-Add"
+    - "native_value"
+    - "X-Rule-Add"
+    - "rule_value"
+  unexpected_result:
+    - "from_backend"
+
+
+# ============================================================
+# 自定义规则模块 - 语法校验/边界用例
+# ============================================================
+
+valid_001:
+  test_purpose: 验证match_http_host重复配置报"is duplicate"错误
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    multi_condition on;
+    server {
+      listen 18100;
+      location /a {
+        match_http_host a.com;
+        match_http_host b.com;
+        return 200 "ok";
+      }
+    }
+  operate_commands:
+    - "nginx -t"
+  expect_syntax_fail: true
+  expected_result:
+    - "is duplicate"
+    - "test failed"
+
+valid_002:
+  test_purpose: 验证match_http_status重复配置报"is duplicate"错误
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    multi_condition on;
+    server {
+      listen 18101;
+      location / { return 200 "ok"; }
+    }
+    server {
+      listen 18100;
+      location /p { proxy_pass http://127.0.0.1:18101; }
+      response_rule r {
+        match_http_status 200;
+        match_http_status 404;
+      }
+    }
+  operate_commands:
+    - "nginx -t"
+  expect_syntax_fail: true
+  expected_result:
+    - "is duplicate"
+    - "test failed"
+
+valid_003:
+  test_purpose: 验证multi_condition关闭时配置match指令报错
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    server {
+      listen 18100;
+      location /a {
+        match_http_host a.com;
+        return 200 "ok";
+      }
+    }
+  operate_commands:
+    - "nginx -t"
+  expect_syntax_fail: true
+  expected_result:
+    - "multi_condition is false"
+    - "test failed"
+
+valid_004:
+  test_purpose: 验证response_add_http_header使用内置保护头(Server)报错
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    multi_condition on;
+    server {
+      listen 18101;
+      location / { return 200 "ok"; }
+    }
+    server {
+      listen 18100;
+      location /p { proxy_pass http://127.0.0.1:18101; }
+      response_rule r {
+        response_add_http_header Server hacked;
+      }
+    }
+  operate_commands:
+    - "nginx -t"
+  expect_syntax_fail: true
+  expected_result:
+    - "builtin response header"
+    - "test failed"
+
+valid_005:
+  test_purpose: 验证match_http_status无效范围(start>end)报错
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    multi_condition on;
+    server {
+      listen 18101;
+      location / { return 200 "ok"; }
+    }
+    server {
+      listen 18100;
+      location /p { proxy_pass http://127.0.0.1:18101; }
+      response_rule r {
+        match_http_status 500-200;
+      }
+    }
+  operate_commands:
+    - "nginx -t"
+  expect_syntax_fail: true
+  expected_result:
+    - "invalid range"
+    - "test failed"
+
+
+# ============================================================
+# 自定义规则模块 - 边界交叉用例
+# ============================================================
+
+edge_001:
+  test_purpose: 验证match_source_ip IPv6地址(::1)匹配
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    multi_condition on;
+    server {
+      listen 18100;
+      listen [::]:18100;
+      location /rule_ipv6 {
+        match_source_ip ::1;
+        return 200 "ipv6_matched";
+      }
+      location /catch_all {
+        return 200 "no_match";
+      }
+    }
+  operate_commands:
+    - "nginx -t"
+    - "nginx -s reload"
+    - "curl -s http://[::1]:18100/"
+    - "curl -s http://127.0.0.1:18100/"
+  expected_result:
+    - "test is successful"
+    - "ipv6_matched"
+    - "no_match"
+
+edge_002:
+  test_purpose: 验证URL编码query值解码后匹配与多Cookie AND关系
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    multi_condition on;
+    server {
+      listen 18100;
+      location /rule_urlenc_cookie {
+        match_query_string name hello@world;
+        match_cookie c1 v1;
+        match_cookie c2 v2;
+        return 200 "urlenc_cookie_matched";
+      }
+      location /catch_all {
+        return 200 "no_match";
+      }
+    }
+  operate_commands:
+    - "nginx -t"
+    - "nginx -s reload"
+    - "curl -s -b \"c1=v1; c2=v2\" \"http://127.0.0.1:18100/rule_urlenc_cookie?name=hello%40world\""
+    - "curl -s -b \"c1=v1\" \"http://127.0.0.1:18100/rule_urlenc_cookie?name=hello%40world\""
+  expected_result:
+    - "test is successful"
+    - "urlenc_cookie_matched"
+    - "no_match"
+

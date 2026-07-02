@@ -40,22 +40,12 @@ nginx_autotest/
 │   ├── info.log             # INFO 级别日志
 │   └── error.log            # ERROR 级别日志
 ├── test_data/               # 测试数据（YAML）
-│   ├── add_header.yaml      # 添加响应头（1 条）
-│   ├── grpc_set_header.yaml # gRPC 请求头设置（6 条）
-│   ├── location.yaml        # location 匹配规则及优先级（10 条）
-│   ├── proxy_hide_header.yaml # 隐藏代理响应头（1 条）
-│   ├── proxy_pass_header.yaml # 代理响应头传递（1 条）
-│   ├── proxy_set_header.yaml  # 设置代理请求头（2 条）
-│   └── server_name.yaml    # server_name 匹配及优先级（8 条）
+│   ├── test_data.yaml       # 全部非 gRPC 用例（79 条，回归 + 自定义规则模块）
+│   └── grpc_set_header.yaml # gRPC 请求头设置（6 条，需 gRPC mock server）
 ├── test_script/             # 测试脚本
 │   ├── conftest.py          # pytest 全局/模块级夹具
-│   ├── test_add_header.py
-│   ├── test_grpc_set_header.py
-│   ├── test_location.py
-│   ├── test_proxy_hide_header.py
-│   ├── test_proxy_pass_header.py
-│   ├── test_proxy_set_header.py
-│   └── test_server_name.py
+│   ├── test_all.py          # 全部非 gRPC 用例（读 test_data.yaml，含 expect_syntax_fail/unexpected_result）
+│   └── test_grpc_set_header.py  # gRPC 用例（含模块级 mock server fixture）
 ├── CLAUDE.md                # Claude Code 项目指引
 └── README.md                # 本文件
 ```
