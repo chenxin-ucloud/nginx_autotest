@@ -3461,3 +3461,169 @@ valid_020:
   expected_result:
     - "multi_condition is off"
     - "test failed"
+
+
+# ============================================================
+# 用例评审补充 - 规模边界 (#7)
+# ============================================================
+
+scale_50_001:
+  test_purpose: 验证50条规则每条一个条件不命中时命中最后一条(规模边界)
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    multi_condition on;
+    server {
+      listen 18100;
+      location /r1 { match_http_host nomatch1.com; return 200 "r1"; }
+      location /r2 { match_http_host nomatch2.com; return 200 "r2"; }
+      location /r3 { match_http_host nomatch3.com; return 200 "r3"; }
+      location /r4 { match_http_host nomatch4.com; return 200 "r4"; }
+      location /r5 { match_http_host nomatch5.com; return 200 "r5"; }
+      location /r6 { match_http_host nomatch6.com; return 200 "r6"; }
+      location /r7 { match_http_host nomatch7.com; return 200 "r7"; }
+      location /r8 { match_http_host nomatch8.com; return 200 "r8"; }
+      location /r9 { match_http_host nomatch9.com; return 200 "r9"; }
+      location /r10 { match_http_host nomatch10.com; return 200 "r10"; }
+      location /r11 { match_http_host nomatch11.com; return 200 "r11"; }
+      location /r12 { match_http_host nomatch12.com; return 200 "r12"; }
+      location /r13 { match_http_host nomatch13.com; return 200 "r13"; }
+      location /r14 { match_http_host nomatch14.com; return 200 "r14"; }
+      location /r15 { match_http_host nomatch15.com; return 200 "r15"; }
+      location /r16 { match_http_host nomatch16.com; return 200 "r16"; }
+      location /r17 { match_http_host nomatch17.com; return 200 "r17"; }
+      location /r18 { match_http_host nomatch18.com; return 200 "r18"; }
+      location /r19 { match_http_host nomatch19.com; return 200 "r19"; }
+      location /r20 { match_http_host nomatch20.com; return 200 "r20"; }
+      location /r21 { match_http_host nomatch21.com; return 200 "r21"; }
+      location /r22 { match_http_host nomatch22.com; return 200 "r22"; }
+      location /r23 { match_http_host nomatch23.com; return 200 "r23"; }
+      location /r24 { match_http_host nomatch24.com; return 200 "r24"; }
+      location /r25 { match_http_host nomatch25.com; return 200 "r25"; }
+      location /r26 { match_http_host nomatch26.com; return 200 "r26"; }
+      location /r27 { match_http_host nomatch27.com; return 200 "r27"; }
+      location /r28 { match_http_host nomatch28.com; return 200 "r28"; }
+      location /r29 { match_http_host nomatch29.com; return 200 "r29"; }
+      location /r30 { match_http_host nomatch30.com; return 200 "r30"; }
+      location /r31 { match_http_host nomatch31.com; return 200 "r31"; }
+      location /r32 { match_http_host nomatch32.com; return 200 "r32"; }
+      location /r33 { match_http_host nomatch33.com; return 200 "r33"; }
+      location /r34 { match_http_host nomatch34.com; return 200 "r34"; }
+      location /r35 { match_http_host nomatch35.com; return 200 "r35"; }
+      location /r36 { match_http_host nomatch36.com; return 200 "r36"; }
+      location /r37 { match_http_host nomatch37.com; return 200 "r37"; }
+      location /r38 { match_http_host nomatch38.com; return 200 "r38"; }
+      location /r39 { match_http_host nomatch39.com; return 200 "r39"; }
+      location /r40 { match_http_host nomatch40.com; return 200 "r40"; }
+      location /r41 { match_http_host nomatch41.com; return 200 "r41"; }
+      location /r42 { match_http_host nomatch42.com; return 200 "r42"; }
+      location /r43 { match_http_host nomatch43.com; return 200 "r43"; }
+      location /r44 { match_http_host nomatch44.com; return 200 "r44"; }
+      location /r45 { match_http_host nomatch45.com; return 200 "r45"; }
+      location /r46 { match_http_host nomatch46.com; return 200 "r46"; }
+      location /r47 { match_http_host nomatch47.com; return 200 "r47"; }
+      location /r48 { match_http_host nomatch48.com; return 200 "r48"; }
+      location /r49 { match_http_host nomatch49.com; return 200 "r49"; }
+      location /r50 { match_http_host nomatch50.com; return 200 "r50"; }
+      location /r_final { match_http_host www.final.com; return 200 "r_final_hit"; }
+      location /catch_all { return 200 "no_match"; }
+    }
+  operate_commands:
+    - "nginx -t"
+    - "nginx -s reload"
+    - "curl -s -H \"Host: www.final.com\" http://127.0.0.1:18100/"
+  expected_result:
+    - "test is successful"
+    - "r_final_hit"
+  unexpected_result:
+    - "no_match"
+
+
+# ============================================================
+# 用例评审补充 - 响应头增删8种组合 (#15)
+# ============================================================
+
+cross_eight_001:
+  test_purpose: 验证原生add_header增删与自定义response增删及上游响应头增删8种组合共存
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    multi_condition on;
+    server {
+      listen 18101;
+      location / {
+        add_header X-Up "up1";
+        add_header X-Up2 "up2";
+        return 200 "backend_ok";
+      }
+    }
+    server {
+      listen 18100;
+      location /p {
+        proxy_pass http://127.0.0.1:18101;
+        add_header X-Native "native1";
+        add_header X-Native "native2";
+        proxy_hide_header X-Up2;
+      }
+      response_rule rr {
+        response_add_http_header X-Rule-Add "rule_val";
+        response_delete_http_header X-Up;
+      }
+    }
+  operate_commands:
+    - "nginx -t"
+    - "nginx -s reload"
+    - "curl -s -v http://127.0.0.1:18100/p 2>&1"
+  expected_result:
+    - "test is successful"
+    - "backend_ok"
+    - "X-Native"
+    - "native1"
+    - "native2"
+    - "X-Rule-Add"
+    - "rule_val"
+  unexpected_result:
+    - "X-Up: up1"
+    - "X-Up2: up2"
+
+cross_eight_002:
+  test_purpose: 验证add_header空值被response_add覆盖及自定义新增同名叠加
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    multi_condition on;
+    server {
+      listen 18101;
+      location / { add_header X-Base "base"; return 200 "backend_ok"; }
+    }
+    server {
+      listen 18100;
+      location /p {
+        proxy_pass http://127.0.0.1:18101;
+        add_header X-Native-Empty "";
+      }
+      response_rule rr {
+        response_add_http_header X-Native-Empty "rule_override";
+        response_add_http_header X-Stacked "s1";
+        response_add_http_header X-Stacked "s2";
+      }
+    }
+  operate_commands:
+    - "nginx -t"
+    - "nginx -s reload"
+    - "curl -s -v http://127.0.0.1:18100/p 2>&1"
+  expected_result:
+    - "test is successful"
+    - "X-Base"
+    - "base"
+    - "X-Native-Empty"
+    - "rule_override"
+    - "X-Stacked"
+    - "s1"
+    - "s2"
