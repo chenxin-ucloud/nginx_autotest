@@ -2733,8 +2733,7 @@ header_samekey_001:
     server {
       listen 18100;
       location /rule_samekey {
-        match_http_header X-K v1;
-        match_http_header X-K v2;
+        match_http_header X-K v1 X-K v2;
         return 200 "samekey_and_matched";
       }
       location /catch_all {
@@ -2757,7 +2756,7 @@ header_samekey_001:
 # ============================================================
 
 method_enum_001:
-  test_purpose: 验证match_request_method枚举方法全覆盖(GET/PUT/DELETE/PATCH/MKCOL/PROPFIND)
+  test_purpose: 验证match_request_method枚举方法全覆盖(16种)+非枚举方法匹配不中
   pre_condition:
     - Nginx配置文件路径已知
     - 已备份原始配置文件
@@ -2767,7 +2766,7 @@ method_enum_001:
     server {
       listen 18100;
       location /rule_methods {
-        match_request_method GET PUT DELETE PATCH MKCOL PROPFIND;
+        match_request_method GET HEAD POST PUT DELETE MKCOL COPY MOVE OPTIONS PROPFIND PROPPATCH LOCK UNLOCK PATCH TRACE CONNECT;
         return 200 "method_enum_matched";
       }
       location /catch_all {
@@ -2778,14 +2777,39 @@ method_enum_001:
     - "nginx -t"
     - "nginx -s reload"
     - "curl -s -X GET http://127.0.0.1:18100/"
+    - "curl -s -X HEAD http://127.0.0.1:18100/"
+    - "curl -s -X POST http://127.0.0.1:18100/"
     - "curl -s -X PUT http://127.0.0.1:18100/"
     - "curl -s -X DELETE http://127.0.0.1:18100/"
-    - "curl -s -X PATCH http://127.0.0.1:18100/"
     - "curl -s -X MKCOL http://127.0.0.1:18100/"
-    - "curl -s -X PROPFIND http://127.0.0.1:18100/"
+    - "curl -s -X COPY http://127.0.0.1:18100/"
+    - "curl -s -X MOVE http://127.0.0.1:18100/"
     - "curl -s -X OPTIONS http://127.0.0.1:18100/"
+    - "curl -s -X PROPFIND http://127.0.0.1:18100/"
+    - "curl -s -X PROPPATCH http://127.0.0.1:18100/"
+    - "curl -s -X LOCK http://127.0.0.1:18100/"
+    - "curl -s -X UNLOCK http://127.0.0.1:18100/"
+    - "curl -s -X PATCH http://127.0.0.1:18100/"
+    - "curl -s -X TRACE http://127.0.0.1:18100/"
+    - "curl -s -X CONNECT http://127.0.0.1:18100/"
+    - "curl -s -X INVALID http://127.0.0.1:18100/"
   expected_result:
     - "test is successful"
+    - "method_enum_matched"
+    - "method_enum_matched"
+    - "method_enum_matched"
+    - "method_enum_matched"
+    - "method_enum_matched"
+    - "method_enum_matched"
+    - "method_enum_matched"
+    - "method_enum_matched"
+    - "method_enum_matched"
+    - "method_enum_matched"
+    - "method_enum_matched"
+    - "method_enum_matched"
+    - "method_enum_matched"
+    - "method_enum_matched"
+    - "method_enum_matched"
     - "method_enum_matched"
     - "no_match"
 
