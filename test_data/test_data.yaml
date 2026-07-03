@@ -2819,7 +2819,7 @@ method_enum_001:
 # ============================================================
 
 always_safe_001:
-  test_purpose: 验证response_add_http_header在safe状态码(301)下不带always也添加
+  test_purpose: 验证response_add_http_header在所有safe状态码下不带always均添加响应头
   pre_condition:
     - Nginx配置文件路径已知
     - 已备份原始配置文件
@@ -2828,23 +2828,41 @@ always_safe_001:
     multi_condition on;
     server {
       listen 18101;
-      location / { return 301 http://example.com; }
+      location /200 { return 200; }
+      location /201 { return 201; }
+      location /204 { return 204; }
+      location /206 { return 206; }
+      location /301 { return 301 http://example.com; }
+      location /302 { return 302 http://example.com; }
+      location /303 { return 303 http://example.com; }
+      location /304 { add_header ETag "abc"; return 304; }
+      location /307 { return 307 http://example.com; }
+      location /308 { return 308 http://example.com; }
     }
     server {
       listen 18100;
-      location /proxy { proxy_pass http://127.0.0.1:18101; }
-      response_rule safe_301 {
-        response_add_http_header X-Safe-301 added_301;
+      location ~ ^/proxy/(.*)$ { proxy_pass http://127.0.0.1:18101/$1; }
+      response_rule safe_all {
+        response_add_http_header X-Safe-Code added;
       }
     }
   operate_commands:
     - "nginx -t"
     - "nginx -s reload"
-    - "curl -s -v http://127.0.0.1:18100/proxy 2>&1"
+    - "curl -s -v http://127.0.0.1:18100/proxy/200 2>&1"
+    - "curl -s -v http://127.0.0.1:18100/proxy/201 2>&1"
+    - "curl -s -v http://127.0.0.1:18100/proxy/204 2>&1"
+    - "curl -s -v http://127.0.0.1:18100/proxy/206 2>&1"
+    - "curl -s -v http://127.0.0.1:18100/proxy/301 2>&1"
+    - "curl -s -v http://127.0.0.1:18100/proxy/302 2>&1"
+    - "curl -s -v http://127.0.0.1:18100/proxy/303 2>&1"
+    - "curl -s -v http://127.0.0.1:18100/proxy/304 2>&1"
+    - "curl -s -v http://127.0.0.1:18100/proxy/307 2>&1"
+    - "curl -s -v http://127.0.0.1:18100/proxy/308 2>&1"
   expected_result:
     - "test is successful"
-    - "X-Safe-301"
-    - "added_301"
+    - "X-Safe-Code"
+    - "added"
 
 always_nosafe_001:
   test_purpose: 验证response_add_http_header在非safe状态码(418)下不带always不添加
