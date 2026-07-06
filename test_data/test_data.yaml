@@ -2723,7 +2723,7 @@ header_keyregex_001:
     - "no_match"
 
 header_samekey_001:
-  test_purpose: 验证同一key不同value多条match_http_header为AND关系
+  test_purpose: 验证同一key不同value单条match_http_header为OR关系
   pre_condition:
     - Nginx配置文件路径已知
     - 已备份原始配置文件
@@ -2734,7 +2734,7 @@ header_samekey_001:
       listen 18100;
       location /rule_samekey {
         match_http_header X-K v1 X-K v2;
-        return 200 "samekey_and_matched";
+        return 200 "samekey_or_matched";
       }
       location /catch_all {
         return 200 "no_match";
@@ -2747,8 +2747,8 @@ header_samekey_001:
     - "curl -s -H \"X-K: v1\" http://127.0.0.1:18100/"
   expected_result:
     - "test is successful"
-    - "samekey_and_matched"
-    - "no_match"
+    - "samekey_or_matched"
+    - "samekey_or_matched"
 
 
 # ============================================================
