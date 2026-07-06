@@ -3645,3 +3645,1737 @@ cross_eight_002:
     - "X-Stacked"
     - "s1"
     - "s2"
+
+# ============================================================
+# 用例评审补充 - 交叉组合规模边界(#17 location 7种条件)
+# 50个location，前49个各有一个条件不命中，仅第50个所有条件全命中
+# ============================================================
+
+cross_loc_50_001:
+  test_purpose: 验证7种location匹配条件交叉组合50条规则仅最后一条全命中
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    multi_condition on;
+    server {
+      listen 18100;
+      location /r1 {
+        match_http_host nomatch1.com www.final.com;
+        match_http_path /nomatch1 /final;
+        match_http_header X-A wrong1;
+        match_http_header X-A ok;
+        match_cookie c1 wrong1;
+        match_cookie c1 cv;
+        match_request_method POST GET;
+        match_source_ip 1.1.1.1 127.0.0.1;
+        match_query_string q1 wrong1;
+        match_query_string q1 qv;
+        return 200 "r1";
+      }
+      location /r2 {
+        match_http_host nomatch2.com www.final.com;
+        match_http_path /nomatch2 /final;
+        match_http_header X-A wrong2;
+        match_http_header X-A ok;
+        match_cookie c1 wrong2;
+        match_cookie c1 cv;
+        match_request_method POST GET;
+        match_source_ip 1.1.1.2 127.0.0.1;
+        match_query_string q1 wrong2;
+        match_query_string q1 qv;
+        return 200 "r2";
+      }
+      location /r3 {
+        match_http_host nomatch3.com www.final.com;
+        match_http_path /nomatch3 /final;
+        match_http_header X-A wrong3;
+        match_http_header X-A ok;
+        match_cookie c1 wrong3;
+        match_cookie c1 cv;
+        match_request_method POST GET;
+        match_source_ip 1.1.1.3 127.0.0.1;
+        match_query_string q1 wrong3;
+        match_query_string q1 qv;
+        return 200 "r3";
+      }
+      location /r4 {
+        match_http_host nomatch4.com www.final.com;
+        match_http_path /nomatch4 /final;
+        match_http_header X-A wrong4;
+        match_http_header X-A ok;
+        match_cookie c1 wrong4;
+        match_cookie c1 cv;
+        match_request_method POST GET;
+        match_source_ip 1.1.1.4 127.0.0.1;
+        match_query_string q1 wrong4;
+        match_query_string q1 qv;
+        return 200 "r4";
+      }
+      location /r5 {
+        match_http_host nomatch5.com www.final.com;
+        match_http_path /nomatch5 /final;
+        match_http_header X-A wrong5;
+        match_http_header X-A ok;
+        match_cookie c1 wrong5;
+        match_cookie c1 cv;
+        match_request_method POST GET;
+        match_source_ip 1.1.1.5 127.0.0.1;
+        match_query_string q1 wrong5;
+        match_query_string q1 qv;
+        return 200 "r5";
+      }
+      location /r6 {
+        match_http_host nomatch6.com www.final.com;
+        match_http_path /nomatch6 /final;
+        match_http_header X-A wrong6;
+        match_http_header X-A ok;
+        match_cookie c1 wrong6;
+        match_cookie c1 cv;
+        match_request_method POST GET;
+        match_source_ip 1.1.1.6 127.0.0.1;
+        match_query_string q1 wrong6;
+        match_query_string q1 qv;
+        return 200 "r6";
+      }
+      location /r7 {
+        match_http_host nomatch7.com www.final.com;
+        match_http_path /nomatch7 /final;
+        match_http_header X-A wrong7;
+        match_http_header X-A ok;
+        match_cookie c1 wrong7;
+        match_cookie c1 cv;
+        match_request_method POST GET;
+        match_source_ip 1.1.1.7 127.0.0.1;
+        match_query_string q1 wrong7;
+        match_query_string q1 qv;
+        return 200 "r7";
+      }
+      location /r8 {
+        match_http_host nomatch8.com www.final.com;
+        match_http_path /nomatch8 /final;
+        match_http_header X-A wrong8;
+        match_http_header X-A ok;
+        match_cookie c1 wrong8;
+        match_cookie c1 cv;
+        match_request_method POST GET;
+        match_source_ip 1.1.1.8 127.0.0.1;
+        match_query_string q1 wrong8;
+        match_query_string q1 qv;
+        return 200 "r8";
+      }
+      location /r9 {
+        match_http_host nomatch9.com www.final.com;
+        match_http_path /nomatch9 /final;
+        match_http_header X-A wrong9;
+        match_http_header X-A ok;
+        match_cookie c1 wrong9;
+        match_cookie c1 cv;
+        match_request_method POST GET;
+        match_source_ip 1.1.1.9 127.0.0.1;
+        match_query_string q1 wrong9;
+        match_query_string q1 qv;
+        return 200 "r9";
+      }
+      location /r10 {
+        match_http_host nomatch10.com www.final.com;
+        match_http_path /nomatch10 /final;
+        match_http_header X-A wrong10;
+        match_http_header X-A ok;
+        match_cookie c1 wrong10;
+        match_cookie c1 cv;
+        match_request_method POST GET;
+        match_source_ip 1.1.1.10 127.0.0.1;
+        match_query_string q1 wrong10;
+        match_query_string q1 qv;
+        return 200 "r10";
+      }
+      location /r11 {
+        match_http_host nomatch11.com www.final.com;
+        match_http_path /nomatch11 /final;
+        match_http_header X-A wrong11;
+        match_http_header X-A ok;
+        match_cookie c1 wrong11;
+        match_cookie c1 cv;
+        match_request_method POST GET;
+        match_source_ip 1.1.1.11 127.0.0.1;
+        match_query_string q1 wrong11;
+        match_query_string q1 qv;
+        return 200 "r11";
+      }
+      location /r12 {
+        match_http_host nomatch12.com www.final.com;
+        match_http_path /nomatch12 /final;
+        match_http_header X-A wrong12;
+        match_http_header X-A ok;
+        match_cookie c1 wrong12;
+        match_cookie c1 cv;
+        match_request_method POST GET;
+        match_source_ip 1.1.1.12 127.0.0.1;
+        match_query_string q1 wrong12;
+        match_query_string q1 qv;
+        return 200 "r12";
+      }
+      location /r13 {
+        match_http_host nomatch13.com www.final.com;
+        match_http_path /nomatch13 /final;
+        match_http_header X-A wrong13;
+        match_http_header X-A ok;
+        match_cookie c1 wrong13;
+        match_cookie c1 cv;
+        match_request_method POST GET;
+        match_source_ip 1.1.1.13 127.0.0.1;
+        match_query_string q1 wrong13;
+        match_query_string q1 qv;
+        return 200 "r13";
+      }
+      location /r14 {
+        match_http_host nomatch14.com www.final.com;
+        match_http_path /nomatch14 /final;
+        match_http_header X-A wrong14;
+        match_http_header X-A ok;
+        match_cookie c1 wrong14;
+        match_cookie c1 cv;
+        match_request_method POST GET;
+        match_source_ip 1.1.1.14 127.0.0.1;
+        match_query_string q1 wrong14;
+        match_query_string q1 qv;
+        return 200 "r14";
+      }
+      location /r15 {
+        match_http_host nomatch15.com www.final.com;
+        match_http_path /nomatch15 /final;
+        match_http_header X-A wrong15;
+        match_http_header X-A ok;
+        match_cookie c1 wrong15;
+        match_cookie c1 cv;
+        match_request_method POST GET;
+        match_source_ip 1.1.1.15 127.0.0.1;
+        match_query_string q1 wrong15;
+        match_query_string q1 qv;
+        return 200 "r15";
+      }
+      location /r16 {
+        match_http_host nomatch16.com www.final.com;
+        match_http_path /nomatch16 /final;
+        match_http_header X-A wrong16;
+        match_http_header X-A ok;
+        match_cookie c1 wrong16;
+        match_cookie c1 cv;
+        match_request_method POST GET;
+        match_source_ip 1.1.1.16 127.0.0.1;
+        match_query_string q1 wrong16;
+        match_query_string q1 qv;
+        return 200 "r16";
+      }
+      location /r17 {
+        match_http_host nomatch17.com www.final.com;
+        match_http_path /nomatch17 /final;
+        match_http_header X-A wrong17;
+        match_http_header X-A ok;
+        match_cookie c1 wrong17;
+        match_cookie c1 cv;
+        match_request_method POST GET;
+        match_source_ip 1.1.1.17 127.0.0.1;
+        match_query_string q1 wrong17;
+        match_query_string q1 qv;
+        return 200 "r17";
+      }
+      location /r18 {
+        match_http_host nomatch18.com www.final.com;
+        match_http_path /nomatch18 /final;
+        match_http_header X-A wrong18;
+        match_http_header X-A ok;
+        match_cookie c1 wrong18;
+        match_cookie c1 cv;
+        match_request_method POST GET;
+        match_source_ip 1.1.1.18 127.0.0.1;
+        match_query_string q1 wrong18;
+        match_query_string q1 qv;
+        return 200 "r18";
+      }
+      location /r19 {
+        match_http_host nomatch19.com www.final.com;
+        match_http_path /nomatch19 /final;
+        match_http_header X-A wrong19;
+        match_http_header X-A ok;
+        match_cookie c1 wrong19;
+        match_cookie c1 cv;
+        match_request_method POST GET;
+        match_source_ip 1.1.1.19 127.0.0.1;
+        match_query_string q1 wrong19;
+        match_query_string q1 qv;
+        return 200 "r19";
+      }
+      location /r20 {
+        match_http_host nomatch20.com www.final.com;
+        match_http_path /nomatch20 /final;
+        match_http_header X-A wrong20;
+        match_http_header X-A ok;
+        match_cookie c1 wrong20;
+        match_cookie c1 cv;
+        match_request_method POST GET;
+        match_source_ip 1.1.1.20 127.0.0.1;
+        match_query_string q1 wrong20;
+        match_query_string q1 qv;
+        return 200 "r20";
+      }
+      location /r21 {
+        match_http_host nomatch21.com www.final.com;
+        match_http_path /nomatch21 /final;
+        match_http_header X-A wrong21;
+        match_http_header X-A ok;
+        match_cookie c1 wrong21;
+        match_cookie c1 cv;
+        match_request_method POST GET;
+        match_source_ip 1.1.1.21 127.0.0.1;
+        match_query_string q1 wrong21;
+        match_query_string q1 qv;
+        return 200 "r21";
+      }
+      location /r22 {
+        match_http_host nomatch22.com www.final.com;
+        match_http_path /nomatch22 /final;
+        match_http_header X-A wrong22;
+        match_http_header X-A ok;
+        match_cookie c1 wrong22;
+        match_cookie c1 cv;
+        match_request_method POST GET;
+        match_source_ip 1.1.1.22 127.0.0.1;
+        match_query_string q1 wrong22;
+        match_query_string q1 qv;
+        return 200 "r22";
+      }
+      location /r23 {
+        match_http_host nomatch23.com www.final.com;
+        match_http_path /nomatch23 /final;
+        match_http_header X-A wrong23;
+        match_http_header X-A ok;
+        match_cookie c1 wrong23;
+        match_cookie c1 cv;
+        match_request_method POST GET;
+        match_source_ip 1.1.1.23 127.0.0.1;
+        match_query_string q1 wrong23;
+        match_query_string q1 qv;
+        return 200 "r23";
+      }
+      location /r24 {
+        match_http_host nomatch24.com www.final.com;
+        match_http_path /nomatch24 /final;
+        match_http_header X-A wrong24;
+        match_http_header X-A ok;
+        match_cookie c1 wrong24;
+        match_cookie c1 cv;
+        match_request_method POST GET;
+        match_source_ip 1.1.1.24 127.0.0.1;
+        match_query_string q1 wrong24;
+        match_query_string q1 qv;
+        return 200 "r24";
+      }
+      location /r25 {
+        match_http_host nomatch25.com www.final.com;
+        match_http_path /nomatch25 /final;
+        match_http_header X-A wrong25;
+        match_http_header X-A ok;
+        match_cookie c1 wrong25;
+        match_cookie c1 cv;
+        match_request_method POST GET;
+        match_source_ip 1.1.1.25 127.0.0.1;
+        match_query_string q1 wrong25;
+        match_query_string q1 qv;
+        return 200 "r25";
+      }
+      location /r26 {
+        match_http_host nomatch26.com www.final.com;
+        match_http_path /nomatch26 /final;
+        match_http_header X-A wrong26;
+        match_http_header X-A ok;
+        match_cookie c1 wrong26;
+        match_cookie c1 cv;
+        match_request_method POST GET;
+        match_source_ip 1.1.1.26 127.0.0.1;
+        match_query_string q1 wrong26;
+        match_query_string q1 qv;
+        return 200 "r26";
+      }
+      location /r27 {
+        match_http_host nomatch27.com www.final.com;
+        match_http_path /nomatch27 /final;
+        match_http_header X-A wrong27;
+        match_http_header X-A ok;
+        match_cookie c1 wrong27;
+        match_cookie c1 cv;
+        match_request_method POST GET;
+        match_source_ip 1.1.1.27 127.0.0.1;
+        match_query_string q1 wrong27;
+        match_query_string q1 qv;
+        return 200 "r27";
+      }
+      location /r28 {
+        match_http_host nomatch28.com www.final.com;
+        match_http_path /nomatch28 /final;
+        match_http_header X-A wrong28;
+        match_http_header X-A ok;
+        match_cookie c1 wrong28;
+        match_cookie c1 cv;
+        match_request_method POST GET;
+        match_source_ip 1.1.1.28 127.0.0.1;
+        match_query_string q1 wrong28;
+        match_query_string q1 qv;
+        return 200 "r28";
+      }
+      location /r29 {
+        match_http_host nomatch29.com www.final.com;
+        match_http_path /nomatch29 /final;
+        match_http_header X-A wrong29;
+        match_http_header X-A ok;
+        match_cookie c1 wrong29;
+        match_cookie c1 cv;
+        match_request_method POST GET;
+        match_source_ip 1.1.1.29 127.0.0.1;
+        match_query_string q1 wrong29;
+        match_query_string q1 qv;
+        return 200 "r29";
+      }
+      location /r30 {
+        match_http_host nomatch30.com www.final.com;
+        match_http_path /nomatch30 /final;
+        match_http_header X-A wrong30;
+        match_http_header X-A ok;
+        match_cookie c1 wrong30;
+        match_cookie c1 cv;
+        match_request_method POST GET;
+        match_source_ip 1.1.1.30 127.0.0.1;
+        match_query_string q1 wrong30;
+        match_query_string q1 qv;
+        return 200 "r30";
+      }
+      location /r31 {
+        match_http_host nomatch31.com www.final.com;
+        match_http_path /nomatch31 /final;
+        match_http_header X-A wrong31;
+        match_http_header X-A ok;
+        match_cookie c1 wrong31;
+        match_cookie c1 cv;
+        match_request_method POST GET;
+        match_source_ip 1.1.1.31 127.0.0.1;
+        match_query_string q1 wrong31;
+        match_query_string q1 qv;
+        return 200 "r31";
+      }
+      location /r32 {
+        match_http_host nomatch32.com www.final.com;
+        match_http_path /nomatch32 /final;
+        match_http_header X-A wrong32;
+        match_http_header X-A ok;
+        match_cookie c1 wrong32;
+        match_cookie c1 cv;
+        match_request_method POST GET;
+        match_source_ip 1.1.1.32 127.0.0.1;
+        match_query_string q1 wrong32;
+        match_query_string q1 qv;
+        return 200 "r32";
+      }
+      location /r33 {
+        match_http_host nomatch33.com www.final.com;
+        match_http_path /nomatch33 /final;
+        match_http_header X-A wrong33;
+        match_http_header X-A ok;
+        match_cookie c1 wrong33;
+        match_cookie c1 cv;
+        match_request_method POST GET;
+        match_source_ip 1.1.1.33 127.0.0.1;
+        match_query_string q1 wrong33;
+        match_query_string q1 qv;
+        return 200 "r33";
+      }
+      location /r34 {
+        match_http_host nomatch34.com www.final.com;
+        match_http_path /nomatch34 /final;
+        match_http_header X-A wrong34;
+        match_http_header X-A ok;
+        match_cookie c1 wrong34;
+        match_cookie c1 cv;
+        match_request_method POST GET;
+        match_source_ip 1.1.1.34 127.0.0.1;
+        match_query_string q1 wrong34;
+        match_query_string q1 qv;
+        return 200 "r34";
+      }
+      location /r35 {
+        match_http_host nomatch35.com www.final.com;
+        match_http_path /nomatch35 /final;
+        match_http_header X-A wrong35;
+        match_http_header X-A ok;
+        match_cookie c1 wrong35;
+        match_cookie c1 cv;
+        match_request_method POST GET;
+        match_source_ip 1.1.1.35 127.0.0.1;
+        match_query_string q1 wrong35;
+        match_query_string q1 qv;
+        return 200 "r35";
+      }
+      location /r36 {
+        match_http_host nomatch36.com www.final.com;
+        match_http_path /nomatch36 /final;
+        match_http_header X-A wrong36;
+        match_http_header X-A ok;
+        match_cookie c1 wrong36;
+        match_cookie c1 cv;
+        match_request_method POST GET;
+        match_source_ip 1.1.1.36 127.0.0.1;
+        match_query_string q1 wrong36;
+        match_query_string q1 qv;
+        return 200 "r36";
+      }
+      location /r37 {
+        match_http_host nomatch37.com www.final.com;
+        match_http_path /nomatch37 /final;
+        match_http_header X-A wrong37;
+        match_http_header X-A ok;
+        match_cookie c1 wrong37;
+        match_cookie c1 cv;
+        match_request_method POST GET;
+        match_source_ip 1.1.1.37 127.0.0.1;
+        match_query_string q1 wrong37;
+        match_query_string q1 qv;
+        return 200 "r37";
+      }
+      location /r38 {
+        match_http_host nomatch38.com www.final.com;
+        match_http_path /nomatch38 /final;
+        match_http_header X-A wrong38;
+        match_http_header X-A ok;
+        match_cookie c1 wrong38;
+        match_cookie c1 cv;
+        match_request_method POST GET;
+        match_source_ip 1.1.1.38 127.0.0.1;
+        match_query_string q1 wrong38;
+        match_query_string q1 qv;
+        return 200 "r38";
+      }
+      location /r39 {
+        match_http_host nomatch39.com www.final.com;
+        match_http_path /nomatch39 /final;
+        match_http_header X-A wrong39;
+        match_http_header X-A ok;
+        match_cookie c1 wrong39;
+        match_cookie c1 cv;
+        match_request_method POST GET;
+        match_source_ip 1.1.1.39 127.0.0.1;
+        match_query_string q1 wrong39;
+        match_query_string q1 qv;
+        return 200 "r39";
+      }
+      location /r40 {
+        match_http_host nomatch40.com www.final.com;
+        match_http_path /nomatch40 /final;
+        match_http_header X-A wrong40;
+        match_http_header X-A ok;
+        match_cookie c1 wrong40;
+        match_cookie c1 cv;
+        match_request_method POST GET;
+        match_source_ip 1.1.1.40 127.0.0.1;
+        match_query_string q1 wrong40;
+        match_query_string q1 qv;
+        return 200 "r40";
+      }
+      location /r41 {
+        match_http_host nomatch41.com www.final.com;
+        match_http_path /nomatch41 /final;
+        match_http_header X-A wrong41;
+        match_http_header X-A ok;
+        match_cookie c1 wrong41;
+        match_cookie c1 cv;
+        match_request_method POST GET;
+        match_source_ip 1.1.1.41 127.0.0.1;
+        match_query_string q1 wrong41;
+        match_query_string q1 qv;
+        return 200 "r41";
+      }
+      location /r42 {
+        match_http_host nomatch42.com www.final.com;
+        match_http_path /nomatch42 /final;
+        match_http_header X-A wrong42;
+        match_http_header X-A ok;
+        match_cookie c1 wrong42;
+        match_cookie c1 cv;
+        match_request_method POST GET;
+        match_source_ip 1.1.1.42 127.0.0.1;
+        match_query_string q1 wrong42;
+        match_query_string q1 qv;
+        return 200 "r42";
+      }
+      location /r43 {
+        match_http_host nomatch43.com www.final.com;
+        match_http_path /nomatch43 /final;
+        match_http_header X-A wrong43;
+        match_http_header X-A ok;
+        match_cookie c1 wrong43;
+        match_cookie c1 cv;
+        match_request_method POST GET;
+        match_source_ip 1.1.1.43 127.0.0.1;
+        match_query_string q1 wrong43;
+        match_query_string q1 qv;
+        return 200 "r43";
+      }
+      location /r44 {
+        match_http_host nomatch44.com www.final.com;
+        match_http_path /nomatch44 /final;
+        match_http_header X-A wrong44;
+        match_http_header X-A ok;
+        match_cookie c1 wrong44;
+        match_cookie c1 cv;
+        match_request_method POST GET;
+        match_source_ip 1.1.1.44 127.0.0.1;
+        match_query_string q1 wrong44;
+        match_query_string q1 qv;
+        return 200 "r44";
+      }
+      location /r45 {
+        match_http_host nomatch45.com www.final.com;
+        match_http_path /nomatch45 /final;
+        match_http_header X-A wrong45;
+        match_http_header X-A ok;
+        match_cookie c1 wrong45;
+        match_cookie c1 cv;
+        match_request_method POST GET;
+        match_source_ip 1.1.1.45 127.0.0.1;
+        match_query_string q1 wrong45;
+        match_query_string q1 qv;
+        return 200 "r45";
+      }
+      location /r46 {
+        match_http_host nomatch46.com www.final.com;
+        match_http_path /nomatch46 /final;
+        match_http_header X-A wrong46;
+        match_http_header X-A ok;
+        match_cookie c1 wrong46;
+        match_cookie c1 cv;
+        match_request_method POST GET;
+        match_source_ip 1.1.1.46 127.0.0.1;
+        match_query_string q1 wrong46;
+        match_query_string q1 qv;
+        return 200 "r46";
+      }
+      location /r47 {
+        match_http_host nomatch47.com www.final.com;
+        match_http_path /nomatch47 /final;
+        match_http_header X-A wrong47;
+        match_http_header X-A ok;
+        match_cookie c1 wrong47;
+        match_cookie c1 cv;
+        match_request_method POST GET;
+        match_source_ip 1.1.1.47 127.0.0.1;
+        match_query_string q1 wrong47;
+        match_query_string q1 qv;
+        return 200 "r47";
+      }
+      location /r48 {
+        match_http_host nomatch48.com www.final.com;
+        match_http_path /nomatch48 /final;
+        match_http_header X-A wrong48;
+        match_http_header X-A ok;
+        match_cookie c1 wrong48;
+        match_cookie c1 cv;
+        match_request_method POST GET;
+        match_source_ip 1.1.1.48 127.0.0.1;
+        match_query_string q1 wrong48;
+        match_query_string q1 qv;
+        return 200 "r48";
+      }
+      location /r49 {
+        match_http_host nomatch49.com www.final.com;
+        match_http_path /nomatch49 /final;
+        match_http_header X-A wrong49;
+        match_http_header X-A ok;
+        match_cookie c1 wrong49;
+        match_cookie c1 cv;
+        match_request_method POST GET;
+        match_source_ip 1.1.1.49 127.0.0.1;
+        match_query_string q1 wrong49;
+        match_query_string q1 qv;
+        return 200 "r49";
+      }
+      location /r50 {
+        match_http_host www.final.com;
+        match_http_path /final;
+        match_http_header X-A ok;
+        match_cookie c1 cv;
+        match_request_method GET;
+        match_source_ip 127.0.0.1;
+        match_query_string q1 qv;
+        return 200 "r50_hit";
+      }
+      location /catch_all { return 200 "no_match"; }
+    }
+  operate_commands:
+    - "nginx -t"
+    - "nginx -s reload"
+    - "curl -s -H \"Host: www.final.com\" -H \"X-A: ok\" -b \"c1=cv\" \"http://127.0.0.1:18100/final?q1=qv\""
+  expected_result:
+    - "test is successful"
+    - "r50_hit"
+  unexpected_result:
+    - "no_match"
+
+cross_loc_multival_001:
+  test_purpose: 验证可多条匹配条件(header/cookie/query)各配置50条AND关系全命中
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    multi_condition on;
+    server {
+      listen 18100;
+      location /r50 {
+        match_http_header H1 v1;
+        match_cookie c1 cv1;
+        match_query_string q1 qv1;
+        match_http_header H2 v2;
+        match_cookie c2 cv2;
+        match_query_string q2 qv2;
+        match_http_header H3 v3;
+        match_cookie c3 cv3;
+        match_query_string q3 qv3;
+        match_http_header H4 v4;
+        match_cookie c4 cv4;
+        match_query_string q4 qv4;
+        match_http_header H5 v5;
+        match_cookie c5 cv5;
+        match_query_string q5 qv5;
+        match_http_header H6 v6;
+        match_cookie c6 cv6;
+        match_query_string q6 qv6;
+        match_http_header H7 v7;
+        match_cookie c7 cv7;
+        match_query_string q7 qv7;
+        match_http_header H8 v8;
+        match_cookie c8 cv8;
+        match_query_string q8 qv8;
+        match_http_header H9 v9;
+        match_cookie c9 cv9;
+        match_query_string q9 qv9;
+        match_http_header H10 v10;
+        match_cookie c10 cv10;
+        match_query_string q10 qv10;
+        match_http_header H11 v11;
+        match_cookie c11 cv11;
+        match_query_string q11 qv11;
+        match_http_header H12 v12;
+        match_cookie c12 cv12;
+        match_query_string q12 qv12;
+        match_http_header H13 v13;
+        match_cookie c13 cv13;
+        match_query_string q13 qv13;
+        match_http_header H14 v14;
+        match_cookie c14 cv14;
+        match_query_string q14 qv14;
+        match_http_header H15 v15;
+        match_cookie c15 cv15;
+        match_query_string q15 qv15;
+        match_http_header H16 v16;
+        match_cookie c16 cv16;
+        match_query_string q16 qv16;
+        match_http_header H17 v17;
+        match_cookie c17 cv17;
+        match_query_string q17 qv17;
+        match_http_header H18 v18;
+        match_cookie c18 cv18;
+        match_query_string q18 qv18;
+        match_http_header H19 v19;
+        match_cookie c19 cv19;
+        match_query_string q19 qv19;
+        match_http_header H20 v20;
+        match_cookie c20 cv20;
+        match_query_string q20 qv20;
+        match_http_header H21 v21;
+        match_cookie c21 cv21;
+        match_query_string q21 qv21;
+        match_http_header H22 v22;
+        match_cookie c22 cv22;
+        match_query_string q22 qv22;
+        match_http_header H23 v23;
+        match_cookie c23 cv23;
+        match_query_string q23 qv23;
+        match_http_header H24 v24;
+        match_cookie c24 cv24;
+        match_query_string q24 qv24;
+        match_http_header H25 v25;
+        match_cookie c25 cv25;
+        match_query_string q25 qv25;
+        match_http_header H26 v26;
+        match_cookie c26 cv26;
+        match_query_string q26 qv26;
+        match_http_header H27 v27;
+        match_cookie c27 cv27;
+        match_query_string q27 qv27;
+        match_http_header H28 v28;
+        match_cookie c28 cv28;
+        match_query_string q28 qv28;
+        match_http_header H29 v29;
+        match_cookie c29 cv29;
+        match_query_string q29 qv29;
+        match_http_header H30 v30;
+        match_cookie c30 cv30;
+        match_query_string q30 qv30;
+        match_http_header H31 v31;
+        match_cookie c31 cv31;
+        match_query_string q31 qv31;
+        match_http_header H32 v32;
+        match_cookie c32 cv32;
+        match_query_string q32 qv32;
+        match_http_header H33 v33;
+        match_cookie c33 cv33;
+        match_query_string q33 qv33;
+        match_http_header H34 v34;
+        match_cookie c34 cv34;
+        match_query_string q34 qv34;
+        match_http_header H35 v35;
+        match_cookie c35 cv35;
+        match_query_string q35 qv35;
+        match_http_header H36 v36;
+        match_cookie c36 cv36;
+        match_query_string q36 qv36;
+        match_http_header H37 v37;
+        match_cookie c37 cv37;
+        match_query_string q37 qv37;
+        match_http_header H38 v38;
+        match_cookie c38 cv38;
+        match_query_string q38 qv38;
+        match_http_header H39 v39;
+        match_cookie c39 cv39;
+        match_query_string q39 qv39;
+        match_http_header H40 v40;
+        match_cookie c40 cv40;
+        match_query_string q40 qv40;
+        match_http_header H41 v41;
+        match_cookie c41 cv41;
+        match_query_string q41 qv41;
+        match_http_header H42 v42;
+        match_cookie c42 cv42;
+        match_query_string q42 qv42;
+        match_http_header H43 v43;
+        match_cookie c43 cv43;
+        match_query_string q43 qv43;
+        match_http_header H44 v44;
+        match_cookie c44 cv44;
+        match_query_string q44 qv44;
+        match_http_header H45 v45;
+        match_cookie c45 cv45;
+        match_query_string q45 qv45;
+        match_http_header H46 v46;
+        match_cookie c46 cv46;
+        match_query_string q46 qv46;
+        match_http_header H47 v47;
+        match_cookie c47 cv47;
+        match_query_string q47 qv47;
+        match_http_header H48 v48;
+        match_cookie c48 cv48;
+        match_query_string q48 qv48;
+        match_http_header H49 v49;
+        match_cookie c49 cv49;
+        match_query_string q49 qv49;
+        match_http_header H50 v50;
+        match_cookie c50 cv50;
+        match_query_string q50 qv50;
+        return 200 "multival_hit";
+      }
+      location /catch_all { return 200 "no_match"; }
+    }
+  operate_commands:
+    - "nginx -t"
+    - "nginx -s reload"
+    - "curl -s -H 'H1: v1' -H 'H2: v2' -H 'H3: v3' -H 'H4: v4' -H 'H5: v5' -H 'H6: v6' -H 'H7: v7' -H 'H8: v8' -H 'H9: v9' -H 'H10: v10' -H 'H11: v11' -H 'H12: v12' -H 'H13: v13' -H 'H14: v14' -H 'H15: v15' -H 'H16: v16' -H 'H17: v17' -H 'H18: v18' -H 'H19: v19' -H 'H20: v20' -H 'H21: v21' -H 'H22: v22' -H 'H23: v23' -H 'H24: v24' -H 'H25: v25' -H 'H26: v26' -H 'H27: v27' -H 'H28: v28' -H 'H29: v29' -H 'H30: v30' -H 'H31: v31' -H 'H32: v32' -H 'H33: v33' -H 'H34: v34' -H 'H35: v35' -H 'H36: v36' -H 'H37: v37' -H 'H38: v38' -H 'H39: v39' -H 'H40: v40' -H 'H41: v41' -H 'H42: v42' -H 'H43: v43' -H 'H44: v44' -H 'H45: v45' -H 'H46: v46' -H 'H47: v47' -H 'H48: v48' -H 'H49: v49' -H 'H50: v50' -b 'c1=cv1;c2=cv2;c3=cv3;c4=cv4;c5=cv5;c6=cv6;c7=cv7;c8=cv8;c9=cv9;c10=cv10;c11=cv11;c12=cv12;c13=cv13;c14=cv14;c15=cv15;c16=cv16;c17=cv17;c18=cv18;c19=cv19;c20=cv20;c21=cv21;c22=cv22;c23=cv23;c24=cv24;c25=cv25;c26=cv26;c27=cv27;c28=cv28;c29=cv29;c30=cv30;c31=cv31;c32=cv32;c33=cv33;c34=cv34;c35=cv35;c36=cv36;c37=cv37;c38=cv38;c39=cv39;c40=cv40;c41=cv41;c42=cv42;c43=cv43;c44=cv44;c45=cv45;c46=cv46;c47=cv47;c48=cv48;c49=cv49;c50=cv50' 'http://127.0.0.1:18100/r50?q1=qv1&q2=qv2&q3=qv3&q4=qv4&q5=qv5&q6=qv6&q7=qv7&q8=qv8&q9=qv9&q10=qv10&q11=qv11&q12=qv12&q13=qv13&q14=qv14&q15=qv15&q16=qv16&q17=qv17&q18=qv18&q19=qv19&q20=qv20&q21=qv21&q22=qv22&q23=qv23&q24=qv24&q25=qv25&q26=qv26&q27=qv27&q28=qv28&q29=qv29&q30=qv30&q31=qv31&q32=qv32&q33=qv33&q34=qv34&q35=qv35&q36=qv36&q37=qv37&q38=qv38&q39=qv39&q40=qv40&q41=qv41&q42=qv42&q43=qv43&q44=qv44&q45=qv45&q46=qv46&q47=qv47&q48=qv48&q49=qv49&q50=qv50'"
+  expected_result:
+    - "test is successful"
+    - "multival_hit"
+
+cross_loc_singleval_001:
+  test_purpose: 验证单值匹配条件(host/path)配置50个值OR关系任一命中
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    multi_condition on;
+    server {
+      listen 18100;
+      location /r50 {
+        match_http_host nomatch1.com nomatch2.com nomatch3.com nomatch4.com nomatch5.com nomatch6.com nomatch7.com nomatch8.com nomatch9.com nomatch10.com nomatch11.com nomatch12.com nomatch13.com nomatch14.com nomatch15.com nomatch16.com nomatch17.com nomatch18.com nomatch19.com nomatch20.com nomatch21.com nomatch22.com nomatch23.com nomatch24.com nomatch25.com nomatch26.com nomatch27.com nomatch28.com nomatch29.com nomatch30.com nomatch31.com nomatch32.com nomatch33.com nomatch34.com nomatch35.com nomatch36.com nomatch37.com nomatch38.com nomatch39.com nomatch40.com nomatch41.com nomatch42.com nomatch43.com nomatch44.com nomatch45.com nomatch46.com nomatch47.com nomatch48.com nomatch49.com www.final.com;
+        match_http_path =/final/path /final/ ^~/final/ ~/final.*$ ~*FINAL.*$ /nomatch6/ /nomatch7/ /nomatch8/ /nomatch9/ /nomatch10/ /nomatch11/ /nomatch12/ /nomatch13/ /nomatch14/ /nomatch15/ /nomatch16/ /nomatch17/ /nomatch18/ /nomatch19/ /nomatch20/ /nomatch21/ /nomatch22/ /nomatch23/ /nomatch24/ /nomatch25/ /nomatch26/ /nomatch27/ /nomatch28/ /nomatch29/ /nomatch30/ /nomatch31/ /nomatch32/ /nomatch33/ /nomatch34/ /nomatch35/ /nomatch36/ /nomatch37/ /nomatch38/ /nomatch39/ /nomatch40/ /nomatch41/ /nomatch42/ /nomatch43/ /nomatch44/ /nomatch45/ /nomatch46/ /nomatch47/ /nomatch48/ /nomatch49/ /nomatch50/;
+        return 200 "singleval_hit";
+      }
+      location /catch_all { return 200 "no_match"; }
+    }
+  operate_commands:
+    - "nginx -t"
+    - "nginx -s reload"
+    - "curl -s -H \"Host: www.final.com\" http://127.0.0.1:18100/final/path"
+    - "curl -s -H \"Host: www.final.com\" http://127.0.0.1:18100/FINAL/xyz"
+  expected_result:
+    - "test is successful"
+    - "singleval_hit"
+
+# ============================================================
+# 用例评审补充 - 交叉组合规模边界(#18 response_rule 9种条件)
+# 50个response_rule，前49个各有一个条件不命中，仅第50个所有条件全命中
+# ============================================================
+
+cross_resp_50_001:
+  test_purpose: 验证9种response_rule匹配条件交叉组合50条规则仅最后一条全命中
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    multi_condition on;
+    server {
+      listen 18101;
+      location / { add_header X-Up-Hdr upval; return 200 "up"; }
+    }
+    server {
+      listen 18100;
+      location /p { proxy_pass http://127.0.0.1:18101; }
+      response_rule rr1 {
+        match_http_host nomatch1.com;
+        match_http_path /nomatch1;
+        match_http_header X-A wrong1;
+        match_cookie c1 wrong1;
+        match_request_method POST;
+        match_source_ip 1.1.1.1;
+        match_query_string q1 wrong1;
+        match_http_status 404;
+        match_response_http_header X-Up-Hdr wrong1;
+      }
+      response_rule rr2 {
+        match_http_host nomatch2.com;
+        match_http_path /nomatch2;
+        match_http_header X-A wrong2;
+        match_cookie c1 wrong2;
+        match_request_method POST;
+        match_source_ip 1.1.1.2;
+        match_query_string q1 wrong2;
+        match_http_status 404;
+        match_response_http_header X-Up-Hdr wrong2;
+      }
+      response_rule rr3 {
+        match_http_host nomatch3.com;
+        match_http_path /nomatch3;
+        match_http_header X-A wrong3;
+        match_cookie c1 wrong3;
+        match_request_method POST;
+        match_source_ip 1.1.1.3;
+        match_query_string q1 wrong3;
+        match_http_status 404;
+        match_response_http_header X-Up-Hdr wrong3;
+      }
+      response_rule rr4 {
+        match_http_host nomatch4.com;
+        match_http_path /nomatch4;
+        match_http_header X-A wrong4;
+        match_cookie c1 wrong4;
+        match_request_method POST;
+        match_source_ip 1.1.1.4;
+        match_query_string q1 wrong4;
+        match_http_status 404;
+        match_response_http_header X-Up-Hdr wrong4;
+      }
+      response_rule rr5 {
+        match_http_host nomatch5.com;
+        match_http_path /nomatch5;
+        match_http_header X-A wrong5;
+        match_cookie c1 wrong5;
+        match_request_method POST;
+        match_source_ip 1.1.1.5;
+        match_query_string q1 wrong5;
+        match_http_status 404;
+        match_response_http_header X-Up-Hdr wrong5;
+      }
+      response_rule rr6 {
+        match_http_host nomatch6.com;
+        match_http_path /nomatch6;
+        match_http_header X-A wrong6;
+        match_cookie c1 wrong6;
+        match_request_method POST;
+        match_source_ip 1.1.1.6;
+        match_query_string q1 wrong6;
+        match_http_status 404;
+        match_response_http_header X-Up-Hdr wrong6;
+      }
+      response_rule rr7 {
+        match_http_host nomatch7.com;
+        match_http_path /nomatch7;
+        match_http_header X-A wrong7;
+        match_cookie c1 wrong7;
+        match_request_method POST;
+        match_source_ip 1.1.1.7;
+        match_query_string q1 wrong7;
+        match_http_status 404;
+        match_response_http_header X-Up-Hdr wrong7;
+      }
+      response_rule rr8 {
+        match_http_host nomatch8.com;
+        match_http_path /nomatch8;
+        match_http_header X-A wrong8;
+        match_cookie c1 wrong8;
+        match_request_method POST;
+        match_source_ip 1.1.1.8;
+        match_query_string q1 wrong8;
+        match_http_status 404;
+        match_response_http_header X-Up-Hdr wrong8;
+      }
+      response_rule rr9 {
+        match_http_host nomatch9.com;
+        match_http_path /nomatch9;
+        match_http_header X-A wrong9;
+        match_cookie c1 wrong9;
+        match_request_method POST;
+        match_source_ip 1.1.1.9;
+        match_query_string q1 wrong9;
+        match_http_status 404;
+        match_response_http_header X-Up-Hdr wrong9;
+      }
+      response_rule rr10 {
+        match_http_host nomatch10.com;
+        match_http_path /nomatch10;
+        match_http_header X-A wrong10;
+        match_cookie c1 wrong10;
+        match_request_method POST;
+        match_source_ip 1.1.1.10;
+        match_query_string q1 wrong10;
+        match_http_status 404;
+        match_response_http_header X-Up-Hdr wrong10;
+      }
+      response_rule rr11 {
+        match_http_host nomatch11.com;
+        match_http_path /nomatch11;
+        match_http_header X-A wrong11;
+        match_cookie c1 wrong11;
+        match_request_method POST;
+        match_source_ip 1.1.1.11;
+        match_query_string q1 wrong11;
+        match_http_status 404;
+        match_response_http_header X-Up-Hdr wrong11;
+      }
+      response_rule rr12 {
+        match_http_host nomatch12.com;
+        match_http_path /nomatch12;
+        match_http_header X-A wrong12;
+        match_cookie c1 wrong12;
+        match_request_method POST;
+        match_source_ip 1.1.1.12;
+        match_query_string q1 wrong12;
+        match_http_status 404;
+        match_response_http_header X-Up-Hdr wrong12;
+      }
+      response_rule rr13 {
+        match_http_host nomatch13.com;
+        match_http_path /nomatch13;
+        match_http_header X-A wrong13;
+        match_cookie c1 wrong13;
+        match_request_method POST;
+        match_source_ip 1.1.1.13;
+        match_query_string q1 wrong13;
+        match_http_status 404;
+        match_response_http_header X-Up-Hdr wrong13;
+      }
+      response_rule rr14 {
+        match_http_host nomatch14.com;
+        match_http_path /nomatch14;
+        match_http_header X-A wrong14;
+        match_cookie c1 wrong14;
+        match_request_method POST;
+        match_source_ip 1.1.1.14;
+        match_query_string q1 wrong14;
+        match_http_status 404;
+        match_response_http_header X-Up-Hdr wrong14;
+      }
+      response_rule rr15 {
+        match_http_host nomatch15.com;
+        match_http_path /nomatch15;
+        match_http_header X-A wrong15;
+        match_cookie c1 wrong15;
+        match_request_method POST;
+        match_source_ip 1.1.1.15;
+        match_query_string q1 wrong15;
+        match_http_status 404;
+        match_response_http_header X-Up-Hdr wrong15;
+      }
+      response_rule rr16 {
+        match_http_host nomatch16.com;
+        match_http_path /nomatch16;
+        match_http_header X-A wrong16;
+        match_cookie c1 wrong16;
+        match_request_method POST;
+        match_source_ip 1.1.1.16;
+        match_query_string q1 wrong16;
+        match_http_status 404;
+        match_response_http_header X-Up-Hdr wrong16;
+      }
+      response_rule rr17 {
+        match_http_host nomatch17.com;
+        match_http_path /nomatch17;
+        match_http_header X-A wrong17;
+        match_cookie c1 wrong17;
+        match_request_method POST;
+        match_source_ip 1.1.1.17;
+        match_query_string q1 wrong17;
+        match_http_status 404;
+        match_response_http_header X-Up-Hdr wrong17;
+      }
+      response_rule rr18 {
+        match_http_host nomatch18.com;
+        match_http_path /nomatch18;
+        match_http_header X-A wrong18;
+        match_cookie c1 wrong18;
+        match_request_method POST;
+        match_source_ip 1.1.1.18;
+        match_query_string q1 wrong18;
+        match_http_status 404;
+        match_response_http_header X-Up-Hdr wrong18;
+      }
+      response_rule rr19 {
+        match_http_host nomatch19.com;
+        match_http_path /nomatch19;
+        match_http_header X-A wrong19;
+        match_cookie c1 wrong19;
+        match_request_method POST;
+        match_source_ip 1.1.1.19;
+        match_query_string q1 wrong19;
+        match_http_status 404;
+        match_response_http_header X-Up-Hdr wrong19;
+      }
+      response_rule rr20 {
+        match_http_host nomatch20.com;
+        match_http_path /nomatch20;
+        match_http_header X-A wrong20;
+        match_cookie c1 wrong20;
+        match_request_method POST;
+        match_source_ip 1.1.1.20;
+        match_query_string q1 wrong20;
+        match_http_status 404;
+        match_response_http_header X-Up-Hdr wrong20;
+      }
+      response_rule rr21 {
+        match_http_host nomatch21.com;
+        match_http_path /nomatch21;
+        match_http_header X-A wrong21;
+        match_cookie c1 wrong21;
+        match_request_method POST;
+        match_source_ip 1.1.1.21;
+        match_query_string q1 wrong21;
+        match_http_status 404;
+        match_response_http_header X-Up-Hdr wrong21;
+      }
+      response_rule rr22 {
+        match_http_host nomatch22.com;
+        match_http_path /nomatch22;
+        match_http_header X-A wrong22;
+        match_cookie c1 wrong22;
+        match_request_method POST;
+        match_source_ip 1.1.1.22;
+        match_query_string q1 wrong22;
+        match_http_status 404;
+        match_response_http_header X-Up-Hdr wrong22;
+      }
+      response_rule rr23 {
+        match_http_host nomatch23.com;
+        match_http_path /nomatch23;
+        match_http_header X-A wrong23;
+        match_cookie c1 wrong23;
+        match_request_method POST;
+        match_source_ip 1.1.1.23;
+        match_query_string q1 wrong23;
+        match_http_status 404;
+        match_response_http_header X-Up-Hdr wrong23;
+      }
+      response_rule rr24 {
+        match_http_host nomatch24.com;
+        match_http_path /nomatch24;
+        match_http_header X-A wrong24;
+        match_cookie c1 wrong24;
+        match_request_method POST;
+        match_source_ip 1.1.1.24;
+        match_query_string q1 wrong24;
+        match_http_status 404;
+        match_response_http_header X-Up-Hdr wrong24;
+      }
+      response_rule rr25 {
+        match_http_host nomatch25.com;
+        match_http_path /nomatch25;
+        match_http_header X-A wrong25;
+        match_cookie c1 wrong25;
+        match_request_method POST;
+        match_source_ip 1.1.1.25;
+        match_query_string q1 wrong25;
+        match_http_status 404;
+        match_response_http_header X-Up-Hdr wrong25;
+      }
+      response_rule rr26 {
+        match_http_host nomatch26.com;
+        match_http_path /nomatch26;
+        match_http_header X-A wrong26;
+        match_cookie c1 wrong26;
+        match_request_method POST;
+        match_source_ip 1.1.1.26;
+        match_query_string q1 wrong26;
+        match_http_status 404;
+        match_response_http_header X-Up-Hdr wrong26;
+      }
+      response_rule rr27 {
+        match_http_host nomatch27.com;
+        match_http_path /nomatch27;
+        match_http_header X-A wrong27;
+        match_cookie c1 wrong27;
+        match_request_method POST;
+        match_source_ip 1.1.1.27;
+        match_query_string q1 wrong27;
+        match_http_status 404;
+        match_response_http_header X-Up-Hdr wrong27;
+      }
+      response_rule rr28 {
+        match_http_host nomatch28.com;
+        match_http_path /nomatch28;
+        match_http_header X-A wrong28;
+        match_cookie c1 wrong28;
+        match_request_method POST;
+        match_source_ip 1.1.1.28;
+        match_query_string q1 wrong28;
+        match_http_status 404;
+        match_response_http_header X-Up-Hdr wrong28;
+      }
+      response_rule rr29 {
+        match_http_host nomatch29.com;
+        match_http_path /nomatch29;
+        match_http_header X-A wrong29;
+        match_cookie c1 wrong29;
+        match_request_method POST;
+        match_source_ip 1.1.1.29;
+        match_query_string q1 wrong29;
+        match_http_status 404;
+        match_response_http_header X-Up-Hdr wrong29;
+      }
+      response_rule rr30 {
+        match_http_host nomatch30.com;
+        match_http_path /nomatch30;
+        match_http_header X-A wrong30;
+        match_cookie c1 wrong30;
+        match_request_method POST;
+        match_source_ip 1.1.1.30;
+        match_query_string q1 wrong30;
+        match_http_status 404;
+        match_response_http_header X-Up-Hdr wrong30;
+      }
+      response_rule rr31 {
+        match_http_host nomatch31.com;
+        match_http_path /nomatch31;
+        match_http_header X-A wrong31;
+        match_cookie c1 wrong31;
+        match_request_method POST;
+        match_source_ip 1.1.1.31;
+        match_query_string q1 wrong31;
+        match_http_status 404;
+        match_response_http_header X-Up-Hdr wrong31;
+      }
+      response_rule rr32 {
+        match_http_host nomatch32.com;
+        match_http_path /nomatch32;
+        match_http_header X-A wrong32;
+        match_cookie c1 wrong32;
+        match_request_method POST;
+        match_source_ip 1.1.1.32;
+        match_query_string q1 wrong32;
+        match_http_status 404;
+        match_response_http_header X-Up-Hdr wrong32;
+      }
+      response_rule rr33 {
+        match_http_host nomatch33.com;
+        match_http_path /nomatch33;
+        match_http_header X-A wrong33;
+        match_cookie c1 wrong33;
+        match_request_method POST;
+        match_source_ip 1.1.1.33;
+        match_query_string q1 wrong33;
+        match_http_status 404;
+        match_response_http_header X-Up-Hdr wrong33;
+      }
+      response_rule rr34 {
+        match_http_host nomatch34.com;
+        match_http_path /nomatch34;
+        match_http_header X-A wrong34;
+        match_cookie c1 wrong34;
+        match_request_method POST;
+        match_source_ip 1.1.1.34;
+        match_query_string q1 wrong34;
+        match_http_status 404;
+        match_response_http_header X-Up-Hdr wrong34;
+      }
+      response_rule rr35 {
+        match_http_host nomatch35.com;
+        match_http_path /nomatch35;
+        match_http_header X-A wrong35;
+        match_cookie c1 wrong35;
+        match_request_method POST;
+        match_source_ip 1.1.1.35;
+        match_query_string q1 wrong35;
+        match_http_status 404;
+        match_response_http_header X-Up-Hdr wrong35;
+      }
+      response_rule rr36 {
+        match_http_host nomatch36.com;
+        match_http_path /nomatch36;
+        match_http_header X-A wrong36;
+        match_cookie c1 wrong36;
+        match_request_method POST;
+        match_source_ip 1.1.1.36;
+        match_query_string q1 wrong36;
+        match_http_status 404;
+        match_response_http_header X-Up-Hdr wrong36;
+      }
+      response_rule rr37 {
+        match_http_host nomatch37.com;
+        match_http_path /nomatch37;
+        match_http_header X-A wrong37;
+        match_cookie c1 wrong37;
+        match_request_method POST;
+        match_source_ip 1.1.1.37;
+        match_query_string q1 wrong37;
+        match_http_status 404;
+        match_response_http_header X-Up-Hdr wrong37;
+      }
+      response_rule rr38 {
+        match_http_host nomatch38.com;
+        match_http_path /nomatch38;
+        match_http_header X-A wrong38;
+        match_cookie c1 wrong38;
+        match_request_method POST;
+        match_source_ip 1.1.1.38;
+        match_query_string q1 wrong38;
+        match_http_status 404;
+        match_response_http_header X-Up-Hdr wrong38;
+      }
+      response_rule rr39 {
+        match_http_host nomatch39.com;
+        match_http_path /nomatch39;
+        match_http_header X-A wrong39;
+        match_cookie c1 wrong39;
+        match_request_method POST;
+        match_source_ip 1.1.1.39;
+        match_query_string q1 wrong39;
+        match_http_status 404;
+        match_response_http_header X-Up-Hdr wrong39;
+      }
+      response_rule rr40 {
+        match_http_host nomatch40.com;
+        match_http_path /nomatch40;
+        match_http_header X-A wrong40;
+        match_cookie c1 wrong40;
+        match_request_method POST;
+        match_source_ip 1.1.1.40;
+        match_query_string q1 wrong40;
+        match_http_status 404;
+        match_response_http_header X-Up-Hdr wrong40;
+      }
+      response_rule rr41 {
+        match_http_host nomatch41.com;
+        match_http_path /nomatch41;
+        match_http_header X-A wrong41;
+        match_cookie c1 wrong41;
+        match_request_method POST;
+        match_source_ip 1.1.1.41;
+        match_query_string q1 wrong41;
+        match_http_status 404;
+        match_response_http_header X-Up-Hdr wrong41;
+      }
+      response_rule rr42 {
+        match_http_host nomatch42.com;
+        match_http_path /nomatch42;
+        match_http_header X-A wrong42;
+        match_cookie c1 wrong42;
+        match_request_method POST;
+        match_source_ip 1.1.1.42;
+        match_query_string q1 wrong42;
+        match_http_status 404;
+        match_response_http_header X-Up-Hdr wrong42;
+      }
+      response_rule rr43 {
+        match_http_host nomatch43.com;
+        match_http_path /nomatch43;
+        match_http_header X-A wrong43;
+        match_cookie c1 wrong43;
+        match_request_method POST;
+        match_source_ip 1.1.1.43;
+        match_query_string q1 wrong43;
+        match_http_status 404;
+        match_response_http_header X-Up-Hdr wrong43;
+      }
+      response_rule rr44 {
+        match_http_host nomatch44.com;
+        match_http_path /nomatch44;
+        match_http_header X-A wrong44;
+        match_cookie c1 wrong44;
+        match_request_method POST;
+        match_source_ip 1.1.1.44;
+        match_query_string q1 wrong44;
+        match_http_status 404;
+        match_response_http_header X-Up-Hdr wrong44;
+      }
+      response_rule rr45 {
+        match_http_host nomatch45.com;
+        match_http_path /nomatch45;
+        match_http_header X-A wrong45;
+        match_cookie c1 wrong45;
+        match_request_method POST;
+        match_source_ip 1.1.1.45;
+        match_query_string q1 wrong45;
+        match_http_status 404;
+        match_response_http_header X-Up-Hdr wrong45;
+      }
+      response_rule rr46 {
+        match_http_host nomatch46.com;
+        match_http_path /nomatch46;
+        match_http_header X-A wrong46;
+        match_cookie c1 wrong46;
+        match_request_method POST;
+        match_source_ip 1.1.1.46;
+        match_query_string q1 wrong46;
+        match_http_status 404;
+        match_response_http_header X-Up-Hdr wrong46;
+      }
+      response_rule rr47 {
+        match_http_host nomatch47.com;
+        match_http_path /nomatch47;
+        match_http_header X-A wrong47;
+        match_cookie c1 wrong47;
+        match_request_method POST;
+        match_source_ip 1.1.1.47;
+        match_query_string q1 wrong47;
+        match_http_status 404;
+        match_response_http_header X-Up-Hdr wrong47;
+      }
+      response_rule rr48 {
+        match_http_host nomatch48.com;
+        match_http_path /nomatch48;
+        match_http_header X-A wrong48;
+        match_cookie c1 wrong48;
+        match_request_method POST;
+        match_source_ip 1.1.1.48;
+        match_query_string q1 wrong48;
+        match_http_status 404;
+        match_response_http_header X-Up-Hdr wrong48;
+      }
+      response_rule rr49 {
+        match_http_host nomatch49.com;
+        match_http_path /nomatch49;
+        match_http_header X-A wrong49;
+        match_cookie c1 wrong49;
+        match_request_method POST;
+        match_source_ip 1.1.1.49;
+        match_query_string q1 wrong49;
+        match_http_status 404;
+        match_response_http_header X-Up-Hdr wrong49;
+      }
+      response_rule rr50 {
+        match_http_host www.final.com;
+        match_http_path /p;
+        match_http_header X-A okval;
+        match_cookie c1 cookval;
+        match_request_method GET;
+        match_source_ip 127.0.0.1;
+        match_query_string q1 qsval;
+        match_http_status 200;
+        match_response_http_header X-Up-Hdr upval;
+        response_add_http_header X-R50 yes;
+      }
+    }
+  operate_commands:
+    - "nginx -t"
+    - "nginx -s reload"
+    - "curl -s -v -H \"Host: www.final.com\" -H \"X-A: okval\" -b \"c1=cookval\" \"http://127.0.0.1:18100/p?q1=qsval\" 2>&1"
+  expected_result:
+    - "test is successful"
+    - "X-R50"
+    - "yes"
+
+cross_resp_multival_001:
+  test_purpose: 验证response_rule可多条条件(header/cookie/query/resp_header)各50条AND全命中
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    multi_condition on;
+    server {
+      listen 18101;
+      location / {
+        add_header H1 v1;
+        add_header H2 v2;
+        add_header H3 v3;
+        add_header H4 v4;
+        add_header H5 v5;
+        add_header H6 v6;
+        add_header H7 v7;
+        add_header H8 v8;
+        add_header H9 v9;
+        add_header H10 v10;
+        add_header H11 v11;
+        add_header H12 v12;
+        add_header H13 v13;
+        add_header H14 v14;
+        add_header H15 v15;
+        add_header H16 v16;
+        add_header H17 v17;
+        add_header H18 v18;
+        add_header H19 v19;
+        add_header H20 v20;
+        add_header H21 v21;
+        add_header H22 v22;
+        add_header H23 v23;
+        add_header H24 v24;
+        add_header H25 v25;
+        add_header H26 v26;
+        add_header H27 v27;
+        add_header H28 v28;
+        add_header H29 v29;
+        add_header H30 v30;
+        add_header H31 v31;
+        add_header H32 v32;
+        add_header H33 v33;
+        add_header H34 v34;
+        add_header H35 v35;
+        add_header H36 v36;
+        add_header H37 v37;
+        add_header H38 v38;
+        add_header H39 v39;
+        add_header H40 v40;
+        add_header H41 v41;
+        add_header H42 v42;
+        add_header H43 v43;
+        add_header H44 v44;
+        add_header H45 v45;
+        add_header H46 v46;
+        add_header H47 v47;
+        add_header H48 v48;
+        add_header H49 v49;
+        add_header H50 v50;
+        return 200 "up";
+      }
+    }
+    server {
+      listen 18100;
+      location /p { proxy_pass http://127.0.0.1:18101; }
+      response_rule rr50 {
+        match_http_header H1 v1;
+        match_cookie c1 cv1;
+        match_query_string q1 qv1;
+        match_response_http_header H1 v1;
+        match_http_header H2 v2;
+        match_cookie c2 cv2;
+        match_query_string q2 qv2;
+        match_response_http_header H2 v2;
+        match_http_header H3 v3;
+        match_cookie c3 cv3;
+        match_query_string q3 qv3;
+        match_response_http_header H3 v3;
+        match_http_header H4 v4;
+        match_cookie c4 cv4;
+        match_query_string q4 qv4;
+        match_response_http_header H4 v4;
+        match_http_header H5 v5;
+        match_cookie c5 cv5;
+        match_query_string q5 qv5;
+        match_response_http_header H5 v5;
+        match_http_header H6 v6;
+        match_cookie c6 cv6;
+        match_query_string q6 qv6;
+        match_response_http_header H6 v6;
+        match_http_header H7 v7;
+        match_cookie c7 cv7;
+        match_query_string q7 qv7;
+        match_response_http_header H7 v7;
+        match_http_header H8 v8;
+        match_cookie c8 cv8;
+        match_query_string q8 qv8;
+        match_response_http_header H8 v8;
+        match_http_header H9 v9;
+        match_cookie c9 cv9;
+        match_query_string q9 qv9;
+        match_response_http_header H9 v9;
+        match_http_header H10 v10;
+        match_cookie c10 cv10;
+        match_query_string q10 qv10;
+        match_response_http_header H10 v10;
+        match_http_header H11 v11;
+        match_cookie c11 cv11;
+        match_query_string q11 qv11;
+        match_response_http_header H11 v11;
+        match_http_header H12 v12;
+        match_cookie c12 cv12;
+        match_query_string q12 qv12;
+        match_response_http_header H12 v12;
+        match_http_header H13 v13;
+        match_cookie c13 cv13;
+        match_query_string q13 qv13;
+        match_response_http_header H13 v13;
+        match_http_header H14 v14;
+        match_cookie c14 cv14;
+        match_query_string q14 qv14;
+        match_response_http_header H14 v14;
+        match_http_header H15 v15;
+        match_cookie c15 cv15;
+        match_query_string q15 qv15;
+        match_response_http_header H15 v15;
+        match_http_header H16 v16;
+        match_cookie c16 cv16;
+        match_query_string q16 qv16;
+        match_response_http_header H16 v16;
+        match_http_header H17 v17;
+        match_cookie c17 cv17;
+        match_query_string q17 qv17;
+        match_response_http_header H17 v17;
+        match_http_header H18 v18;
+        match_cookie c18 cv18;
+        match_query_string q18 qv18;
+        match_response_http_header H18 v18;
+        match_http_header H19 v19;
+        match_cookie c19 cv19;
+        match_query_string q19 qv19;
+        match_response_http_header H19 v19;
+        match_http_header H20 v20;
+        match_cookie c20 cv20;
+        match_query_string q20 qv20;
+        match_response_http_header H20 v20;
+        match_http_header H21 v21;
+        match_cookie c21 cv21;
+        match_query_string q21 qv21;
+        match_response_http_header H21 v21;
+        match_http_header H22 v22;
+        match_cookie c22 cv22;
+        match_query_string q22 qv22;
+        match_response_http_header H22 v22;
+        match_http_header H23 v23;
+        match_cookie c23 cv23;
+        match_query_string q23 qv23;
+        match_response_http_header H23 v23;
+        match_http_header H24 v24;
+        match_cookie c24 cv24;
+        match_query_string q24 qv24;
+        match_response_http_header H24 v24;
+        match_http_header H25 v25;
+        match_cookie c25 cv25;
+        match_query_string q25 qv25;
+        match_response_http_header H25 v25;
+        match_http_header H26 v26;
+        match_cookie c26 cv26;
+        match_query_string q26 qv26;
+        match_response_http_header H26 v26;
+        match_http_header H27 v27;
+        match_cookie c27 cv27;
+        match_query_string q27 qv27;
+        match_response_http_header H27 v27;
+        match_http_header H28 v28;
+        match_cookie c28 cv28;
+        match_query_string q28 qv28;
+        match_response_http_header H28 v28;
+        match_http_header H29 v29;
+        match_cookie c29 cv29;
+        match_query_string q29 qv29;
+        match_response_http_header H29 v29;
+        match_http_header H30 v30;
+        match_cookie c30 cv30;
+        match_query_string q30 qv30;
+        match_response_http_header H30 v30;
+        match_http_header H31 v31;
+        match_cookie c31 cv31;
+        match_query_string q31 qv31;
+        match_response_http_header H31 v31;
+        match_http_header H32 v32;
+        match_cookie c32 cv32;
+        match_query_string q32 qv32;
+        match_response_http_header H32 v32;
+        match_http_header H33 v33;
+        match_cookie c33 cv33;
+        match_query_string q33 qv33;
+        match_response_http_header H33 v33;
+        match_http_header H34 v34;
+        match_cookie c34 cv34;
+        match_query_string q34 qv34;
+        match_response_http_header H34 v34;
+        match_http_header H35 v35;
+        match_cookie c35 cv35;
+        match_query_string q35 qv35;
+        match_response_http_header H35 v35;
+        match_http_header H36 v36;
+        match_cookie c36 cv36;
+        match_query_string q36 qv36;
+        match_response_http_header H36 v36;
+        match_http_header H37 v37;
+        match_cookie c37 cv37;
+        match_query_string q37 qv37;
+        match_response_http_header H37 v37;
+        match_http_header H38 v38;
+        match_cookie c38 cv38;
+        match_query_string q38 qv38;
+        match_response_http_header H38 v38;
+        match_http_header H39 v39;
+        match_cookie c39 cv39;
+        match_query_string q39 qv39;
+        match_response_http_header H39 v39;
+        match_http_header H40 v40;
+        match_cookie c40 cv40;
+        match_query_string q40 qv40;
+        match_response_http_header H40 v40;
+        match_http_header H41 v41;
+        match_cookie c41 cv41;
+        match_query_string q41 qv41;
+        match_response_http_header H41 v41;
+        match_http_header H42 v42;
+        match_cookie c42 cv42;
+        match_query_string q42 qv42;
+        match_response_http_header H42 v42;
+        match_http_header H43 v43;
+        match_cookie c43 cv43;
+        match_query_string q43 qv43;
+        match_response_http_header H43 v43;
+        match_http_header H44 v44;
+        match_cookie c44 cv44;
+        match_query_string q44 qv44;
+        match_response_http_header H44 v44;
+        match_http_header H45 v45;
+        match_cookie c45 cv45;
+        match_query_string q45 qv45;
+        match_response_http_header H45 v45;
+        match_http_header H46 v46;
+        match_cookie c46 cv46;
+        match_query_string q46 qv46;
+        match_response_http_header H46 v46;
+        match_http_header H47 v47;
+        match_cookie c47 cv47;
+        match_query_string q47 qv47;
+        match_response_http_header H47 v47;
+        match_http_header H48 v48;
+        match_cookie c48 cv48;
+        match_query_string q48 qv48;
+        match_response_http_header H48 v48;
+        match_http_header H49 v49;
+        match_cookie c49 cv49;
+        match_query_string q49 qv49;
+        match_response_http_header H49 v49;
+        match_http_header H50 v50;
+        match_cookie c50 cv50;
+        match_query_string q50 qv50;
+        match_response_http_header H50 v50;
+        response_add_http_header X-Multi yes;
+      }
+    }
+  operate_commands:
+    - "nginx -t"
+    - "nginx -s reload"
+    - "curl -s -v -H 'H1: v1' -H 'H2: v2' -H 'H3: v3' -H 'H4: v4' -H 'H5: v5' -H 'H6: v6' -H 'H7: v7' -H 'H8: v8' -H 'H9: v9' -H 'H10: v10' -H 'H11: v11' -H 'H12: v12' -H 'H13: v13' -H 'H14: v14' -H 'H15: v15' -H 'H16: v16' -H 'H17: v17' -H 'H18: v18' -H 'H19: v19' -H 'H20: v20' -H 'H21: v21' -H 'H22: v22' -H 'H23: v23' -H 'H24: v24' -H 'H25: v25' -H 'H26: v26' -H 'H27: v27' -H 'H28: v28' -H 'H29: v29' -H 'H30: v30' -H 'H31: v31' -H 'H32: v32' -H 'H33: v33' -H 'H34: v34' -H 'H35: v35' -H 'H36: v36' -H 'H37: v37' -H 'H38: v38' -H 'H39: v39' -H 'H40: v40' -H 'H41: v41' -H 'H42: v42' -H 'H43: v43' -H 'H44: v44' -H 'H45: v45' -H 'H46: v46' -H 'H47: v47' -H 'H48: v48' -H 'H49: v49' -H 'H50: v50' -b 'c1=cv1;c2=cv2;c3=cv3;c4=cv4;c5=cv5;c6=cv6;c7=cv7;c8=cv8;c9=cv9;c10=cv10;c11=cv11;c12=cv12;c13=cv13;c14=cv14;c15=cv15;c16=cv16;c17=cv17;c18=cv18;c19=cv19;c20=cv20;c21=cv21;c22=cv22;c23=cv23;c24=cv24;c25=cv25;c26=cv26;c27=cv27;c28=cv28;c29=cv29;c30=cv30;c31=cv31;c32=cv32;c33=cv33;c34=cv34;c35=cv35;c36=cv36;c37=cv37;c38=cv38;c39=cv39;c40=cv40;c41=cv41;c42=cv42;c43=cv43;c44=cv44;c45=cv45;c46=cv46;c47=cv47;c48=cv48;c49=cv49;c50=cv50' 'http://127.0.0.1:18100/p?q1=qv1&q2=qv2&q3=qv3&q4=qv4&q5=qv5&q6=qv6&q7=qv7&q8=qv8&q9=qv9&q10=qv10&q11=qv11&q12=qv12&q13=qv13&q14=qv14&q15=qv15&q16=qv16&q17=qv17&q18=qv18&q19=qv19&q20=qv20&q21=qv21&q22=qv22&q23=qv23&q24=qv24&q25=qv25&q26=qv26&q27=qv27&q28=qv28&q29=qv29&q30=qv30&q31=qv31&q32=qv32&q33=qv33&q34=qv34&q35=qv35&q36=qv36&q37=qv37&q38=qv38&q39=qv39&q40=qv40&q41=qv41&q42=qv42&q43=qv43&q44=qv44&q45=qv45&q46=qv46&q47=qv47&q48=qv48&q49=qv49&q50=qv50' 2>&1"
+  expected_result:
+    - "test is successful"
+    - "X-Multi"
+    - "yes"
