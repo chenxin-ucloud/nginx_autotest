@@ -4477,3 +4477,41 @@ cross_combined_50_001:
     - "test is successful"
     - "X-Final"
     - "yes"
+
+
+# ============================================================
+# 用例评审补充 - 多location原生path回退命中(#25)
+# ============================================================
+
+native_path_fallback_001:
+  test_purpose: 验证match条件不命中时回退到原生location path匹配命中第二个location
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    multi_condition on;
+    server {
+      listen 18100;
+      location /path1 {
+        match_http_header X-Key val;
+        return 200 "loc1_hit";
+      }
+      location /path2 {
+        match_http_header X-Key val;
+        return 200 "loc2_hit";
+      }
+      location /path3 {
+        match_http_header X-Key val;
+        return 200 "loc3_hit";
+      }
+    }
+  operate_commands:
+    - "nginx -t"
+    - "nginx -s reload"
+    - "curl -s http://127.0.0.1:18100/path2"
+    - "curl -s -H \"X-Key: val\" http://127.0.0.1:18100/path2"
+  expected_result:
+    - "test is successful"
+    - "loc2_hit"
+    - "loc1_hit"
