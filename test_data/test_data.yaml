@@ -2448,7 +2448,7 @@ case_host_001:
     - "case_host_matched"
 
 case_header_001:
-  test_purpose: 验证match_http_header精确值大小写不敏感
+  test_purpose: 验证match_http_header精确值大小写不敏感及key大小写不敏感
   pre_condition:
     - Nginx配置文件路径已知
     - 已备份原始配置文件
@@ -2469,12 +2469,14 @@ case_header_001:
     - "nginx -t"
     - "nginx -s reload"
     - "curl -s -H \"X-Key: valueex\" http://127.0.0.1:18100/"
+    - "curl -s -H \"x-key: ValueEx\" http://127.0.0.1:18100/"
+    - "curl -s -H \"X-KEY: valueex\" http://127.0.0.1:18100/"
   expected_result:
     - "test is successful"
     - "header_case_matched"
 
 case_header_regex_001:
-  test_purpose: 验证match_http_header正则~区分大小写(大写请求不匹配小写正则)
+  test_purpose: 验证match_http_header正则~区分大小写(value及key正则均区分大小写)
   pre_condition:
     - Nginx配置文件路径已知
     - 已备份原始配置文件
@@ -2484,7 +2486,7 @@ case_header_regex_001:
     server {
       listen 18100;
       location /rule_regex_cs {
-        match_http_header X-Key ~^val_[a-z]+$;
+        match_http_header ~^X-Key$ ~^val_[a-z]+$;
         return 200 "regex_cs_matched";
       }
       location /catch_all {
@@ -2496,6 +2498,7 @@ case_header_regex_001:
     - "nginx -s reload"
     - "curl -s -H \"X-Key: val_abc\" http://127.0.0.1:18100/"
     - "curl -s -H \"X-Key: VAL_ABC\" http://127.0.0.1:18100/"
+    - "curl -s -H \"x-key: val_abc\" http://127.0.0.1:18100/"
   expected_result:
     - "test is successful"
     - "regex_cs_matched"
@@ -4555,3 +4558,90 @@ nocond_first_001:
     - "loc1_no_cond_hit"
   unexpected_result:
     - "loc2_all_cond_hit"
+
+
+# ============================================================
+# 用例评审补充 - path大小写敏感
+# ============================================================
+
+case_path_exact_001:
+  test_purpose: 验证match_http_path精确匹配(=)区分大小写
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    multi_condition on;
+    server {
+      listen 18100;
+      location /rule_exact {
+        match_http_path =/Exact/Path;
+        return 200 "exact_case_matched";
+      }
+      location /catch_all {
+        return 200 "no_match";
+      }
+    }
+  operate_commands:
+    - "nginx -t"
+    - "nginx -s reload"
+    - "curl -s http://127.0.0.1:18100/Exact/Path"
+    - "curl -s http://127.0.0.1:18100/exact/path"
+  expected_result:
+    - "test is successful"
+    - "exact_case_matched"
+    - "no_match"
+
+case_path_regex_001:
+  test_purpose: 验证match_http_path正则~区分大小写(大写请求不匹配小写正则)
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    multi_condition on;
+    server {
+      listen 18100;
+      location /rule_regex_cs {
+        match_http_path ~\.html$;
+        return 200 "path_regex_cs_matched";
+      }
+      location /catch_all {
+        return 200 "no_match";
+      }
+    }
+  operate_commands:
+    - "nginx -t"
+    - "nginx -s reload"
+    - "curl -s http://127.0.0.1:18100/page.html"
+    - "curl -s http://127.0.0.1:18100/page.HTML"
+  expected_result:
+    - "test is successful"
+    - "path_regex_cs_matched"
+    - "no_match"
+
+case_path_regex_002:
+  test_purpose: 验证match_http_path正则~*大小写不敏感(大写请求可匹配)
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    multi_condition on;
+    server {
+      listen 18100;
+      location /rule_regex_ci {
+        match_http_path ~*\.html$;
+        return 200 "path_regex_ci_matched";
+      }
+      location /catch_all {
+        return 200 "no_match";
+      }
+    }
+  operate_commands:
+    - "nginx -t"
+    - "nginx -s reload"
+    - "curl -s http://127.0.0.1:18100/page.HTML"
+  expected_result:
+    - "test is successful"
+    - "path_regex_ci_matched"
