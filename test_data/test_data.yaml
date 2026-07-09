@@ -6250,3 +6250,142 @@ qs_regex_samekey_001:
     - "test is successful"
     - "qs_regex_samekey_matched"
     - "no_match"
+
+
+# ============================================================
+# 用例评审补充 - match_response_http_header 正则key/重复key
+# ============================================================
+
+resp_header_regex_key_001:
+  test_purpose: 验证match_response_http_header正则匹配key
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    multi_condition on;
+    server {
+      listen 18101;
+      location / {
+        add_header X-Up-Foo upval;
+        return 200 "up";
+      }
+    }
+    server {
+      listen 18100;
+      location /proxy { proxy_pass http://127.0.0.1:18101; }
+      response_rule rr {
+        match_response_http_header ~^X-Up-.*$ upval;
+        response_add_http_header X-Matched yes;
+      }
+    }
+  operate_commands:
+    - "nginx -t"
+    - "nginx -s reload"
+    - "curl -s -v http://127.0.0.1:18100/proxy 2>&1"
+  expected_result:
+    - "test is successful"
+    - "X-Matched"
+    - "yes"
+
+resp_header_samekey_001:
+  test_purpose: 验证match_response_http_header同key不同value多条AND关系
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    multi_condition on;
+    server {
+      listen 18101;
+      location / {
+        add_header X-Up v1;
+        add_header X-Up v2;
+        return 200 "up";
+      }
+    }
+    server {
+      listen 18100;
+      location /proxy { proxy_pass http://127.0.0.1:18101; }
+      response_rule rr {
+        match_response_http_header X-Up v1;
+        match_response_http_header X-Up v2;
+        response_add_http_header X-Matched yes;
+      }
+    }
+  operate_commands:
+    - "nginx -t"
+    - "nginx -s reload"
+    - "curl -s -v http://127.0.0.1:18100/proxy 2>&1"
+  expected_result:
+    - "test is successful"
+    - "X-Matched"
+    - "yes"
+
+resp_header_samekey_002:
+  test_purpose: 验证match_response_http_header同key不同value仅一个值时AND不命中
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    multi_condition on;
+    server {
+      listen 18101;
+      location / {
+        add_header X-Up v1;
+        return 200 "up";
+      }
+    }
+    server {
+      listen 18100;
+      location /proxy { proxy_pass http://127.0.0.1:18101; }
+      response_rule rr {
+        match_response_http_header X-Up v1;
+        match_response_http_header X-Up v2;
+        response_add_http_header X-Matched yes;
+      }
+    }
+  operate_commands:
+    - "nginx -t"
+    - "nginx -s reload"
+    - "curl -s -v http://127.0.0.1:18100/proxy 2>&1"
+  expected_result:
+    - "test is successful"
+    - "up"
+  unexpected_result:
+    - "X-Matched"
+
+resp_header_regex_samekey_001:
+  test_purpose: 验证match_response_http_header正则key同模式不同value多条AND关系
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    multi_condition on;
+    server {
+      listen 18101;
+      location / {
+        add_header X-Up v1;
+        add_header X-Up v2;
+        return 200 "up";
+      }
+    }
+    server {
+      listen 18100;
+      location /proxy { proxy_pass http://127.0.0.1:18101; }
+      response_rule rr {
+        match_response_http_header ~^X-Up$ v1;
+        match_response_http_header ~^X-Up$ v2;
+        response_add_http_header X-Matched yes;
+      }
+    }
+  operate_commands:
+    - "nginx -t"
+    - "nginx -s reload"
+    - "curl -s -v http://127.0.0.1:18100/proxy 2>&1"
+  expected_result:
+    - "test is successful"
+    - "X-Matched"
+    - "yes"
