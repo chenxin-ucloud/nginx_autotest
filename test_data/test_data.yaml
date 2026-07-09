@@ -2868,7 +2868,7 @@ always_safe_001:
     - "added"
 
 always_nosafe_001:
-  test_purpose: 验证response_add_http_header在非safe状态码(418)下不带always不添加
+  test_purpose: 验证response_add_http_header非safe状态码(418)不带always不添加带always添加
   pre_condition:
     - Nginx配置文件路径已知
     - 已备份原始配置文件
@@ -2881,18 +2881,27 @@ always_nosafe_001:
     }
     server {
       listen 18100;
-      location /proxy { proxy_pass http://127.0.0.1:18101; }
-      response_rule nosafe_418 {
+      location /proxy_noalways { proxy_pass http://127.0.0.1:18101; }
+      location /proxy_always { proxy_pass http://127.0.0.1:18101; }
+      response_rule noalways {
+        match_http_path /proxy_noalways;
         response_add_http_header X-Nosafe-418 added_418;
+      }
+      response_rule withalways {
+        match_http_path /proxy_always;
+        response_add_http_header X-Always-418 added_418_always always;
       }
     }
   operate_commands:
     - "nginx -t"
     - "nginx -s reload"
-    - "curl -s -v http://127.0.0.1:18100/proxy 2>&1"
+    - "curl -s -v http://127.0.0.1:18100/proxy_noalways 2>&1"
+    - "curl -s -v http://127.0.0.1:18100/proxy_always 2>&1"
   expected_result:
     - "test is successful"
     - "418"
+    - "X-Always-418"
+    - "added_418_always"
   unexpected_result:
     - "X-Nosafe-418"
 
