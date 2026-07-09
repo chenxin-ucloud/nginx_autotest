@@ -4515,3 +4515,43 @@ native_path_fallback_001:
     - "test is successful"
     - "loc2_hit"
     - "loc1_hit"
+
+
+# ============================================================
+# 用例评审补充 - 无条件location优先于全条件location
+# ============================================================
+
+nocond_first_001:
+  test_purpose: 验证第一个location不配置任何匹配条件时优先于第二个全条件location命中
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    multi_condition on;
+    server {
+      listen 18100;
+      location /catch_all {
+        return 200 "loc1_no_cond_hit";
+      }
+      location /rule_all {
+        match_http_host www.test.com;
+        match_http_path /rule_all;
+        match_http_header X-Auth token;
+        match_cookie session abc;
+        match_request_method GET;
+        match_source_ip 127.0.0.1;
+        match_query_string v1 ok;
+        return 200 "loc2_all_cond_hit";
+      }
+    }
+  operate_commands:
+    - "nginx -t"
+    - "nginx -s reload"
+    - "curl -s -H \"Host: www.test.com\" -H \"X-Auth: token\" -b \"session=abc\" \"http://127.0.0.1:18100/rule_all?v1=ok\""
+    - "curl -s http://127.0.0.1:18100/anything"
+  expected_result:
+    - "test is successful"
+    - "loc1_no_cond_hit"
+  unexpected_result:
+    - "loc2_all_cond_hit"
