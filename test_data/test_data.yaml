@@ -4855,3 +4855,240 @@ nomatch_status_001:
     - "upstream_ok"
   unexpected_result:
     - "X-Matched"
+
+
+# ============================================================
+# 用例评审补充 - cookie/query_string/response_header 大小写敏感
+# (match_http_path 已由 case_path_exact_001/regex_001/regex_002 覆盖)
+# ============================================================
+
+case_cookie_001:
+  test_purpose: 验证match_cookie精确值大小写不敏感及key大小写不敏感
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    multi_condition on;
+    server {
+      listen 18100;
+      location /rule_cookie {
+        match_cookie Token ValueEx;
+        return 200 "cookie_case_matched";
+      }
+      location /catch_all {
+        return 200 "no_match";
+      }
+    }
+  operate_commands:
+    - "nginx -t"
+    - "nginx -s reload"
+    - "curl -s -b \"token=valueex\" http://127.0.0.1:18100/"
+    - "curl -s -b \"TOKEN=valueex\" http://127.0.0.1:18100/"
+  expected_result:
+    - "test is successful"
+    - "cookie_case_matched"
+
+case_cookie_regex_001:
+  test_purpose: 验证match_cookie正则~区分大小写(大写请求不匹配小写正则)
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    multi_condition on;
+    server {
+      listen 18100;
+      location /rule_regex_cs {
+        match_cookie t ~^val_[a-z]+$;
+        return 200 "cookie_regex_cs_matched";
+      }
+      location /catch_all {
+        return 200 "no_match";
+      }
+    }
+  operate_commands:
+    - "nginx -t"
+    - "nginx -s reload"
+    - "curl -s -b \"t=val_abc\" http://127.0.0.1:18100/"
+    - "curl -s -b \"t=VAL_ABC\" http://127.0.0.1:18100/"
+  expected_result:
+    - "test is successful"
+    - "cookie_regex_cs_matched"
+    - "no_match"
+
+case_cookie_regex_002:
+  test_purpose: 验证match_cookie正则~*大小写不敏感(大写请求可匹配)
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    multi_condition on;
+    server {
+      listen 18100;
+      location /rule_regex_ci {
+        match_cookie t ~*^val_[a-z]+$;
+        return 200 "cookie_regex_ci_matched";
+      }
+      location /catch_all {
+        return 200 "no_match";
+      }
+    }
+  operate_commands:
+    - "nginx -t"
+    - "nginx -s reload"
+    - "curl -s -b \"t=VAL_ABC\" http://127.0.0.1:18100/"
+  expected_result:
+    - "test is successful"
+    - "cookie_regex_ci_matched"
+
+case_qs_001:
+  test_purpose: 验证match_query_string精确值大小写不敏感及key大小写不敏感
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    multi_condition on;
+    server {
+      listen 18100;
+      location /rule_qs {
+        match_query_string Key ValueEx;
+        return 200 "qs_case_matched";
+      }
+      location /catch_all {
+        return 200 "no_match";
+      }
+    }
+  operate_commands:
+    - "nginx -t"
+    - "nginx -s reload"
+    - "curl -s \"http://127.0.0.1:18100/?key=valueex\""
+    - "curl -s \"http://127.0.0.1:18100/?KEY=valueex\""
+  expected_result:
+    - "test is successful"
+    - "qs_case_matched"
+
+case_qs_regex_001:
+  test_purpose: 验证match_query_string正则~区分大小写(大写请求不匹配小写正则)
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    multi_condition on;
+    server {
+      listen 18100;
+      location /rule_regex_cs {
+        match_query_string k ~^val_[a-z]+$;
+        return 200 "qs_regex_cs_matched";
+      }
+      location /catch_all {
+        return 200 "no_match";
+      }
+    }
+  operate_commands:
+    - "nginx -t"
+    - "nginx -s reload"
+    - "curl -s \"http://127.0.0.1:18100/?k=val_abc\""
+    - "curl -s \"http://127.0.0.1:18100/?k=VAL_ABC\""
+  expected_result:
+    - "test is successful"
+    - "qs_regex_cs_matched"
+    - "no_match"
+
+case_qs_regex_002:
+  test_purpose: 验证match_query_string正则~*大小写不敏感(大写请求可匹配)
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    multi_condition on;
+    server {
+      listen 18100;
+      location /rule_regex_ci {
+        match_query_string k ~*^val_[a-z]+$;
+        return 200 "qs_regex_ci_matched";
+      }
+      location /catch_all {
+        return 200 "no_match";
+      }
+    }
+  operate_commands:
+    - "nginx -t"
+    - "nginx -s reload"
+    - "curl -s \"http://127.0.0.1:18100/?k=VAL_ABC\""
+  expected_result:
+    - "test is successful"
+    - "qs_regex_ci_matched"
+
+case_resp_header_001:
+  test_purpose: 验证match_response_http_header精确值大小写不敏感及key大小写不敏感
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    multi_condition on;
+    server {
+      listen 18101;
+      location / {
+        add_header X-Up-Hdr ValueEx;
+        return 200 "upstream_ok";
+      }
+    }
+    server {
+      listen 18100;
+      location /proxy { proxy_pass http://127.0.0.1:18101; }
+      response_rule rr {
+        match_response_http_header x-up-hdr valueex;
+        response_add_http_header X-Matched yes;
+      }
+    }
+  operate_commands:
+    - "nginx -t"
+    - "nginx -s reload"
+    - "curl -s -v http://127.0.0.1:18100/proxy 2>&1"
+  expected_result:
+    - "test is successful"
+    - "X-Matched"
+    - "yes"
+
+case_resp_header_regex_001:
+  test_purpose: 验证match_response_http_header正则~区分大小写及~*大小写不敏感
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    multi_condition on;
+    server {
+      listen 18101;
+      location / {
+        add_header X-Up-Hdr VAL_ABC;
+        return 200 "upstream_ok";
+      }
+    }
+    server {
+      listen 18100;
+      location /proxy { proxy_pass http://127.0.0.1:18101; }
+      response_rule rr_cs {
+        match_response_http_header X-Up-Hdr ~^val_[a-z]+$;
+        response_add_http_header X-Cs-No yes;
+      }
+      response_rule rr_ci {
+        match_response_http_header X-Up-Hdr ~*^val_[a-z]+$;
+        response_add_http_header X-Ci-Yes yes;
+      }
+    }
+  operate_commands:
+    - "nginx -t"
+    - "nginx -s reload"
+    - "curl -s -v http://127.0.0.1:18100/proxy 2>&1"
+  expected_result:
+    - "test is successful"
+    - "X-Ci-Yes"
+  unexpected_result:
+    - "X-Cs-No"
