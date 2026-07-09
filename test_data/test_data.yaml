@@ -6158,3 +6158,95 @@ resp_qs_nomatch_001:
     - "up"
   unexpected_result:
     - "X-Matched"
+
+
+# ============================================================
+# 用例评审补充 - keyval 正则同key不同value(AND)
+# ============================================================
+
+header_regex_samekey_001:
+  test_purpose: 验证match_http_header正则key同模式不同value多条AND关系
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    multi_condition on;
+    server {
+      listen 18100;
+      location /rule_regex_samekey {
+        match_http_header ~^X-K$ v1;
+        match_http_header ~^X-K$ v2;
+        return 200 "header_regex_samekey_matched";
+      }
+      location /catch_all {
+        return 200 "no_match";
+      }
+    }
+  operate_commands:
+    - "nginx -t"
+    - "nginx -s reload"
+    - "curl -s -H \"X-K: v1\" -H \"X-K: v2\" http://127.0.0.1:18100/"
+    - "curl -s -H \"X-K: v1\" http://127.0.0.1:18100/"
+  expected_result:
+    - "test is successful"
+    - "header_regex_samekey_matched"
+    - "no_match"
+
+cookie_regex_samekey_001:
+  test_purpose: 验证match_cookie正则key同模式不同value多条AND关系
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    multi_condition on;
+    server {
+      listen 18100;
+      location /rule_regex_samekey {
+        match_cookie ~^t$ v1;
+        match_cookie ~^t$ v2;
+        return 200 "cookie_regex_samekey_matched";
+      }
+      location /catch_all {
+        return 200 "no_match";
+      }
+    }
+  operate_commands:
+    - "nginx -t"
+    - "nginx -s reload"
+    - "curl -s -b \"t=v1; t=v2\" http://127.0.0.1:18100/"
+    - "curl -s -b \"t=v1\" http://127.0.0.1:18100/"
+  expected_result:
+    - "test is successful"
+    - "cookie_regex_samekey_matched"
+    - "no_match"
+
+qs_regex_samekey_001:
+  test_purpose: 验证match_query_string正则key同模式不同value多条AND关系
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    multi_condition on;
+    server {
+      listen 18100;
+      location /rule_regex_samekey {
+        match_query_string ~^k$ v1;
+        match_query_string ~^k$ v2;
+        return 200 "qs_regex_samekey_matched";
+      }
+      location /catch_all {
+        return 200 "no_match";
+      }
+    }
+  operate_commands:
+    - "nginx -t"
+    - "nginx -s reload"
+    - "curl -s \"http://127.0.0.1:18100/?k=v1&k=v2\""
+    - "curl -s \"http://127.0.0.1:18100/?k=v1\""
+  expected_result:
+    - "test is successful"
+    - "qs_regex_samekey_matched"
+    - "no_match"
