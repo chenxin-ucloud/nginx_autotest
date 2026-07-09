@@ -6398,3 +6398,80 @@ resp_header_regex_samekey_001:
     - "test is successful"
     - "X-Matched"
     - "yes"
+
+
+# ============================================================
+# 用例评审补充 - response_rule与rewrite组合场景
+# ============================================================
+
+resp_rewrite_001:
+  test_purpose: 验证rewrite改写URI后proxy_pass仍触发response_rule添加响应头
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    multi_condition on;
+    server {
+      listen 18101;
+      location / {
+        add_header X-Up "upval";
+        return 200 "upstream_ok";
+      }
+    }
+    server {
+      listen 18100;
+      location /proxy {
+        rewrite ^/proxy(.*)$ $1 break;
+        proxy_pass http://127.0.0.1:18101;
+      }
+      response_rule rr {
+        response_add_http_header X-Rewrite-Rule added;
+      }
+    }
+  operate_commands:
+    - "nginx -t"
+    - "nginx -s reload"
+    - "curl -s -v http://127.0.0.1:18100/proxy/ 2>&1"
+  expected_result:
+    - "test is successful"
+    - "X-Rewrite-Rule"
+    - "added"
+    - "upstream_ok"
+
+resp_rewrite_002:
+  test_purpose: 验证rewrite改写URI后response_rule的match_http_path按改写后路径匹配
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    multi_condition on;
+    server {
+      listen 18101;
+      location / { return 200 "upstream_ok"; }
+    }
+    server {
+      listen 18100;
+      location /proxy {
+        rewrite ^/proxy(.*)$ $1 break;
+        proxy_pass http://127.0.0.1:18101;
+      }
+      response_rule rr_match {
+        match_http_path /;
+        response_add_http_header X-Path-Matched yes;
+      }
+      response_rule rr_nomatch {
+        match_http_path /proxy;
+        response_add_http_header X-Path-Nomatch yes;
+      }
+    }
+  operate_commands:
+    - "nginx -t"
+    - "nginx -s reload"
+    - "curl -s -v http://127.0.0.1:18100/proxy/ 2>&1"
+  expected_result:
+    - "test is successful"
+    - "X-Path-Matched"
+  unexpected_result:
+    - "X-Path-Nomatch"
