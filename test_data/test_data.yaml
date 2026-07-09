@@ -6475,3 +6475,79 @@ resp_rewrite_002:
     - "X-Path-Matched"
   unexpected_result:
     - "X-Path-Nomatch"
+
+
+# ============================================================
+# 用例评审补充 - proxy_set_header转发变量与转发日志场景
+# ============================================================
+
+proxy_set_header_var_001:
+  test_purpose: 验证proxy_set_header转发$custom_rule_request_rule_name变量到上游并回显
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    multi_condition on;
+    server {
+      listen 18101;
+      location / {
+        add_header X-Echo-Fwd $http_x_fwd_rule;
+        return 200 "up";
+      }
+    }
+    server {
+      listen 18100;
+      location /myrule {
+        proxy_pass http://127.0.0.1:18101;
+        proxy_set_header X-Fwd-Rule $custom_rule_request_rule_name;
+      }
+      response_rule myresprule {
+        response_add_http_header X-Resp-Rule $custom_rule_response_rule_name;
+      }
+    }
+  operate_commands:
+    - "nginx -t"
+    - "nginx -s reload"
+    - "curl -s -v http://127.0.0.1:18100/myrule 2>&1"
+  expected_result:
+    - "test is successful"
+    - "X-Echo-Fwd"
+    - "/myrule"
+    - "X-Resp-Rule"
+    - "myresprule"
+
+fwd_log_001:
+  test_purpose: 验证转发日志access_log输出$custom_rule_request_rule_name与$custom_rule_response_rule_name变量
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    multi_condition on;
+    log_format fwdlog '$remote_addr $custom_rule_request_rule_name $custom_rule_response_rule_name';
+    access_log /ulb/access_fwd.log fwdlog;
+    server {
+      listen 18101;
+      location / { return 200 "up"; }
+    }
+    server {
+      listen 18100;
+      location /myrule {
+        proxy_pass http://127.0.0.1:18101;
+      }
+      response_rule myresprule {
+        response_add_http_header X-Test yes;
+      }
+    }
+  operate_commands:
+    - "nginx -t"
+    - "nginx -s reload"
+    - "curl -s http://127.0.0.1:18100/myrule"
+    - "tail -1 /ulb/alb-test/access_fwd.log"
+  expected_result:
+    - "test is successful"
+    - "up"
+    - "127.0.0.1"
+    - "/myrule"
+    - "myresprule"
