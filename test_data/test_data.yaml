@@ -5092,3 +5092,37 @@ case_resp_header_regex_001:
     - "X-Ci-Yes"
   unexpected_result:
     - "X-Cs-No"
+
+
+# ============================================================
+# 用例评审补充 - source_ip IPv6 /0 网段
+# ============================================================
+
+ip_004:
+  test_purpose: 验证match_source_ip IPv6 ::/0网段匹配所有IPv6(不匹配IPv4)
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    multi_condition on;
+    server {
+      listen 18100;
+      listen [::]:18100;
+      location /rule_v6_all {
+        match_source_ip ::/0;
+        return 200 "v6_all_matched";
+      }
+      location /catch_all {
+        return 200 "no_match";
+      }
+    }
+  operate_commands:
+    - "nginx -t"
+    - "nginx -s reload"
+    - "curl -s http://[::1]:18100/"
+    - "curl -s http://127.0.0.1:18100/"
+  expected_result:
+    - "test is successful"
+    - "v6_all_matched"
+    - "no_match"
