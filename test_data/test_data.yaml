@@ -7452,3 +7452,152 @@ valid_ipv6_maskabc_001:
   expected_result:
     - "invalid network"
     - "test failed"
+
+# ============================================================
+# 用例评审补充 - keyval参数数量必须为偶数(奇数报错)
+# ============================================================
+
+valid_odd_header_001:
+  test_purpose: 验证match_http_header参数为奇数(3个)报not in pairs
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    multi_condition on;
+    server {
+      listen 18100;
+      location /a { match_http_header X-A v1 X-B; return 200 "ok"; }
+    }
+  operate_commands:
+    - "nginx -t"
+  expect_syntax_fail: true
+  expected_result:
+    - "not in pairs"
+    - "test failed"
+
+valid_odd_cookie_001:
+  test_purpose: 验证match_cookie参数为奇数(3个)报not in pairs
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    multi_condition on;
+    server {
+      listen 18100;
+      location /a { match_cookie c1 v1 c2; return 200 "ok"; }
+    }
+  operate_commands:
+    - "nginx -t"
+  expect_syntax_fail: true
+  expected_result:
+    - "not in pairs"
+    - "test failed"
+
+valid_odd_qs_001:
+  test_purpose: 验证match_query_string参数为奇数(3个)报not in pairs
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    multi_condition on;
+    server {
+      listen 18100;
+      location /a { match_query_string k1 v1 k2; return 200 "ok"; }
+    }
+  operate_commands:
+    - "nginx -t"
+  expect_syntax_fail: true
+  expected_result:
+    - "not in pairs"
+    - "test failed"
+
+valid_odd_resphdr_001:
+  test_purpose: 验证match_response_http_header参数为奇数(3个)报not in pairs
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    multi_condition on;
+    server {
+      listen 18101; location / { return 200 "ok"; }
+    }
+    server {
+      listen 18100;
+      location /p { proxy_pass http://127.0.0.1:18101; }
+      response_rule r { match_response_http_header X-A v1 X-B; }
+    }
+  operate_commands:
+    - "nginx -t"
+  expect_syntax_fail: true
+  expected_result:
+    - "not in pairs"
+    - "test failed"
+
+valid_odd_header5_001:
+  test_purpose: 验证match_http_header参数为奇数(5个)报not in pairs
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    multi_condition on;
+    server {
+      listen 18100;
+      location /a { match_http_header X-A v1 X-B v2 X-C; return 200 "ok"; }
+    }
+  operate_commands:
+    - "nginx -t"
+  expect_syntax_fail: true
+  expected_result:
+    - "not in pairs"
+    - "test failed"
+
+valid_odd_respadd_1_001:
+  test_purpose: 验证response_add_http_header仅key(1个参数)报错
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    multi_condition on;
+    server {
+      listen 18101; location / { return 200 "ok"; }
+    }
+    server {
+      listen 18100;
+      location /p { proxy_pass http://127.0.0.1:18101; }
+      response_rule r { response_add_http_header X-A; }
+    }
+  operate_commands:
+    - "nginx -t"
+  expect_syntax_fail: true
+  expected_result:
+    - "invalid number of arguments"
+    - "test failed"
+
+valid_odd_respadd_3_001:
+  test_purpose: 验证response_add_http_header参数为奇数(3个非always)报invalid parameter
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    multi_condition on;
+    server {
+      listen 18101; location / { return 200 "ok"; }
+    }
+    server {
+      listen 18100;
+      location /p { proxy_pass http://127.0.0.1:18101; }
+      response_rule r { response_add_http_header X-A v1 X-B; }
+    }
+  operate_commands:
+    - "nginx -t"
+  expect_syntax_fail: true
+  expected_result:
+    - "invalid parameter"
+    - "test failed"
