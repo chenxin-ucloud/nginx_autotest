@@ -3572,11 +3572,13 @@ scale_50_001:
 
 
 # ============================================================
-# 用例评审补充 - 响应头增删8种组合 (#15)
+# ============================================================
+# 用例评审补充 - 响应头增删8种组合独立场景 (#15)
+# 3维(上游有无/原生增删/自定义增删)2x2x2=8种,每种独立验证
 # ============================================================
 
 cross_eight_001:
-  test_purpose: 验证原生add_header增删与自定义response增删及上游响应头增删8种组合共存
+  test_purpose: 组合1-上游有+原生增+自定义增(三者叠加)
   pre_condition:
     - Nginx配置文件路径已知
     - 已备份原始配置文件
@@ -3586,22 +3588,18 @@ cross_eight_001:
     server {
       listen 18101;
       location / {
-        add_header X-Up "up1";
-        add_header X-Up2 "up2";
-        return 200 "backend_ok";
+        add_header X-H "up_val";
+        return 200 "up";
       }
     }
     server {
       listen 18100;
       location /p {
         proxy_pass http://127.0.0.1:18101;
-        add_header X-Native "native1";
-        add_header X-Native "native2";
-        proxy_hide_header X-Up2;
+        add_header X-H "native_val";
       }
-      response_rule rr {
-        response_add_http_header X-Rule-Add "rule_val";
-        response_delete_http_header X-Up;
+      response_rule r {
+        response_add_http_header X-H "custom_val";
       }
     }
   operate_commands:
@@ -3610,18 +3608,13 @@ cross_eight_001:
     - "curl -s -v http://127.0.0.1:18100/p 2>&1"
   expected_result:
     - "test is successful"
-    - "backend_ok"
-    - "X-Native"
-    - "native1"
-    - "native2"
-    - "X-Rule-Add"
-    - "rule_val"
-  unexpected_result:
-    - "X-Up: up1"
-    - "X-Up2: up2"
+    - "up"
+    - "X-H: up_val"
+    - "X-H: native_val"
+    - "X-H: custom_val"
 
 cross_eight_002:
-  test_purpose: 验证add_header空值被response_add覆盖及自定义新增同名叠加
+  test_purpose: 组合2-上游有+原生增+自定义删(删上游保留原生)
   pre_condition:
     - Nginx配置文件路径已知
     - 已备份原始配置文件
@@ -3630,18 +3623,19 @@ cross_eight_002:
     multi_condition on;
     server {
       listen 18101;
-      location / { add_header X-Base "base"; return 200 "backend_ok"; }
+      location / {
+        add_header X-H "up_val";
+        return 200 "up";
+      }
     }
     server {
       listen 18100;
       location /p {
         proxy_pass http://127.0.0.1:18101;
-        add_header X-Native-Empty "";
+        add_header X-H "native_val";
       }
-      response_rule rr {
-        response_add_http_header X-Native-Empty "rule_override";
-        response_add_http_header X-Stacked "s1";
-        response_add_http_header X-Stacked "s2";
+      response_rule r {
+        response_delete_http_header X-H;
       }
     }
   operate_commands:
@@ -3650,15 +3644,225 @@ cross_eight_002:
     - "curl -s -v http://127.0.0.1:18100/p 2>&1"
   expected_result:
     - "test is successful"
-    - "X-Base"
-    - "base"
-    - "X-Native-Empty"
-    - "rule_override"
-    - "X-Stacked"
-    - "s1"
-    - "s2"
+    - "up"
+    - "X-H: native_val"
+  unexpected_result:
+    - "up_val"
+    - "custom_val"
 
-# ============================================================
+cross_eight_003:
+  test_purpose: 组合3-上游有+原生删+自定义增(隐藏上游新增自定义)
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    multi_condition on;
+    server {
+      listen 18101;
+      location / {
+        add_header X-H "up_val";
+        return 200 "up";
+      }
+    }
+    server {
+      listen 18100;
+      location /p {
+        proxy_pass http://127.0.0.1:18101;
+        proxy_hide_header X-H;
+      }
+      response_rule r {
+        response_add_http_header X-H "custom_val";
+      }
+    }
+  operate_commands:
+    - "nginx -t"
+    - "nginx -s reload"
+    - "curl -s -v http://127.0.0.1:18100/p 2>&1"
+  expected_result:
+    - "test is successful"
+    - "up"
+    - "X-H: custom_val"
+  unexpected_result:
+    - "up_val"
+    - "native_val"
+
+cross_eight_004:
+  test_purpose: 组合4-上游有+原生删+自定义删(全删无X-H)
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    multi_condition on;
+    server {
+      listen 18101;
+      location / {
+        add_header X-H "up_val";
+        return 200 "up";
+      }
+    }
+    server {
+      listen 18100;
+      location /p {
+        proxy_pass http://127.0.0.1:18101;
+        proxy_hide_header X-H;
+      }
+      response_rule r {
+        response_delete_http_header X-H;
+      }
+    }
+  operate_commands:
+    - "nginx -t"
+    - "nginx -s reload"
+    - "curl -s -v http://127.0.0.1:18100/p 2>&1"
+  expected_result:
+    - "test is successful"
+    - "up"
+  unexpected_result:
+    - "X-H:"
+
+cross_eight_005:
+  test_purpose: 组合5-上游无+原生增+自定义增(叠加两值)
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    multi_condition on;
+    server {
+      listen 18101;
+      location / {
+        return 200 "up";
+      }
+    }
+    server {
+      listen 18100;
+      location /p {
+        proxy_pass http://127.0.0.1:18101;
+        add_header X-H "native_val";
+      }
+      response_rule r {
+        response_add_http_header X-H "custom_val";
+      }
+    }
+  operate_commands:
+    - "nginx -t"
+    - "nginx -s reload"
+    - "curl -s -v http://127.0.0.1:18100/p 2>&1"
+  expected_result:
+    - "test is successful"
+    - "up"
+    - "X-H: native_val"
+    - "X-H: custom_val"
+
+cross_eight_006:
+  test_purpose: 组合6-上游无+原生增+自定义删(保留原生)
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    multi_condition on;
+    server {
+      listen 18101;
+      location / {
+        return 200 "up";
+      }
+    }
+    server {
+      listen 18100;
+      location /p {
+        proxy_pass http://127.0.0.1:18101;
+        add_header X-H "native_val";
+      }
+      response_rule r {
+        response_delete_http_header X-H;
+      }
+    }
+  operate_commands:
+    - "nginx -t"
+    - "nginx -s reload"
+    - "curl -s -v http://127.0.0.1:18100/p 2>&1"
+  expected_result:
+    - "test is successful"
+    - "up"
+    - "X-H: native_val"
+  unexpected_result:
+    - "up_val"
+    - "custom_val"
+
+cross_eight_007:
+  test_purpose: 组合7-上游无+原生删+自定义增(仅自定义)
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    multi_condition on;
+    server {
+      listen 18101;
+      location / {
+        return 200 "up";
+      }
+    }
+    server {
+      listen 18100;
+      location /p {
+        proxy_pass http://127.0.0.1:18101;
+        proxy_hide_header X-H;
+      }
+      response_rule r {
+        response_add_http_header X-H "custom_val";
+      }
+    }
+  operate_commands:
+    - "nginx -t"
+    - "nginx -s reload"
+    - "curl -s -v http://127.0.0.1:18100/p 2>&1"
+  expected_result:
+    - "test is successful"
+    - "up"
+    - "X-H: custom_val"
+  unexpected_result:
+    - "up_val"
+    - "native_val"
+
+cross_eight_008:
+  test_purpose: 组合8-上游无+原生删+自定义删(全无X-H)
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    multi_condition on;
+    server {
+      listen 18101;
+      location / {
+        return 200 "up";
+      }
+    }
+    server {
+      listen 18100;
+      location /p {
+        proxy_pass http://127.0.0.1:18101;
+        proxy_hide_header X-H;
+      }
+      response_rule r {
+        response_delete_http_header X-H;
+      }
+    }
+  operate_commands:
+    - "nginx -t"
+    - "nginx -s reload"
+    - "curl -s -v http://127.0.0.1:18100/p 2>&1"
+  expected_result:
+    - "test is successful"
+    - "up"
+  unexpected_result:
+    - "X-H:"
+
+
 # 用例评审补充 - 规模交叉组合综合用例(#17/#18合并)
 # 单值条件(host/path/method/source_ip/status)一指令多值OR,
 # 多值条件(header/cookie/query/response_http_header)50条AND,
