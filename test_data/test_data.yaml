@@ -6763,3 +6763,63 @@ valid_mc_dup_001:
   expected_result:
     - "is duplicate"
     - "test failed"
+
+
+# ============================================================
+# 用例评审补充 - multi_condition关闭时变量返回行为
+# 注:$custom_rule_request_rule_name关闭时返回location名(非空),
+#    $custom_rule_response_rule_name关闭时返回空
+# ============================================================
+
+var_off_001:
+  test_purpose: 验证multi_condition关闭时$custom_rule_response_rule_name返回空而request_rule_name返回location名
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    multi_condition off;
+    server {
+      listen 18100;
+      location /test {
+        add_header X-Req-Rule "$custom_rule_request_rule_name";
+        add_header X-Resp-Rule "$custom_rule_response_rule_name";
+        return 200 "ok";
+      }
+    }
+  operate_commands:
+    - "nginx -t"
+    - "nginx -s reload"
+    - "curl -s -v http://127.0.0.1:18100/test 2>&1"
+  expected_result:
+    - "test is successful"
+    - "ok"
+    - "X-Req-Rule"
+    - "/test"
+  unexpected_result:
+    - "X-Resp-Rule"
+
+var_off_log_001:
+  test_purpose: 验证multi_condition关闭时转发日志中response_rule_name为空request_rule_name为location名
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    multi_condition off;
+    log_format vlog 'req=[$custom_rule_request_rule_name] resp=[$custom_rule_response_rule_name]';
+    access_log /ulb/access_v.log vlog;
+    server {
+      listen 18100;
+      location /test { return 200 "ok"; }
+    }
+  operate_commands:
+    - "nginx -t"
+    - "nginx -s reload"
+    - "curl -s http://127.0.0.1:18100/test"
+    - "tail -1 /ulb/alb-test/access_v.log"
+  expected_result:
+    - "test is successful"
+    - "ok"
+    - "req=[/test]"
+    - "resp=[-]"
