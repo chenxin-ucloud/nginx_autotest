@@ -6551,3 +6551,215 @@ fwd_log_001:
     - "127.0.0.1"
     - "/myrule"
     - "myresprule"
+
+# ============================================================
+# 用例评审补充 - multi_condition关闭时各关键字报错(#10补全)
+# ============================================================
+
+valid_off_path_001:
+  test_purpose: 验证multi_condition关闭时配置match_http_path报错
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    server {
+      listen 18100;
+      location /a { match_http_path /a; return 200 "ok"; }
+    }
+  operate_commands:
+    - "nginx -t"
+  expect_syntax_fail: true
+  expected_result:
+    - "multi_condition is false"
+    - "test failed"
+
+valid_off_header_001:
+  test_purpose: 验证multi_condition关闭时配置match_http_header报错
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    server {
+      listen 18100;
+      location /a { match_http_header X-A v; return 200 "ok"; }
+    }
+  operate_commands:
+    - "nginx -t"
+  expect_syntax_fail: true
+  expected_result:
+    - "multi_condition is false"
+    - "test failed"
+
+valid_off_cookie_001:
+  test_purpose: 验证multi_condition关闭时配置match_cookie报错
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    server {
+      listen 18100;
+      location /a { match_cookie c v; return 200 "ok"; }
+    }
+  operate_commands:
+    - "nginx -t"
+  expect_syntax_fail: true
+  expected_result:
+    - "multi_condition is false"
+    - "test failed"
+
+valid_off_method_001:
+  test_purpose: 验证multi_condition关闭时配置match_request_method报错
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    server {
+      listen 18100;
+      location /a { match_request_method GET; return 200 "ok"; }
+    }
+  operate_commands:
+    - "nginx -t"
+  expect_syntax_fail: true
+  expected_result:
+    - "multi_condition is false"
+    - "test failed"
+
+valid_off_ip_001:
+  test_purpose: 验证multi_condition关闭时配置match_source_ip报错
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    server {
+      listen 18100;
+      location /a { match_source_ip 1.1.1.1; return 200 "ok"; }
+    }
+  operate_commands:
+    - "nginx -t"
+  expect_syntax_fail: true
+  expected_result:
+    - "multi_condition is false"
+    - "test failed"
+
+valid_off_qs_001:
+  test_purpose: 验证multi_condition关闭时配置match_query_string报错
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    server {
+      listen 18100;
+      location /a { match_query_string k v; return 200 "ok"; }
+    }
+  operate_commands:
+    - "nginx -t"
+  expect_syntax_fail: true
+  expected_result:
+    - "multi_condition is false"
+    - "test failed"
+
+# ============================================================
+# 用例评审补充 - multi_condition非枚举值报错
+# ============================================================
+
+valid_mc_maybe_001:
+  test_purpose: 验证multi_condition非枚举值(maybe)报错
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    multi_condition maybe;
+    server {
+      listen 18100;
+      location / { return 200 "ok"; }
+    }
+  operate_commands:
+    - "nginx -t"
+  expect_syntax_fail: true
+  expected_result:
+    - "invalid value"
+    - "test failed"
+
+valid_mc_yes_001:
+  test_purpose: 验证multi_condition非枚举值(yes)报错
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    multi_condition yes;
+    server {
+      listen 18100;
+      location / { return 200 "ok"; }
+    }
+  operate_commands:
+    - "nginx -t"
+  expect_syntax_fail: true
+  expected_result:
+    - "invalid value"
+    - "test failed"
+
+valid_mc_noargs_001:
+  test_purpose: 验证multi_condition无参数报错
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    multi_condition;
+    server {
+      listen 18100;
+      location / { return 200 "ok"; }
+    }
+  operate_commands:
+    - "nginx -t"
+  expect_syntax_fail: true
+  expected_result:
+    - "invalid number of arguments"
+    - "test failed"
+
+valid_mc_multiargs_001:
+  test_purpose: 验证multi_condition多参数报错
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    multi_condition on off;
+    server {
+      listen 18100;
+      location / { return 200 "ok"; }
+    }
+  operate_commands:
+    - "nginx -t"
+  expect_syntax_fail: true
+  expected_result:
+    - "invalid number of arguments"
+    - "test failed"
+
+valid_mc_dup_001:
+  test_purpose: 验证multi_condition重复配置报错
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    multi_condition on;
+    multi_condition off;
+    server {
+      listen 18100;
+      location / { return 200 "ok"; }
+    }
+  operate_commands:
+    - "nginx -t"
+  expect_syntax_fail: true
+  expected_result:
+    - "is duplicate"
+    - "test failed"
