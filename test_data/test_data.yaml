@@ -6823,3 +6823,237 @@ var_off_log_001:
     - "ok"
     - "req=[/test]"
     - "resp=[-]"
+
+# ============================================================
+# 用例评审补充 - 唯一关键字不可重复(location/response_rule双场景)
+# ============================================================
+
+valid_dup_path_loc_001:
+  test_purpose: 验证location内match_http_path重复配置报错
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    multi_condition on;
+    server {
+      listen 18100;
+      location /a { match_http_path /x; match_http_path /y; return 200 "ok"; }
+    }
+  operate_commands:
+    - "nginx -t"
+  expect_syntax_fail: true
+  expected_result:
+    - "is duplicate"
+    - "test failed"
+
+valid_dup_method_loc_001:
+  test_purpose: 验证location内match_request_method重复配置报错
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    multi_condition on;
+    server {
+      listen 18100;
+      location /a { match_request_method GET; match_request_method POST; return 200 "ok"; }
+    }
+  operate_commands:
+    - "nginx -t"
+  expect_syntax_fail: true
+  expected_result:
+    - "is duplicate"
+    - "test failed"
+
+valid_dup_ip_loc_001:
+  test_purpose: 验证location内match_source_ip重复配置报错
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    multi_condition on;
+    server {
+      listen 18100;
+      location /a { match_source_ip 1.1.1.1; match_source_ip 2.2.2.2; return 200 "ok"; }
+    }
+  operate_commands:
+    - "nginx -t"
+  expect_syntax_fail: true
+  expected_result:
+    - "is duplicate"
+    - "test failed"
+
+valid_dup_host_resp_001:
+  test_purpose: 验证response_rule内match_http_host重复配置报错
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    multi_condition on;
+    server {
+      listen 18101; location / { return 200 "ok"; }
+    }
+    server {
+      listen 18100;
+      location /p { proxy_pass http://127.0.0.1:18101; }
+      response_rule r { match_http_host a.com; match_http_host b.com; }
+    }
+  operate_commands:
+    - "nginx -t"
+  expect_syntax_fail: true
+  expected_result:
+    - "is duplicate"
+    - "test failed"
+
+valid_dup_path_resp_001:
+  test_purpose: 验证response_rule内match_http_path重复配置报错
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    multi_condition on;
+    server {
+      listen 18101; location / { return 200 "ok"; }
+    }
+    server {
+      listen 18100;
+      location /p { proxy_pass http://127.0.0.1:18101; }
+      response_rule r { match_http_path /a; match_http_path /b; }
+    }
+  operate_commands:
+    - "nginx -t"
+  expect_syntax_fail: true
+  expected_result:
+    - "is duplicate"
+    - "test failed"
+
+valid_dup_method_resp_001:
+  test_purpose: 验证response_rule内match_request_method重复配置报错
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    multi_condition on;
+    server {
+      listen 18101; location / { return 200 "ok"; }
+    }
+    server {
+      listen 18100;
+      location /p { proxy_pass http://127.0.0.1:18101; }
+      response_rule r { match_request_method GET; match_request_method POST; }
+    }
+  operate_commands:
+    - "nginx -t"
+  expect_syntax_fail: true
+  expected_result:
+    - "is duplicate"
+    - "test failed"
+
+valid_dup_ip_resp_001:
+  test_purpose: 验证response_rule内match_source_ip重复配置报错
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    multi_condition on;
+    server {
+      listen 18101; location / { return 200 "ok"; }
+    }
+    server {
+      listen 18100;
+      location /p { proxy_pass http://127.0.0.1:18101; }
+      response_rule r { match_source_ip 1.1.1.1; match_source_ip 2.2.2.2; }
+    }
+  operate_commands:
+    - "nginx -t"
+  expect_syntax_fail: true
+  expected_result:
+    - "is duplicate"
+    - "test failed"
+
+# ============================================================
+# 用例评审补充 - 唯一关键字作用范围(location/response_rule上下文)
+# response_rule专属关键字不可配置在location块内
+# ============================================================
+
+valid_ctx_status_loc_001:
+  test_purpose: 验证match_http_status配置在location块内报错(仅response_rule允许)
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    multi_condition on;
+    server {
+      listen 18100;
+      location /a { match_http_status 200; return 200 "ok"; }
+    }
+  operate_commands:
+    - "nginx -t"
+  expect_syntax_fail: true
+  expected_result:
+    - "not allowed here"
+    - "test failed"
+
+valid_ctx_resphdr_loc_001:
+  test_purpose: 验证match_response_http_header配置在location块内报错(仅response_rule允许)
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    multi_condition on;
+    server {
+      listen 18100;
+      location /a { match_response_http_header X-A v; return 200 "ok"; }
+    }
+  operate_commands:
+    - "nginx -t"
+  expect_syntax_fail: true
+  expected_result:
+    - "not allowed here"
+    - "test failed"
+
+valid_ctx_respadd_loc_001:
+  test_purpose: 验证response_add_http_header配置在location块内报错(仅response_rule允许)
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    multi_condition on;
+    server {
+      listen 18100;
+      location /a { response_add_http_header X-A v; return 200 "ok"; }
+    }
+  operate_commands:
+    - "nginx -t"
+  expect_syntax_fail: true
+  expected_result:
+    - "not allowed here"
+    - "test failed"
+
+valid_ctx_respdel_loc_001:
+  test_purpose: 验证response_delete_http_header配置在location块内报错(仅response_rule允许)
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    multi_condition on;
+    server {
+      listen 18100;
+      location /a { response_delete_http_header X-A; return 200 "ok"; }
+    }
+  operate_commands:
+    - "nginx -t"
+  expect_syntax_fail: true
+  expected_result:
+    - "not allowed here"
+    - "test failed"
