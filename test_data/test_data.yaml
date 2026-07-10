@@ -7601,3 +7601,355 @@ valid_odd_respadd_3_001:
   expected_result:
     - "invalid parameter"
     - "test failed"
+
+# ============================================================
+# 用例评审补充 - response_add/delete_http_header always非法与响应头非法
+# 内置保护头全列表(15):Server/Date/Content-Type/Content-Length/
+# Content-Encoding/Location/Refresh/Last-Modified/Content-Range/
+# Accept-Ranges/WWW-Authenticate/Expires/ETag/Cache-Control/Link
+# ============================================================
+
+valid_respadd_always_case_001:
+  test_purpose: 验证response_add_http_header的always参数大小写敏感(Always非法)
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    multi_condition on;
+    server {
+      listen 18101; location / { return 200 "ok"; }
+    }
+    server {
+      listen 18100;
+      location /p { proxy_pass http://127.0.0.1:18101; }
+      response_rule r { response_add_http_header X-A v1 Always; }
+    }
+  operate_commands:
+    - "nginx -t"
+  expect_syntax_fail: true
+  expected_result:
+    - "invalid parameter"
+    - "test failed"
+
+valid_respadd_always_extra_001:
+  test_purpose: 验证response_add_http_header的always后多余参数报错
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    multi_condition on;
+    server {
+      listen 18101; location / { return 200 "ok"; }
+    }
+    server {
+      listen 18100;
+      location /p { proxy_pass http://127.0.0.1:18101; }
+      response_rule r { response_add_http_header X-A v1 always extra; }
+    }
+  operate_commands:
+    - "nginx -t"
+  expect_syntax_fail: true
+  expected_result:
+    - "invalid number of arguments"
+    - "test failed"
+
+valid_respdel_always_case_001:
+  test_purpose: 验证response_delete_http_header的always参数大小写敏感(Always非法)
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    multi_condition on;
+    server {
+      listen 18101; location / { return 200 "ok"; }
+    }
+    server {
+      listen 18100;
+      location /p { proxy_pass http://127.0.0.1:18101; }
+      response_rule r { response_delete_http_header X-A Always; }
+    }
+  operate_commands:
+    - "nginx -t"
+  expect_syntax_fail: true
+  expected_result:
+    - "invalid parameter"
+    - "test failed"
+
+valid_respdel_always_extra_001:
+  test_purpose: 验证response_delete_http_header的always后多余参数报错
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    multi_condition on;
+    server {
+      listen 18101; location / { return 200 "ok"; }
+    }
+    server {
+      listen 18100;
+      location /p { proxy_pass http://127.0.0.1:18101; }
+      response_rule r { response_delete_http_header X-A always extra; }
+    }
+  operate_commands:
+    - "nginx -t"
+  expect_syntax_fail: true
+  expected_result:
+    - "invalid number of arguments"
+    - "test failed"
+
+valid_respadd_forbidden_contentencoding_001:
+  test_purpose: 验证response_add_http_header内置保护头(Content-Encoding)报错
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    multi_condition on;
+    server {
+      listen 18101; location / { return 200 "ok"; }
+    }
+    server {
+      listen 18100;
+      location /p { proxy_pass http://127.0.0.1:18101; }
+      response_rule r { response_add_http_header Content-Encoding hacked; }
+    }
+  operate_commands:
+    - "nginx -t"
+  expect_syntax_fail: true
+  expected_result:
+    - "builtin response header"
+    - "test failed"
+
+valid_respadd_forbidden_location_001:
+  test_purpose: 验证response_add_http_header内置保护头(Location)报错
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    multi_condition on;
+    server {
+      listen 18101; location / { return 200 "ok"; }
+    }
+    server {
+      listen 18100;
+      location /p { proxy_pass http://127.0.0.1:18101; }
+      response_rule r { response_add_http_header Location hacked; }
+    }
+  operate_commands:
+    - "nginx -t"
+  expect_syntax_fail: true
+  expected_result:
+    - "builtin response header"
+    - "test failed"
+
+valid_respadd_forbidden_refresh_001:
+  test_purpose: 验证response_add_http_header内置保护头(Refresh)报错
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    multi_condition on;
+    server {
+      listen 18101; location / { return 200 "ok"; }
+    }
+    server {
+      listen 18100;
+      location /p { proxy_pass http://127.0.0.1:18101; }
+      response_rule r { response_add_http_header Refresh hacked; }
+    }
+  operate_commands:
+    - "nginx -t"
+  expect_syntax_fail: true
+  expected_result:
+    - "builtin response header"
+    - "test failed"
+
+valid_respadd_forbidden_lastmodified_001:
+  test_purpose: 验证response_add_http_header内置保护头(Last-Modified)报错
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    multi_condition on;
+    server {
+      listen 18101; location / { return 200 "ok"; }
+    }
+    server {
+      listen 18100;
+      location /p { proxy_pass http://127.0.0.1:18101; }
+      response_rule r { response_add_http_header Last-Modified hacked; }
+    }
+  operate_commands:
+    - "nginx -t"
+  expect_syntax_fail: true
+  expected_result:
+    - "builtin response header"
+    - "test failed"
+
+valid_respadd_forbidden_contentrange_001:
+  test_purpose: 验证response_add_http_header内置保护头(Content-Range)报错
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    multi_condition on;
+    server {
+      listen 18101; location / { return 200 "ok"; }
+    }
+    server {
+      listen 18100;
+      location /p { proxy_pass http://127.0.0.1:18101; }
+      response_rule r { response_add_http_header Content-Range hacked; }
+    }
+  operate_commands:
+    - "nginx -t"
+  expect_syntax_fail: true
+  expected_result:
+    - "builtin response header"
+    - "test failed"
+
+valid_respdel_forbidden_acceptranges_001:
+  test_purpose: 验证response_delete_http_header内置保护头(Accept-Ranges)报错
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    multi_condition on;
+    server {
+      listen 18101; location / { return 200 "ok"; }
+    }
+    server {
+      listen 18100;
+      location /p { proxy_pass http://127.0.0.1:18101; }
+      response_rule r { response_delete_http_header Accept-Ranges; }
+    }
+  operate_commands:
+    - "nginx -t"
+  expect_syntax_fail: true
+  expected_result:
+    - "builtin response header"
+    - "test failed"
+
+valid_respdel_forbidden_wwwauthenticate_001:
+  test_purpose: 验证response_delete_http_header内置保护头(WWW-Authenticate)报错
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    multi_condition on;
+    server {
+      listen 18101; location / { return 200 "ok"; }
+    }
+    server {
+      listen 18100;
+      location /p { proxy_pass http://127.0.0.1:18101; }
+      response_rule r { response_delete_http_header WWW-Authenticate; }
+    }
+  operate_commands:
+    - "nginx -t"
+  expect_syntax_fail: true
+  expected_result:
+    - "builtin response header"
+    - "test failed"
+
+valid_respdel_forbidden_expires_001:
+  test_purpose: 验证response_delete_http_header内置保护头(Expires)报错
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    multi_condition on;
+    server {
+      listen 18101; location / { return 200 "ok"; }
+    }
+    server {
+      listen 18100;
+      location /p { proxy_pass http://127.0.0.1:18101; }
+      response_rule r { response_delete_http_header Expires; }
+    }
+  operate_commands:
+    - "nginx -t"
+  expect_syntax_fail: true
+  expected_result:
+    - "builtin response header"
+    - "test failed"
+
+valid_respdel_forbidden_etag_001:
+  test_purpose: 验证response_delete_http_header内置保护头(ETag)报错
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    multi_condition on;
+    server {
+      listen 18101; location / { return 200 "ok"; }
+    }
+    server {
+      listen 18100;
+      location /p { proxy_pass http://127.0.0.1:18101; }
+      response_rule r { response_delete_http_header ETag; }
+    }
+  operate_commands:
+    - "nginx -t"
+  expect_syntax_fail: true
+  expected_result:
+    - "builtin response header"
+    - "test failed"
+
+valid_respdel_forbidden_cachecontrol_001:
+  test_purpose: 验证response_delete_http_header内置保护头(Cache-Control)报错
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    multi_condition on;
+    server {
+      listen 18101; location / { return 200 "ok"; }
+    }
+    server {
+      listen 18100;
+      location /p { proxy_pass http://127.0.0.1:18101; }
+      response_rule r { response_delete_http_header Cache-Control; }
+    }
+  operate_commands:
+    - "nginx -t"
+  expect_syntax_fail: true
+  expected_result:
+    - "builtin response header"
+    - "test failed"
+
+valid_respdel_forbidden_link_001:
+  test_purpose: 验证response_delete_http_header内置保护头(Link)报错
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    multi_condition on;
+    server {
+      listen 18101; location / { return 200 "ok"; }
+    }
+    server {
+      listen 18100;
+      location /p { proxy_pass http://127.0.0.1:18101; }
+      response_rule r { response_delete_http_header Link; }
+    }
+  operate_commands:
+    - "nginx -t"
+  expect_syntax_fail: true
+  expected_result:
+    - "builtin response header"
+    - "test failed"
