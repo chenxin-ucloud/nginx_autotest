@@ -7057,3 +7057,398 @@ valid_ctx_respdel_loc_001:
   expected_result:
     - "not allowed here"
     - "test failed"
+
+# ============================================================
+# 用例评审补充 - 作用范围非法/参数数量为0/参数格式校验
+# ============================================================
+
+valid_ctx_mc_loc_001:
+  test_purpose: 验证multi_condition配置在location块内报错(仅http允许)
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    server {
+      listen 18100;
+      location /a { multi_condition on; return 200 "ok"; }
+    }
+  operate_commands:
+    - "nginx -t"
+  expect_syntax_fail: true
+  expected_result:
+    - "not allowed here"
+    - "test failed"
+
+valid_ctx_mc_srv_001:
+  test_purpose: 验证multi_condition配置在server块内报错(仅http允许)
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    server {
+      listen 18100;
+      multi_condition on;
+      location / { return 200 "ok"; }
+    }
+  operate_commands:
+    - "nginx -t"
+  expect_syntax_fail: true
+  expected_result:
+    - "not allowed here"
+    - "test failed"
+
+valid_noargs_header_001:
+  test_purpose: 验证match_http_header无参数报错
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    multi_condition on;
+    server {
+      listen 18100;
+      location /a { match_http_header; return 200 "ok"; }
+    }
+  operate_commands:
+    - "nginx -t"
+  expect_syntax_fail: true
+  expected_result:
+    - "invalid number of arguments"
+    - "test failed"
+
+valid_noargs_cookie_001:
+  test_purpose: 验证match_cookie无参数报错
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    multi_condition on;
+    server {
+      listen 18100;
+      location /a { match_cookie; return 200 "ok"; }
+    }
+  operate_commands:
+    - "nginx -t"
+  expect_syntax_fail: true
+  expected_result:
+    - "invalid number of arguments"
+    - "test failed"
+
+valid_noargs_qs_001:
+  test_purpose: 验证match_query_string无参数报错
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    multi_condition on;
+    server {
+      listen 18100;
+      location /a { match_query_string; return 200 "ok"; }
+    }
+  operate_commands:
+    - "nginx -t"
+  expect_syntax_fail: true
+  expected_result:
+    - "invalid number of arguments"
+    - "test failed"
+
+valid_noargs_resphdr_001:
+  test_purpose: 验证match_response_http_header无参数报错
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    multi_condition on;
+    server {
+      listen 18101; location / { return 200 "ok"; }
+    }
+    server {
+      listen 18100;
+      location /p { proxy_pass http://127.0.0.1:18101; }
+      response_rule r { match_response_http_header; }
+    }
+  operate_commands:
+    - "nginx -t"
+  expect_syntax_fail: true
+  expected_result:
+    - "invalid number of arguments"
+    - "test failed"
+
+valid_noargs_respadd_001:
+  test_purpose: 验证response_add_http_header无参数报错
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    multi_condition on;
+    server {
+      listen 18101; location / { return 200 "ok"; }
+    }
+    server {
+      listen 18100;
+      location /p { proxy_pass http://127.0.0.1:18101; }
+      response_rule r { response_add_http_header; }
+    }
+  operate_commands:
+    - "nginx -t"
+  expect_syntax_fail: true
+  expected_result:
+    - "invalid number of arguments"
+    - "test failed"
+
+valid_regex_header_001:
+  test_purpose: 验证match_http_header正则表达式非法报错
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    multi_condition on;
+    server {
+      listen 18100;
+      location /a { match_http_header X-A ~[invalid; return 200 "ok"; }
+    }
+  operate_commands:
+    - "nginx -t"
+  expect_syntax_fail: true
+  expected_result:
+    - "pcre2_compile"
+    - "test failed"
+
+valid_regex_path_001:
+  test_purpose: 验证match_http_path正则表达式非法报错
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    multi_condition on;
+    server {
+      listen 18100;
+      location /a { match_http_path ~[invalid; return 200 "ok"; }
+    }
+  operate_commands:
+    - "nginx -t"
+  expect_syntax_fail: true
+  expected_result:
+    - "pcre2_compile"
+    - "test failed"
+
+valid_regex_host_001:
+  test_purpose: 验证match_http_host正则表达式非法报错
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    multi_condition on;
+    server {
+      listen 18100;
+      location /a { match_http_host ~[invalid; return 200 "ok"; }
+    }
+  operate_commands:
+    - "nginx -t"
+  expect_syntax_fail: true
+  expected_result:
+    - "pcre2_compile"
+    - "test failed"
+
+valid_regex_cookie_001:
+  test_purpose: 验证match_cookie正则表达式非法报错
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    multi_condition on;
+    server {
+      listen 18100;
+      location /a { match_cookie c ~[invalid; return 200 "ok"; }
+    }
+  operate_commands:
+    - "nginx -t"
+  expect_syntax_fail: true
+  expected_result:
+    - "pcre2_compile"
+    - "test failed"
+
+valid_regex_qs_001:
+  test_purpose: 验证match_query_string正则表达式非法报错
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    multi_condition on;
+    server {
+      listen 18100;
+      location /a { match_query_string k ~[invalid; return 200 "ok"; }
+    }
+  operate_commands:
+    - "nginx -t"
+  expect_syntax_fail: true
+  expected_result:
+    - "pcre2_compile"
+    - "test failed"
+
+valid_regex_resphdr_001:
+  test_purpose: 验证match_response_http_header正则表达式非法报错
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    multi_condition on;
+    server {
+      listen 18101; location / { return 200 "ok"; }
+    }
+    server {
+      listen 18100;
+      location /p { proxy_pass http://127.0.0.1:18101; }
+      response_rule r { match_response_http_header X-A ~[invalid; }
+    }
+  operate_commands:
+    - "nginx -t"
+  expect_syntax_fail: true
+  expected_result:
+    - "pcre2_compile"
+    - "test failed"
+
+valid_method_nonenum_001:
+  test_purpose: 验证match_request_method配置单个非枚举值报错
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    multi_condition on;
+    server {
+      listen 18100;
+      location /a { match_request_method FOO; return 200 "ok"; }
+    }
+  operate_commands:
+    - "nginx -t"
+  expect_syntax_fail: true
+  expected_result:
+    - "invalid value"
+    - "test failed"
+
+valid_ipv4_mask33_001:
+  test_purpose: 验证match_source_ip IPv4掩码超32报错
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    multi_condition on;
+    server {
+      listen 18100;
+      location /a { match_source_ip 1.1.1.1/33; return 200 "ok"; }
+    }
+  operate_commands:
+    - "nginx -t"
+  expect_syntax_fail: true
+  expected_result:
+    - "invalid network"
+    - "test failed"
+
+valid_ipv4_maskabc_001:
+  test_purpose: 验证match_source_ip IPv4掩码非数字报错
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    multi_condition on;
+    server {
+      listen 18100;
+      location /a { match_source_ip 1.1.1.1/abc; return 200 "ok"; }
+    }
+  operate_commands:
+    - "nginx -t"
+  expect_syntax_fail: true
+  expected_result:
+    - "invalid network"
+    - "test failed"
+
+valid_ipv4_maskneg_001:
+  test_purpose: 验证match_source_ip IPv4掩码负数报错
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    multi_condition on;
+    server {
+      listen 18100;
+      location /a { match_source_ip 1.1.1.1/-1; return 200 "ok"; }
+    }
+  operate_commands:
+    - "nginx -t"
+  expect_syntax_fail: true
+  expected_result:
+    - "invalid network"
+    - "test failed"
+
+valid_ipv6_mask129_001:
+  test_purpose: 验证match_source_ip IPv6掩码超128报错
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    multi_condition on;
+    server {
+      listen 18100;
+      location /a { match_source_ip ::1/129; return 200 "ok"; }
+    }
+  operate_commands:
+    - "nginx -t"
+  expect_syntax_fail: true
+  expected_result:
+    - "invalid network"
+    - "test failed"
+
+valid_ipv6_fmt_001:
+  test_purpose: 验证match_source_ip IPv6格式非法报错
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    multi_condition on;
+    server {
+      listen 18100;
+      location /a { match_source_ip ::gg::1; return 200 "ok"; }
+    }
+  operate_commands:
+    - "nginx -t"
+  expect_syntax_fail: true
+  expected_result:
+    - "invalid network"
+    - "test failed"
+
+valid_ipv6_maskabc_001:
+  test_purpose: 验证match_source_ip IPv6掩码非数字报错
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    multi_condition on;
+    server {
+      listen 18100;
+      location /a { match_source_ip ::1/abc; return 200 "ok"; }
+    }
+  operate_commands:
+    - "nginx -t"
+  expect_syntax_fail: true
+  expected_result:
+    - "invalid network"
+    - "test failed"
