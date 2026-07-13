@@ -37,6 +37,11 @@ def test_case(case_id, case_info):
     """
     通用测试用例执行函数
 
+    断言模式：
+    - expect_syntax_fail: 语法检查必须失败，expected_result 中的串需出现在失败输出中
+    - operate_steps: 每条命令独立断言，expected 仅对该命令输出校验，unexpected 不应出现
+    - 旧格式（operate_commands+扁平expected/unexpected）: 回退到合并输出断言
+
     Args:
         case_id: 用例ID
         case_info: 用例信息字典
@@ -59,46 +64,53 @@ def test_case(case_id, case_info):
             if success:
                 raise AssertionError("预期语法检查失败但实际通过")
             logger.info("语法检查按预期失败")
-            all_output = output
+            for expected in case_info["expected_result"]:
+                assert expected in output, f"语法失败输出未包含预期: {expected}"
+            logger.info(f"[{case_id}] {case_info['test_purpose']} 执行成功！")
+            return
+
+        if not success:
+            raise AssertionError(f"Nginx配置语法检查失败: {output}")
+        logger.info("配置语法检查通过")
+
+        # 3. 重新加载Nginx配置
+        logger.info("重新加载Nginx配置...")
+        success, output = reload_nginx()
+        if not success:
+            logger.warning(f"Nginx重新加载失败: {output}")
+            success, output = restart_nginx()
+            if not success:
+                raise AssertionError(f"Nginx重启失败: {output}")
+        logger.info("Nginx配置重新加载成功")
+
+        # 4. 执行测试命令并断言
+        if "operate_steps" in case_info:
+            # 新格式：每命令独立断言
+            for step in case_info["operate_steps"]:
+                cmd = step["command"]
+                logger.info(f"执行: {cmd}")
+                result = run_nginx_cmd(cmd)
+                logger.info(f"输出: {result[:200]}..." if len(result) > 200 else f"输出: {result}")
+                for expected in step.get("expected", []):
+                    assert expected in result, f"命令[{cmd}]输出未包含预期: {expected}"
+                for unexpected in step.get("unexpected", []):
+                    assert unexpected not in result, f"命令[{cmd}]输出不应包含: {unexpected}"
+                logger.info(f"命令[{cmd}] 断言通过")
         else:
-            # 常规用例：要求语法检查通过
-            if not success:
-                raise AssertionError(f"Nginx配置语法检查失败: {output}")
-            logger.info("配置语法检查通过")
-
-            # 3. 重新加载Nginx配置
-            logger.info("重新加载Nginx配置...")
-            success, output = reload_nginx()
-            if not success:
-                logger.warning(f"Nginx重新加载失败: {output}")
-                # 尝试重启
-                success, output = restart_nginx()
-                if not success:
-                    raise AssertionError(f"Nginx重启失败: {output}")
-            logger.info("Nginx配置重新加载成功")
-
-            # 4. 执行测试命令
-            logger.info("执行测试命令...")
+            # 旧格式回退：合并输出断言
+            logger.info("执行测试命令(旧格式合并断言)...")
             all_output = ""
             for cmd in case_info["operate_commands"]:
                 logger.info(f"执行: {cmd}")
                 result = run_nginx_cmd(cmd)
                 all_output += result + "\n"
                 logger.info(f"输出: {result[:200]}..." if len(result) > 200 else f"输出: {result}")
-
-        # 5. 验证预期结果
-        logger.info("验证预期结果...")
-        for expected in case_info["expected_result"]:
-            assert expected in all_output, f"结果验证失败！预期包含: {expected}"
-        logger.info("所有预期结果验证通过")
-
-        # 6. 验证不应出现的结果（优先级/反向验证）
-        if "unexpected_result" in case_info:
-            logger.info("验证不应命中的结果...")
-            for unexpected in case_info["unexpected_result"]:
-                assert unexpected not in all_output, \
-                    f"优先级验证失败！响应中不应包含: {unexpected}"
-            logger.info("所有优先级验证通过")
+            for expected in case_info["expected_result"]:
+                assert expected in all_output, f"结果验证失败！预期包含: {expected}"
+            if "unexpected_result" in case_info:
+                for unexpected in case_info["unexpected_result"]:
+                    assert unexpected not in all_output, \
+                        f"优先级验证失败！响应中不应包含: {unexpected}"
 
         logger.info(f"[{case_id}] {case_info['test_purpose']} 执行成功！")
 

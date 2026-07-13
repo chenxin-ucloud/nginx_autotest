@@ -17,20 +17,10 @@ add_header_001:
         return 200 "OK";
       }
     }
-  operate_commands:
-    - "nginx -t"
-    - "nginx -s reload"
-    - "curl -v http://localhost:18090/test_add_response_header"
-  expected_result:
-    - "configuration file"
-    - "test is successful"
-    - "X-Custom-Response: custom_value"
-
-
-# ============================================================
-# 回归用例 - location
-# ============================================================
-
+  operate_steps:
+    - command: 'curl -v http://localhost:18090/test_add_response_header'
+      expected:
+        - 'X-Custom-Response: custom_value'
 location_001:
   test_purpose: 验证基础功能-精确匹配location
   pre_condition:
@@ -44,15 +34,10 @@ location_001:
         return 200 "Exact Location";
       }
     }
-  operate_commands:
-    - "nginx -t"
-    - "nginx -s reload"
-    - "curl http://localhost:18090/exact"
-  expected_result:
-    - "configuration file"
-    - "test is successful"
-    - "Exact Location"
-
+  operate_steps:
+    - command: 'curl http://localhost:18090/exact'
+      expected:
+        - 'Exact Location'
 location_002:
   test_purpose: 验证基础功能-前缀匹配location
   pre_condition:
@@ -66,15 +51,10 @@ location_002:
         return 200 "Prefix Match";
       }
     }
-  operate_commands:
-    - "nginx -t"
-    - "nginx -s reload"
-    - "curl http://localhost:18090/prefix/path"
-  expected_result:
-    - "configuration file"
-    - "test is successful"
-    - "Prefix Match"
-
+  operate_steps:
+    - command: 'curl http://localhost:18090/prefix/path'
+      expected:
+        - 'Prefix Match'
 location_003:
   test_purpose: 验证基础功能-正则匹配location
   pre_condition:
@@ -88,15 +68,10 @@ location_003:
         return 200 "Image Regex Match";
       }
     }
-  operate_commands:
-    - "nginx -t"
-    - "nginx -s reload"
-    - "curl http://localhost:18090/test.png"
-  expected_result:
-    - "configuration file"
-    - "test is successful"
-    - "Image Regex Match"
-
+  operate_steps:
+    - command: 'curl http://localhost:18090/test.png'
+      expected:
+        - 'Image Regex Match'
 location_004:
   test_purpose: 验证基础功能-不区分大小写正则匹配
   pre_condition:
@@ -110,15 +85,10 @@ location_004:
         return 200 "Case Insensitive Regex";
       }
     }
-  operate_commands:
-    - "nginx -t"
-    - "nginx -s reload"
-    - "curl http://localhost:18090/test.JPG"
-  expected_result:
-    - "configuration file"
-    - "test is successful"
-    - "Case Insensitive Regex"
-
+  operate_steps:
+    - command: 'curl http://localhost:18090/test.JPG'
+      expected:
+        - 'Case Insensitive Regex'
 location_005:
   test_purpose: 验证基础功能-优先匹配location ^~
   pre_condition:
@@ -132,15 +102,10 @@ location_005:
         return 200 "Prefix Priority Match";
       }
     }
-  operate_commands:
-    - "nginx -t"
-    - "nginx -s reload"
-    - "curl http://localhost:18090/static/file.txt"
-  expected_result:
-    - "configuration file"
-    - "test is successful"
-    - "Prefix Priority Match"
-
+  operate_steps:
+    - command: 'curl http://localhost:18090/static/file.txt'
+      expected:
+        - 'Prefix Priority Match'
 location_006:
   test_purpose: 验证匹配优先级-精确匹配(=)优先于正则和前缀匹配
   pre_condition:
@@ -160,17 +125,13 @@ location_006:
         return 200 "Exact Hit";
       }
     }
-  operate_commands:
-    - "nginx -t"
-    - "nginx -s reload"
-    - "curl http://localhost:18090/api/exact"
-  expected_result:
-    - "test is successful"
-    - "Exact Hit"
-  unexpected_result:
-    - "Regex Hit"
-    - "General Prefix Hit"
-
+  operate_steps:
+    - command: 'curl http://localhost:18090/api/exact'
+      expected:
+        - 'Exact Hit'
+      unexpected:
+        - 'Regex Hit'
+        - 'General Prefix Hit'
 location_007:
   test_purpose: 验证匹配优先级-^~前缀匹配优先于正则匹配
   pre_condition:
@@ -190,17 +151,13 @@ location_007:
         return 200 "Priority Prefix Hit";
       }
     }
-  operate_commands:
-    - "nginx -t"
-    - "nginx -s reload"
-    - "curl http://localhost:18090/static/page.html"
-  expected_result:
-    - "test is successful"
-    - "Priority Prefix Hit"
-  unexpected_result:
-    - "Regex Hit"
-    - "General Prefix Hit"
-
+  operate_steps:
+    - command: 'curl http://localhost:18090/static/page.html'
+      expected:
+        - 'Priority Prefix Hit'
+      unexpected:
+        - 'Regex Hit'
+        - 'General Prefix Hit'
 location_008:
   test_purpose: 验证匹配优先级-正则匹配优先于普通前缀匹配
   pre_condition:
@@ -220,17 +177,13 @@ location_008:
         return 200 "Regex Hit";
       }
     }
-  operate_commands:
-    - "nginx -t"
-    - "nginx -s reload"
-    - "curl http://localhost:18090/images/logo.png"
-  expected_result:
-    - "test is successful"
-    - "Regex Hit"
-  unexpected_result:
-    - "Prefix Hit"
-    - "General Prefix Hit"
-
+  operate_steps:
+    - command: 'curl http://localhost:18090/images/logo.png'
+      expected:
+        - 'Regex Hit'
+      unexpected:
+        - 'Prefix Hit'
+        - 'General Prefix Hit'
 location_009:
   test_purpose: 验证匹配优先级-普通前缀匹配优先于通用/匹配
   pre_condition:
@@ -247,16 +200,12 @@ location_009:
         return 200 "Prefix Hit";
       }
     }
-  operate_commands:
-    - "nginx -t"
-    - "nginx -s reload"
-    - "curl http://localhost:18090/api/users"
-  expected_result:
-    - "test is successful"
-    - "Prefix Hit"
-  unexpected_result:
-    - "General Prefix Hit"
-
+  operate_steps:
+    - command: 'curl http://localhost:18090/api/users'
+      expected:
+        - 'Prefix Hit'
+      unexpected:
+        - 'General Prefix Hit'
 location_010:
   test_purpose: 验证匹配优先级-全部共存时完整优先级链(= > ^~ > 正则 > 普通前缀 > /)
   pre_condition:
@@ -282,25 +231,19 @@ location_010:
         return 200 "Exact Hit";
       }
     }
-  operate_commands:
-    - "nginx -t"
-    - "nginx -s reload"
-    - "curl http://localhost:18090/app/static/main.js"
-    - "curl http://localhost:18090/app/static/other.js"
-    - "curl http://localhost:18090/app/page"
-    - "curl http://localhost:18090/other"
-  expected_result:
-    - "test is successful"
-    - "Exact Hit"
-    - "Priority Prefix Hit"
-    - "Regex Hit"
-    - "General Prefix Hit"
-
-
-# ============================================================
-# 回归用例 - server_name
-# ============================================================
-
+  operate_steps:
+    - command: 'curl http://localhost:18090/app/static/main.js'
+      expected:
+        - 'Exact Hit'
+    - command: 'curl http://localhost:18090/app/static/other.js'
+      expected:
+        - 'Priority Prefix Hit'
+    - command: 'curl http://localhost:18090/app/page'
+      expected:
+        - 'Regex Hit'
+    - command: 'curl http://localhost:18090/other'
+      expected:
+        - 'General Prefix Hit'
 server_name_001:
   test_purpose: 验证基础功能-精确匹配server_name
   pre_condition:
@@ -316,15 +259,10 @@ server_name_001:
         return 200 "Exact Match";
       }
     }
-  operate_commands:
-    - "nginx -t"
-    - "nginx -s reload"
-    - "curl -H \"Host: exact.example.com\" http://localhost/"
-  expected_result:
-    - "configuration file"
-    - "test is successful"
-    - "Exact Match"
-
+  operate_steps:
+    - command: 'curl -H "Host: exact.example.com" http://localhost/'
+      expected:
+        - 'Exact Match'
 server_name_002:
   test_purpose: 验证基础功能-通配符匹配server_name
   pre_condition:
@@ -339,15 +277,10 @@ server_name_002:
         return 200 "Wildcard Match";
       }
     }
-  operate_commands:
-    - "nginx -t"
-    - "nginx -s reload"
-    - "curl -H \"Host: sub.example.com\" http://localhost/"
-  expected_result:
-    - "configuration file"
-    - "test is successful"
-    - "Wildcard Match"
-
+  operate_steps:
+    - command: 'curl -H "Host: sub.example.com" http://localhost/'
+      expected:
+        - 'Wildcard Match'
 server_name_003:
   test_purpose: 验证基础功能-正则匹配server_name
   pre_condition:
@@ -362,15 +295,10 @@ server_name_003:
         return 200 "Regex Match";
       }
     }
-  operate_commands:
-    - "nginx -t"
-    - "nginx -s reload"
-    - "curl -H \"Host: www123.example.com\" http://localhost/"
-  expected_result:
-    - "configuration file"
-    - "test is successful"
-    - "Regex Match"
-
+  operate_steps:
+    - command: 'curl -H "Host: www123.example.com" http://localhost/'
+      expected:
+        - 'Regex Match'
 server_name_004:
   test_purpose: 验证匹配优先级-精确匹配优先于通配符和正则
   pre_condition:
@@ -401,17 +329,13 @@ server_name_004:
         return 200 "Exact Hit";
       }
     }
-  operate_commands:
-    - "nginx -t"
-    - "nginx -s reload"
-    - "curl -H \"Host: priority.example.com\" http://localhost/"
-  expected_result:
-    - "test is successful"
-    - "Exact Hit"
-  unexpected_result:
-    - "Wildcard Hit"
-    - "Regex Hit"
-
+  operate_steps:
+    - command: 'curl -H "Host: priority.example.com" http://localhost/'
+      expected:
+        - 'Exact Hit'
+      unexpected:
+        - 'Wildcard Hit'
+        - 'Regex Hit'
 server_name_005:
   test_purpose: 验证匹配优先级-前缀通配符(*.x)优先于正则匹配
   pre_condition:
@@ -434,16 +358,12 @@ server_name_005:
         return 200 "Wildcard Hit";
       }
     }
-  operate_commands:
-    - "nginx -t"
-    - "nginx -s reload"
-    - "curl -H \"Host: any.example.com\" http://localhost/"
-  expected_result:
-    - "test is successful"
-    - "Wildcard Hit"
-  unexpected_result:
-    - "Regex Hit"
-
+  operate_steps:
+    - command: 'curl -H "Host: any.example.com" http://localhost/'
+      expected:
+        - 'Wildcard Hit'
+      unexpected:
+        - 'Regex Hit'
 server_name_006:
   test_purpose: 验证匹配优先级-前缀通配符(*.x)优先于后缀通配符(x.*)
   pre_condition:
@@ -466,16 +386,12 @@ server_name_006:
         return 200 "Prefix Wildcard Hit";
       }
     }
-  operate_commands:
-    - "nginx -t"
-    - "nginx -s reload"
-    - "curl -H \"Host: www.example.com\" http://localhost/"
-  expected_result:
-    - "test is successful"
-    - "Prefix Wildcard Hit"
-  unexpected_result:
-    - "Suffix Wildcard Hit"
-
+  operate_steps:
+    - command: 'curl -H "Host: www.example.com" http://localhost/'
+      expected:
+        - 'Prefix Wildcard Hit'
+      unexpected:
+        - 'Suffix Wildcard Hit'
 server_name_007:
   test_purpose: 验证匹配优先级-正则按配置顺序匹配第一个
   pre_condition:
@@ -498,16 +414,12 @@ server_name_007:
         return 200 "Second Regex Hit";
       }
     }
-  operate_commands:
-    - "nginx -t"
-    - "nginx -s reload"
-    - "curl -H \"Host: www123.example.com\" http://localhost/"
-  expected_result:
-    - "test is successful"
-    - "First Regex Hit"
-  unexpected_result:
-    - "Second Regex Hit"
-
+  operate_steps:
+    - command: 'curl -H "Host: www123.example.com" http://localhost/'
+      expected:
+        - 'First Regex Hit'
+      unexpected:
+        - 'Second Regex Hit'
 server_name_008:
   test_purpose: 验证匹配优先级-未匹配任何server_name时由default_server处理
   pre_condition:
@@ -530,21 +442,12 @@ server_name_008:
         return 200 "Default Server Hit";
       }
     }
-  operate_commands:
-    - "nginx -t"
-    - "nginx -s reload"
-    - "curl -H \"Host: nomatch.other.com\" http://localhost/"
-  expected_result:
-    - "test is successful"
-    - "Default Server Hit"
-  unexpected_result:
-    - "Specific Hit"
-
-
-# ============================================================
-# 回归用例 - proxy_set_header
-# ============================================================
-
+  operate_steps:
+    - command: 'curl -H "Host: nomatch.other.com" http://localhost/'
+      expected:
+        - 'Default Server Hit'
+      unexpected:
+        - 'Specific Hit'
 proxy_set_header_001:
   test_purpose: 验证基础功能-添加自定义请求头
   pre_condition:
@@ -556,14 +459,8 @@ proxy_set_header_001:
       proxy_pass http://127.0.0.1:19999;
       proxy_set_header X-Test-Header "test123";
     }
-  operate_commands:
-    - "nginx -t"
-    - "nginx -s reload"
-    - "curl -v http://localhost/test_add_header"
-  expected_result:
-    - "configuration file"
-    - "test is successful"
-
+  operate_steps:
+    - command: 'curl -v http://localhost/test_add_header'
 proxy_set_header_002:
   test_purpose: 验证基础功能-修改Host请求头
   pre_condition:
@@ -575,19 +472,8 @@ proxy_set_header_002:
       proxy_pass http://127.0.0.1:19999;
       proxy_set_header Host "modified.host.com";
     }
-  operate_commands:
-    - "nginx -t"
-    - "nginx -s reload"
-    - "curl -v -H \"Host: original.host.com\" http://localhost/test_modify_host"
-  expected_result:
-    - "configuration file"
-    - "test is successful"
-
-
-# ============================================================
-# 回归用例 - proxy_pass_header
-# ============================================================
-
+  operate_steps:
+    - command: 'curl -v -H "Host: original.host.com" http://localhost/test_modify_host'
 proxy_pass_header_001:
   test_purpose: 验证基础功能-传递自定义响应头
   pre_condition:
@@ -599,19 +485,8 @@ proxy_pass_header_001:
       proxy_pass http://127.0.0.1:19999;
       proxy_pass_header X-Custom-Response;
     }
-  operate_commands:
-    - "nginx -t"
-    - "nginx -s reload"
-    - "curl -v http://localhost/test_pass_header"
-  expected_result:
-    - "configuration file"
-    - "test is successful"
-
-
-# ============================================================
-# 回归用例 - proxy_hide_header
-# ============================================================
-
+  operate_steps:
+    - command: 'curl -v http://localhost/test_pass_header'
 proxy_hide_header_001:
   test_purpose: 验证基础功能-隐藏单个自定义响应头
   pre_condition:
@@ -636,22 +511,13 @@ proxy_hide_header_001:
         proxy_hide_header X-Secret-Info;
       }
     }
-  operate_commands:
-    - "nginx -t"
-    - "nginx -s reload"
-    - "curl -v http://localhost:18080/test_hide_single"
-  expected_result:
-    - "test is successful"
-    - "upstream ok"
-    - "X-Public-Info: public_data"
-  unexpected_result:
-    - "X-Secret-Info"
-
-
-# ============================================================
-# 自定义规则模块 - multi_condition 开关
-# ============================================================
-
+  operate_steps:
+    - command: 'curl -v http://localhost:18080/test_hide_single'
+      expected:
+        - 'upstream ok'
+        - 'X-Public-Info: public_data'
+      unexpected:
+        - 'X-Secret-Info'
 multi_condition_001:
   test_purpose: 验证multi_condition关闭时原生location匹配正常工作
   pre_condition:
@@ -668,16 +534,12 @@ multi_condition_001:
         return 200 "default_match";
       }
     }
-  operate_commands:
-    - "nginx -t"
-    - "nginx -s reload"
-    - "curl -s http://127.0.0.1:18100/exact"
-  expected_result:
-    - "test is successful"
-    - "exact_match"
-  unexpected_result:
-    - "default_match"
-
+  operate_steps:
+    - command: 'curl -s http://127.0.0.1:18100/exact'
+      expected:
+        - 'exact_match'
+      unexpected:
+        - 'default_match'
 multi_condition_002:
   test_purpose: 验证multi_condition开启后自定义规则匹配生效
   pre_condition:
@@ -696,21 +558,13 @@ multi_condition_002:
         return 200 "no_match";
       }
     }
-  operate_commands:
-    - "nginx -t"
-    - "nginx -s reload"
-    - "curl -s -H \"Host: www.test.com\" http://127.0.0.1:18100/anything"
-    - "curl -s -H \"Host: other.com\" http://127.0.0.1:18100/anything"
-  expected_result:
-    - "test is successful"
-    - "host_rule_matched"
-    - "no_match"
-
-
-# ============================================================
-# 自定义规则模块 - match_http_host
-# ============================================================
-
+  operate_steps:
+    - command: 'curl -s -H "Host: www.test.com" http://127.0.0.1:18100/anything'
+      expected:
+        - 'host_rule_matched'
+    - command: 'curl -s -H "Host: other.com" http://127.0.0.1:18100/anything'
+      expected:
+        - 'no_match'
 match_host_001:
   test_purpose: 验证match_http_host精确匹配
   pre_condition:
@@ -729,14 +583,10 @@ match_host_001:
         return 200 "no_match";
       }
     }
-  operate_commands:
-    - "nginx -t"
-    - "nginx -s reload"
-    - "curl -s -H \"Host: www.test.com\" http://127.0.0.1:18100/"
-  expected_result:
-    - "test is successful"
-    - "exact_host_matched"
-
+  operate_steps:
+    - command: 'curl -s -H "Host: www.test.com" http://127.0.0.1:18100/'
+      expected:
+        - 'exact_host_matched'
 match_host_002:
   test_purpose: 验证match_http_host前缀通配符匹配(*.example.com)
   pre_condition:
@@ -755,14 +605,10 @@ match_host_002:
         return 200 "no_match";
       }
     }
-  operate_commands:
-    - "nginx -t"
-    - "nginx -s reload"
-    - "curl -s -H \"Host: sub.example.com\" http://127.0.0.1:18100/"
-  expected_result:
-    - "test is successful"
-    - "wildcard_prefix_matched"
-
+  operate_steps:
+    - command: 'curl -s -H "Host: sub.example.com" http://127.0.0.1:18100/'
+      expected:
+        - 'wildcard_prefix_matched'
 match_host_003:
   test_purpose: 验证match_http_host后缀通配符匹配(www.example.*)
   pre_condition:
@@ -781,14 +627,10 @@ match_host_003:
         return 200 "no_match";
       }
     }
-  operate_commands:
-    - "nginx -t"
-    - "nginx -s reload"
-    - "curl -s -H \"Host: www.example.org\" http://127.0.0.1:18100/"
-  expected_result:
-    - "test is successful"
-    - "wildcard_suffix_matched"
-
+  operate_steps:
+    - command: 'curl -s -H "Host: www.example.org" http://127.0.0.1:18100/'
+      expected:
+        - 'wildcard_suffix_matched'
 match_host_004:
   test_purpose: 验证match_http_host正则匹配
   pre_condition:
@@ -807,14 +649,10 @@ match_host_004:
         return 200 "no_match";
       }
     }
-  operate_commands:
-    - "nginx -t"
-    - "nginx -s reload"
-    - "curl -s -H \"Host: www123.test.com\" http://127.0.0.1:18100/"
-  expected_result:
-    - "test is successful"
-    - "regex_host_matched"
-
+  operate_steps:
+    - command: 'curl -s -H "Host: www123.test.com" http://127.0.0.1:18100/'
+      expected:
+        - 'regex_host_matched'
 match_host_005:
   test_purpose: 验证match_http_host多值OR关系(任一匹配即成功)
   pre_condition:
@@ -833,22 +671,16 @@ match_host_005:
         return 200 "no_match";
       }
     }
-  operate_commands:
-    - "nginx -t"
-    - "nginx -s reload"
-    - "curl -s -H \"Host: www.first.com\" http://127.0.0.1:18100/"
-    - "curl -s -H \"Host: www.second.com\" http://127.0.0.1:18100/"
-    - "curl -s -H \"Host: www.third.com\" http://127.0.0.1:18100/"
-  expected_result:
-    - "test is successful"
-    - "multi_host_matched"
-    - "no_match"
-
-
-# ============================================================
-# 自定义规则模块 - match_http_path
-# ============================================================
-
+  operate_steps:
+    - command: 'curl -s -H "Host: www.first.com" http://127.0.0.1:18100/'
+      expected:
+        - 'multi_host_matched'
+    - command: 'curl -s -H "Host: www.second.com" http://127.0.0.1:18100/'
+      expected:
+        - 'multi_host_matched'
+    - command: 'curl -s -H "Host: www.third.com" http://127.0.0.1:18100/'
+      expected:
+        - 'no_match'
 match_path_001:
   test_purpose: 验证match_http_path精确匹配(=)
   pre_condition:
@@ -867,14 +699,10 @@ match_path_001:
         return 200 "no_match";
       }
     }
-  operate_commands:
-    - "nginx -t"
-    - "nginx -s reload"
-    - "curl -s http://127.0.0.1:18100/exact/path"
-  expected_result:
-    - "test is successful"
-    - "exact_path_matched"
-
+  operate_steps:
+    - command: 'curl -s http://127.0.0.1:18100/exact/path'
+      expected:
+        - 'exact_path_matched'
 match_path_002:
   test_purpose: 验证match_http_path前缀匹配
   pre_condition:
@@ -893,14 +721,10 @@ match_path_002:
         return 200 "no_match";
       }
     }
-  operate_commands:
-    - "nginx -t"
-    - "nginx -s reload"
-    - "curl -s http://127.0.0.1:18100/prefix/subpath"
-  expected_result:
-    - "test is successful"
-    - "prefix_path_matched"
-
+  operate_steps:
+    - command: 'curl -s http://127.0.0.1:18100/prefix/subpath'
+      expected:
+        - 'prefix_path_matched'
 match_path_003:
   test_purpose: 验证match_http_path优先前缀匹配(^~)
   pre_condition:
@@ -919,14 +743,10 @@ match_path_003:
         return 200 "no_match";
       }
     }
-  operate_commands:
-    - "nginx -t"
-    - "nginx -s reload"
-    - "curl -s http://127.0.0.1:18100/static/file.js"
-  expected_result:
-    - "test is successful"
-    - "priority_prefix_matched"
-
+  operate_steps:
+    - command: 'curl -s http://127.0.0.1:18100/static/file.js'
+      expected:
+        - 'priority_prefix_matched'
 match_path_004:
   test_purpose: 验证match_http_path正则匹配(~)
   pre_condition:
@@ -945,14 +765,10 @@ match_path_004:
         return 200 "no_match";
       }
     }
-  operate_commands:
-    - "nginx -t"
-    - "nginx -s reload"
-    - "curl -s http://127.0.0.1:18100/page.html"
-  expected_result:
-    - "test is successful"
-    - "regex_path_matched"
-
+  operate_steps:
+    - command: 'curl -s http://127.0.0.1:18100/page.html'
+      expected:
+        - 'regex_path_matched'
 match_path_005:
   test_purpose: 验证match_http_path大小写不敏感正则匹配(~*)
   pre_condition:
@@ -971,14 +787,10 @@ match_path_005:
         return 200 "no_match";
       }
     }
-  operate_commands:
-    - "nginx -t"
-    - "nginx -s reload"
-    - "curl -s http://127.0.0.1:18100/image.JPG"
-  expected_result:
-    - "test is successful"
-    - "iregex_path_matched"
-
+  operate_steps:
+    - command: 'curl -s http://127.0.0.1:18100/image.JPG'
+      expected:
+        - 'iregex_path_matched'
 match_path_006:
   test_purpose: 验证match_http_path多值OR关系
   pre_condition:
@@ -997,22 +809,16 @@ match_path_006:
         return 200 "no_match";
       }
     }
-  operate_commands:
-    - "nginx -t"
-    - "nginx -s reload"
-    - "curl -s http://127.0.0.1:18100/path_a"
-    - "curl -s http://127.0.0.1:18100/path_b"
-    - "curl -s http://127.0.0.1:18100/path_c"
-  expected_result:
-    - "test is successful"
-    - "multi_path_matched"
-    - "no_match"
-
-
-# ============================================================
-# 自定义规则模块 - match_http_header
-# ============================================================
-
+  operate_steps:
+    - command: 'curl -s http://127.0.0.1:18100/path_a'
+      expected:
+        - 'multi_path_matched'
+    - command: 'curl -s http://127.0.0.1:18100/path_b'
+      expected:
+        - 'multi_path_matched'
+    - command: 'curl -s http://127.0.0.1:18100/path_c'
+      expected:
+        - 'no_match'
 match_header_001:
   test_purpose: 验证match_http_header精确键值匹配
   pre_condition:
@@ -1031,16 +837,13 @@ match_header_001:
         return 200 "no_match";
       }
     }
-  operate_commands:
-    - "nginx -t"
-    - "nginx -s reload"
-    - "curl -s -H \"X-Test-Key: test_value\" http://127.0.0.1:18100/"
-    - "curl -s -H \"X-Test-Key: wrong_value\" http://127.0.0.1:18100/"
-  expected_result:
-    - "test is successful"
-    - "header_exact_matched"
-    - "no_match"
-
+  operate_steps:
+    - command: 'curl -s -H "X-Test-Key: test_value" http://127.0.0.1:18100/'
+      expected:
+        - 'header_exact_matched'
+    - command: 'curl -s -H "X-Test-Key: wrong_value" http://127.0.0.1:18100/'
+      expected:
+        - 'no_match'
 match_header_002:
   test_purpose: 验证match_http_header正则值匹配
   pre_condition:
@@ -1059,16 +862,13 @@ match_header_002:
         return 200 "no_match";
       }
     }
-  operate_commands:
-    - "nginx -t"
-    - "nginx -s reload"
-    - "curl -s -H \"X-Test-Key: val_123\" http://127.0.0.1:18100/"
-    - "curl -s -H \"X-Test-Key: val_abc\" http://127.0.0.1:18100/"
-  expected_result:
-    - "test is successful"
-    - "header_regex_matched"
-    - "no_match"
-
+  operate_steps:
+    - command: 'curl -s -H "X-Test-Key: val_123" http://127.0.0.1:18100/'
+      expected:
+        - 'header_regex_matched'
+    - command: 'curl -s -H "X-Test-Key: val_abc" http://127.0.0.1:18100/'
+      expected:
+        - 'no_match'
 match_header_003:
   test_purpose: 验证match_http_header单条多KV为OR关系且多条之间为AND关系
   pre_condition:
@@ -1088,16 +888,13 @@ match_header_003:
         return 200 "no_match";
       }
     }
-  operate_commands:
-    - "nginx -t"
-    - "nginx -s reload"
-    - "curl -s -H \"X-Group-A: val_a1\" -H \"X-Group-B: val_b1\" http://127.0.0.1:18100/"
-    - "curl -s -H \"X-Group-A: val_a1\" http://127.0.0.1:18100/"
-  expected_result:
-    - "test is successful"
-    - "header_and_or_matched"
-    - "no_match"
-
+  operate_steps:
+    - command: 'curl -s -H "X-Group-A: val_a1" -H "X-Group-B: val_b1" http://127.0.0.1:18100/'
+      expected:
+        - 'header_and_or_matched'
+    - command: 'curl -s -H "X-Group-A: val_a1" http://127.0.0.1:18100/'
+      expected:
+        - 'no_match'
 match_header_004:
   test_purpose: 验证match_http_header仅配置key不配置value时语法检查拒绝
   pre_condition:
@@ -1128,6 +925,7 @@ match_header_004:
 # 自定义规则模块 - match_cookie
 # ============================================================
 
+
 match_cookie_001:
   test_purpose: 验证match_cookie精确键值匹配
   pre_condition:
@@ -1146,16 +944,13 @@ match_cookie_001:
         return 200 "no_match";
       }
     }
-  operate_commands:
-    - "nginx -t"
-    - "nginx -s reload"
-    - "curl -s -b \"token=abc123\" http://127.0.0.1:18100/"
-    - "curl -s -b \"token=wrong\" http://127.0.0.1:18100/"
-  expected_result:
-    - "test is successful"
-    - "cookie_exact_matched"
-    - "no_match"
-
+  operate_steps:
+    - command: 'curl -s -b "token=abc123" http://127.0.0.1:18100/'
+      expected:
+        - 'cookie_exact_matched'
+    - command: 'curl -s -b "token=wrong" http://127.0.0.1:18100/'
+      expected:
+        - 'no_match'
 match_cookie_002:
   test_purpose: 验证match_cookie正则值匹配
   pre_condition:
@@ -1174,16 +969,13 @@ match_cookie_002:
         return 200 "no_match";
       }
     }
-  operate_commands:
-    - "nginx -t"
-    - "nginx -s reload"
-    - "curl -s -b \"session=sess_abc123\" http://127.0.0.1:18100/"
-    - "curl -s -b \"session=invalid\" http://127.0.0.1:18100/"
-  expected_result:
-    - "test is successful"
-    - "cookie_regex_matched"
-    - "no_match"
-
+  operate_steps:
+    - command: 'curl -s -b "session=sess_abc123" http://127.0.0.1:18100/'
+      expected:
+        - 'cookie_regex_matched'
+    - command: 'curl -s -b "session=invalid" http://127.0.0.1:18100/'
+      expected:
+        - 'no_match'
 match_cookie_003:
   test_purpose: 验证match_cookie单条多KV为OR关系且多条之间为AND关系
   pre_condition:
@@ -1203,16 +995,13 @@ match_cookie_003:
         return 200 "no_match";
       }
     }
-  operate_commands:
-    - "nginx -t"
-    - "nginx -s reload"
-    - "curl -s -b \"user_a=val_a; role=admin\" http://127.0.0.1:18100/"
-    - "curl -s -b \"user_a=val_a\" http://127.0.0.1:18100/"
-  expected_result:
-    - "test is successful"
-    - "cookie_and_or_matched"
-    - "no_match"
-
+  operate_steps:
+    - command: 'curl -s -b "user_a=val_a; role=admin" http://127.0.0.1:18100/'
+      expected:
+        - 'cookie_and_or_matched'
+    - command: 'curl -s -b "user_a=val_a" http://127.0.0.1:18100/'
+      expected:
+        - 'no_match'
 match_cookie_004:
   test_purpose: 验证match_cookie仅配置key不配置value时语法检查拒绝
   pre_condition:
@@ -1243,6 +1032,7 @@ match_cookie_004:
 # 自定义规则模块 - match_request_method
 # ============================================================
 
+
 match_method_001:
   test_purpose: 验证match_request_method单方法匹配(GET)
   pre_condition:
@@ -1261,14 +1051,10 @@ match_method_001:
         return 200 "no_match";
       }
     }
-  operate_commands:
-    - "nginx -t"
-    - "nginx -s reload"
-    - "curl -s http://127.0.0.1:18100/"
-  expected_result:
-    - "test is successful"
-    - "get_method_matched"
-
+  operate_steps:
+    - command: 'curl -s http://127.0.0.1:18100/'
+      expected:
+        - 'get_method_matched'
 match_method_002:
   test_purpose: 验证match_request_method多方法OR关系(GET POST)
   pre_condition:
@@ -1287,14 +1073,10 @@ match_method_002:
         return 200 "no_match";
       }
     }
-  operate_commands:
-    - "nginx -t"
-    - "nginx -s reload"
-    - "curl -s -X POST http://127.0.0.1:18100/"
-  expected_result:
-    - "test is successful"
-    - "multi_method_matched"
-
+  operate_steps:
+    - command: 'curl -s -X POST http://127.0.0.1:18100/'
+      expected:
+        - 'multi_method_matched'
 match_method_003:
   test_purpose: 验证match_request_method不匹配时回退到兜底规则
   pre_condition:
@@ -1313,21 +1095,12 @@ match_method_003:
         return 200 "no_match";
       }
     }
-  operate_commands:
-    - "nginx -t"
-    - "nginx -s reload"
-    - "curl -s -X DELETE http://127.0.0.1:18100/"
-  expected_result:
-    - "test is successful"
-    - "no_match"
-  unexpected_result:
-    - "get_only_matched"
-
-
-# ============================================================
-# 自定义规则模块 - match_source_ip
-# ============================================================
-
+  operate_steps:
+    - command: 'curl -s -X DELETE http://127.0.0.1:18100/'
+      expected:
+        - 'no_match'
+      unexpected:
+        - 'get_only_matched'
 match_ip_001:
   test_purpose: 验证match_source_ip精确IP匹配(127.0.0.1)
   pre_condition:
@@ -1346,14 +1119,10 @@ match_ip_001:
         return 200 "no_match";
       }
     }
-  operate_commands:
-    - "nginx -t"
-    - "nginx -s reload"
-    - "curl -s http://127.0.0.1:18100/"
-  expected_result:
-    - "test is successful"
-    - "exact_ip_matched"
-
+  operate_steps:
+    - command: 'curl -s http://127.0.0.1:18100/'
+      expected:
+        - 'exact_ip_matched'
 match_ip_002:
   test_purpose: 验证match_source_ip CIDR网段匹配(127.0.0.0/8)
   pre_condition:
@@ -1372,14 +1141,10 @@ match_ip_002:
         return 200 "no_match";
       }
     }
-  operate_commands:
-    - "nginx -t"
-    - "nginx -s reload"
-    - "curl -s http://127.0.0.1:18100/"
-  expected_result:
-    - "test is successful"
-    - "cidr_ip_matched"
-
+  operate_steps:
+    - command: 'curl -s http://127.0.0.1:18100/'
+      expected:
+        - 'cidr_ip_matched'
 match_ip_003:
   test_purpose: 验证match_source_ip不匹配时回退到兜底规则
   pre_condition:
@@ -1398,21 +1163,12 @@ match_ip_003:
         return 200 "no_match";
       }
     }
-  operate_commands:
-    - "nginx -t"
-    - "nginx -s reload"
-    - "curl -s http://127.0.0.1:18100/"
-  expected_result:
-    - "test is successful"
-    - "no_match"
-  unexpected_result:
-    - "other_ip_matched"
-
-
-# ============================================================
-# 自定义规则模块 - match_query_string
-# ============================================================
-
+  operate_steps:
+    - command: 'curl -s http://127.0.0.1:18100/'
+      expected:
+        - 'no_match'
+      unexpected:
+        - 'other_ip_matched'
 match_qs_001:
   test_purpose: 验证match_query_string精确键值匹配
   pre_condition:
@@ -1431,16 +1187,13 @@ match_qs_001:
         return 200 "no_match";
       }
     }
-  operate_commands:
-    - "nginx -t"
-    - "nginx -s reload"
-    - "curl -s \"http://127.0.0.1:18100/?key=test_value\""
-    - "curl -s \"http://127.0.0.1:18100/?key=wrong\""
-  expected_result:
-    - "test is successful"
-    - "qs_exact_matched"
-    - "no_match"
-
+  operate_steps:
+    - command: 'curl -s "http://127.0.0.1:18100/?key=test_value"'
+      expected:
+        - 'qs_exact_matched'
+    - command: 'curl -s "http://127.0.0.1:18100/?key=wrong"'
+      expected:
+        - 'no_match'
 match_qs_002:
   test_purpose: 验证match_query_string正则值匹配
   pre_condition:
@@ -1459,16 +1212,13 @@ match_qs_002:
         return 200 "no_match";
       }
     }
-  operate_commands:
-    - "nginx -t"
-    - "nginx -s reload"
-    - "curl -s \"http://127.0.0.1:18100/?id=12345\""
-    - "curl -s \"http://127.0.0.1:18100/?id=abc\""
-  expected_result:
-    - "test is successful"
-    - "qs_regex_matched"
-    - "no_match"
-
+  operate_steps:
+    - command: 'curl -s "http://127.0.0.1:18100/?id=12345"'
+      expected:
+        - 'qs_regex_matched'
+    - command: 'curl -s "http://127.0.0.1:18100/?id=abc"'
+      expected:
+        - 'no_match'
 match_qs_003:
   test_purpose: 验证match_query_string单条多KV为OR关系且多条之间为AND关系
   pre_condition:
@@ -1488,16 +1238,13 @@ match_qs_003:
         return 200 "no_match";
       }
     }
-  operate_commands:
-    - "nginx -t"
-    - "nginx -s reload"
-    - "curl -s \"http://127.0.0.1:18100/?page=1&lang=en\""
-    - "curl -s \"http://127.0.0.1:18100/?page=1\""
-  expected_result:
-    - "test is successful"
-    - "qs_and_or_matched"
-    - "no_match"
-
+  operate_steps:
+    - command: 'curl -s "http://127.0.0.1:18100/?page=1&lang=en"'
+      expected:
+        - 'qs_and_or_matched'
+    - command: 'curl -s "http://127.0.0.1:18100/?page=1"'
+      expected:
+        - 'no_match'
 match_qs_004:
   test_purpose: 验证match_query_string仅配置key不配置value时语法检查拒绝
   pre_condition:
@@ -1528,6 +1275,7 @@ match_qs_004:
 # 自定义规则模块 - 请求方向组合条件与变量
 # ============================================================
 
+
 combined_001:
   test_purpose: 验证所有请求条件同时配置的AND关系(全部满足时命中)
   pre_condition:
@@ -1551,14 +1299,10 @@ combined_001:
         return 200 "no_match";
       }
     }
-  operate_commands:
-    - "nginx -t"
-    - "nginx -s reload"
-    - "curl -s -H \"Host: www.test.com\" -H \"X-Auth: token123\" -b \"session=sess_abc\" \"http://127.0.0.1:18100/api/test?version=v1\""
-  expected_result:
-    - "test is successful"
-    - "all_conditions_matched"
-
+  operate_steps:
+    - command: 'curl -s -H "Host: www.test.com" -H "X-Auth: token123" -b "session=sess_abc" "http://127.0.0.1:18100/api/test?version=v1"'
+      expected:
+        - 'all_conditions_matched'
 combined_002:
   test_purpose: 验证部分条件不匹配时规则不命中(AND关系验证)
   pre_condition:
@@ -1579,16 +1323,12 @@ combined_002:
         return 200 "no_match";
       }
     }
-  operate_commands:
-    - "nginx -t"
-    - "nginx -s reload"
-    - "curl -s -H \"Host: www.test.com\" -H \"X-Auth: wrong_token\" http://127.0.0.1:18100/api/test"
-  expected_result:
-    - "test is successful"
-    - "no_match"
-  unexpected_result:
-    - "all_conditions_matched"
-
+  operate_steps:
+    - command: 'curl -s -H "Host: www.test.com" -H "X-Auth: wrong_token" http://127.0.0.1:18100/api/test'
+      expected:
+        - 'no_match'
+      unexpected:
+        - 'all_conditions_matched'
 combined_003:
   test_purpose: 验证$custom_rule_request_rule_name变量记录命中的请求规则名称
   pre_condition:
@@ -1608,20 +1348,11 @@ combined_003:
         return 200 "no_match";
       }
     }
-  operate_commands:
-    - "nginx -t"
-    - "nginx -s reload"
-    - "curl -s -v -H \"Host: www.test.com\" http://127.0.0.1:18100/ 2>&1"
-  expected_result:
-    - "test is successful"
-    - "variable_test"
-    - "X-Rule-Name"
-
-
-# ============================================================
-# 自定义规则模块 - response_rule 响应方向规则
-# ============================================================
-
+  operate_steps:
+    - command: 'curl -s -v -H "Host: www.test.com" http://127.0.0.1:18100/ 2>&1'
+      expected:
+        - 'variable_test'
+        - 'X-Rule-Name'
 response_rule_001:
   test_purpose: 验证response_rule基础功能-response_add_http_header添加响应头
   pre_condition:
@@ -1646,15 +1377,11 @@ response_rule_001:
         response_add_http_header X-Custom-Resp added_value;
       }
     }
-  operate_commands:
-    - "nginx -t"
-    - "nginx -s reload"
-    - "curl -s -v http://127.0.0.1:18100/proxy 2>&1"
-  expected_result:
-    - "test is successful"
-    - "X-Custom-Resp"
-    - "added_value"
-
+  operate_steps:
+    - command: 'curl -s -v http://127.0.0.1:18100/proxy 2>&1'
+      expected:
+        - 'X-Custom-Resp'
+        - 'added_value'
 response_rule_002:
   test_purpose: 验证多个response_rule从上到下匹配且仅匹配第一个
   pre_condition:
@@ -1682,16 +1409,12 @@ response_rule_002:
         response_add_http_header X-Second-Rule matched;
       }
     }
-  operate_commands:
-    - "nginx -t"
-    - "nginx -s reload"
-    - "curl -s -v http://127.0.0.1:18100/proxy 2>&1"
-  expected_result:
-    - "test is successful"
-    - "X-First-Rule"
-  unexpected_result:
-    - "X-Second-Rule"
-
+  operate_steps:
+    - command: 'curl -s -v http://127.0.0.1:18100/proxy 2>&1'
+      expected:
+        - 'X-First-Rule'
+      unexpected:
+        - 'X-Second-Rule'
 response_rule_003:
   test_purpose: 验证空response_rule(无条件)匹配所有请求
   pre_condition:
@@ -1716,15 +1439,11 @@ response_rule_003:
         response_add_http_header X-Empty-Rule always_added;
       }
     }
-  operate_commands:
-    - "nginx -t"
-    - "nginx -s reload"
-    - "curl -s -v http://127.0.0.1:18100/proxy 2>&1"
-  expected_result:
-    - "test is successful"
-    - "X-Empty-Rule"
-    - "always_added"
-
+  operate_steps:
+    - command: 'curl -s -v http://127.0.0.1:18100/proxy 2>&1'
+      expected:
+        - 'X-Empty-Rule'
+        - 'always_added'
 response_rule_004:
   test_purpose: 验证match_http_status单个状态码匹配
   pre_condition:
@@ -1750,15 +1469,11 @@ response_rule_004:
         response_add_http_header X-Status-Match matched_200;
       }
     }
-  operate_commands:
-    - "nginx -t"
-    - "nginx -s reload"
-    - "curl -s -v http://127.0.0.1:18100/proxy 2>&1"
-  expected_result:
-    - "test is successful"
-    - "X-Status-Match"
-    - "matched_200"
-
+  operate_steps:
+    - command: 'curl -s -v http://127.0.0.1:18100/proxy 2>&1'
+      expected:
+        - 'X-Status-Match'
+        - 'matched_200'
 response_rule_005:
   test_purpose: 验证match_http_status状态码范围匹配(200-299)
   pre_condition:
@@ -1784,15 +1499,11 @@ response_rule_005:
         response_add_http_header X-Status-Range matched_range;
       }
     }
-  operate_commands:
-    - "nginx -t"
-    - "nginx -s reload"
-    - "curl -s -v http://127.0.0.1:18100/proxy 2>&1"
-  expected_result:
-    - "test is successful"
-    - "X-Status-Range"
-    - "matched_range"
-
+  operate_steps:
+    - command: 'curl -s -v http://127.0.0.1:18100/proxy 2>&1'
+      expected:
+        - 'X-Status-Range'
+        - 'matched_range'
 response_rule_006:
   test_purpose: 验证response_delete_http_header删除上游响应头
   pre_condition:
@@ -1819,22 +1530,13 @@ response_rule_006:
         response_delete_http_header X-To-Delete;
       }
     }
-  operate_commands:
-    - "nginx -t"
-    - "nginx -s reload"
-    - "curl -s -v http://127.0.0.1:18100/proxy 2>&1"
-  expected_result:
-    - "test is successful"
-    - "X-Keep"
-    - "should_remain"
-  unexpected_result:
-    - "X-To-Delete"
-
-
-# ============================================================
-# 自定义规则模块 - response_rule 高级用例
-# ============================================================
-
+  operate_steps:
+    - command: 'curl -s -v http://127.0.0.1:18100/proxy 2>&1'
+      expected:
+        - 'X-Keep'
+        - 'should_remain'
+      unexpected:
+        - 'X-To-Delete'
 resp_adv_001:
   test_purpose: 验证match_response_http_header精确匹配上游响应头
   pre_condition:
@@ -1860,15 +1562,11 @@ resp_adv_001:
         response_add_http_header X-Resp-Matched yes;
       }
     }
-  operate_commands:
-    - "nginx -t"
-    - "nginx -s reload"
-    - "curl -s -v http://127.0.0.1:18100/proxy 2>&1"
-  expected_result:
-    - "test is successful"
-    - "X-Resp-Matched"
-    - "yes"
-
+  operate_steps:
+    - command: 'curl -s -v http://127.0.0.1:18100/proxy 2>&1'
+      expected:
+        - 'X-Resp-Matched'
+        - 'yes'
 resp_adv_002:
   test_purpose: 验证match_response_http_header正则值匹配
   pre_condition:
@@ -1894,15 +1592,11 @@ resp_adv_002:
         response_add_http_header X-Resp-Matched yes;
       }
     }
-  operate_commands:
-    - "nginx -t"
-    - "nginx -s reload"
-    - "curl -s -v http://127.0.0.1:18100/proxy 2>&1"
-  expected_result:
-    - "test is successful"
-    - "X-Resp-Matched"
-    - "yes"
-
+  operate_steps:
+    - command: 'curl -s -v http://127.0.0.1:18100/proxy 2>&1'
+      expected:
+        - 'X-Resp-Matched'
+        - 'yes'
 resp_adv_003:
   test_purpose: 验证$custom_rule_response_rule_name变量返回命中的响应规则名称
   pre_condition:
@@ -1926,15 +1620,11 @@ resp_adv_003:
         response_add_http_header X-Rule-Name $custom_rule_response_rule_name;
       }
     }
-  operate_commands:
-    - "nginx -t"
-    - "nginx -s reload"
-    - "curl -s -v http://127.0.0.1:18100/proxy 2>&1"
-  expected_result:
-    - "test is successful"
-    - "X-Rule-Name"
-    - "my_resp_rule"
-
+  operate_steps:
+    - command: 'curl -s -v http://127.0.0.1:18100/proxy 2>&1'
+      expected:
+        - 'X-Rule-Name'
+        - 'my_resp_rule'
 resp_adv_004:
   test_purpose: 验证response_rule块内配置match_http_host请求条件(请求条件与响应条件AND)
   pre_condition:
@@ -1959,17 +1649,13 @@ resp_adv_004:
         response_add_http_header X-Req-In-Resp matched;
       }
     }
-  operate_commands:
-    - "nginx -t"
-    - "nginx -s reload"
-    - "curl -s -v -H \"Host: www.test.com\" http://127.0.0.1:18100/proxy 2>&1"
-  expected_result:
-    - "test is successful"
-    - "X-Req-In-Resp"
-    - "matched"
-  unexpected_result:
-    - "X-Req-In-Resp-Not-Added"
-
+  operate_steps:
+    - command: 'curl -s -v -H "Host: www.test.com" http://127.0.0.1:18100/proxy 2>&1'
+      expected:
+        - 'X-Req-In-Resp'
+        - 'matched'
+      unexpected:
+        - 'X-Req-In-Resp-Not-Added'
 resp_adv_005:
   test_purpose: 验证response_add_http_header的always标志在非safe状态码(404)下添加响应头
   pre_condition:
@@ -1993,15 +1679,11 @@ resp_adv_005:
         response_add_http_header X-Always-Header added_with_always always;
       }
     }
-  operate_commands:
-    - "nginx -t"
-    - "nginx -s reload"
-    - "curl -s -v http://127.0.0.1:18100/proxy 2>&1"
-  expected_result:
-    - "test is successful"
-    - "X-Always-Header"
-    - "added_with_always"
-
+  operate_steps:
+    - command: 'curl -s -v http://127.0.0.1:18100/proxy 2>&1'
+      expected:
+        - 'X-Always-Header'
+        - 'added_with_always'
 resp_adv_006:
   test_purpose: 验证safe_status机制-不带always时非safe状态码(404)不添加响应头
   pre_condition:
@@ -2025,16 +1707,12 @@ resp_adv_006:
         response_add_http_header X-No-Always added_without_always;
       }
     }
-  operate_commands:
-    - "nginx -t"
-    - "nginx -s reload"
-    - "curl -s -v http://127.0.0.1:18100/proxy 2>&1"
-  expected_result:
-    - "test is successful"
-    - "404"
-  unexpected_result:
-    - "X-No-Always"
-
+  operate_steps:
+    - command: 'curl -s -v http://127.0.0.1:18100/proxy 2>&1'
+      expected:
+        - '404'
+      unexpected:
+        - 'X-No-Always'
 resp_adv_007:
   test_purpose: 验证response_add_http_header的value支持变量(complex_value)
   pre_condition:
@@ -2058,15 +1736,11 @@ resp_adv_007:
         response_add_http_header X-Var-Value $remote_addr;
       }
     }
-  operate_commands:
-    - "nginx -t"
-    - "nginx -s reload"
-    - "curl -s -v http://127.0.0.1:18100/proxy 2>&1"
-  expected_result:
-    - "test is successful"
-    - "X-Var-Value"
-    - "127.0.0.1"
-
+  operate_steps:
+    - command: 'curl -s -v http://127.0.0.1:18100/proxy 2>&1'
+      expected:
+        - 'X-Var-Value'
+        - '127.0.0.1'
 resp_adv_008:
   test_purpose: 验证match_http_status多值OR关系(单状态码+范围混合)
   pre_condition:
@@ -2089,17 +1763,19 @@ resp_adv_008:
         response_add_http_header X-Status-Matched yes always;
       }
     }
-  operate_commands:
-    - "nginx -t"
-    - "nginx -s reload"
-    - "curl -s -v http://127.0.0.1:18100/proxy/200 2>&1"
-    - "curl -s -v http://127.0.0.1:18100/proxy/404 2>&1"
-    - "curl -s -v http://127.0.0.1:18100/proxy/500 2>&1"
-  expected_result:
-    - "test is successful"
-    - "X-Status-Matched"
-    - "yes"
-
+  operate_steps:
+    - command: 'curl -s -v http://127.0.0.1:18100/proxy/200 2>&1'
+      expected:
+        - 'X-Status-Matched'
+        - 'yes'
+    - command: 'curl -s -v http://127.0.0.1:18100/proxy/404 2>&1'
+      expected:
+        - 'X-Status-Matched'
+        - 'yes'
+    - command: 'curl -s -v http://127.0.0.1:18100/proxy/500 2>&1'
+      expected:
+        - 'X-Status-Matched'
+        - 'yes'
 resp_adv_009:
   test_purpose: 验证add_header与response_add_http_header/response_delete_http_header交叉配置共存
   pre_condition:
@@ -2126,24 +1802,15 @@ resp_adv_009:
         response_delete_http_header X-Upstream;
       }
     }
-  operate_commands:
-    - "nginx -t"
-    - "nginx -s reload"
-    - "curl -s -v http://127.0.0.1:18100/proxy 2>&1"
-  expected_result:
-    - "test is successful"
-    - "X-Native-Add"
-    - "native_value"
-    - "X-Rule-Add"
-    - "rule_value"
-  unexpected_result:
-    - "from_backend"
-
-
-# ============================================================
-# 自定义规则模块 - 语法校验/边界用例
-# ============================================================
-
+  operate_steps:
+    - command: 'curl -s -v http://127.0.0.1:18100/proxy 2>&1'
+      expected:
+        - 'X-Native-Add'
+        - 'native_value'
+        - 'X-Rule-Add'
+        - 'rule_value'
+      unexpected:
+        - 'from_backend'
 valid_001:
   test_purpose: 验证match_http_host重复配置报"is duplicate"错误
   pre_condition:
@@ -2166,6 +1833,7 @@ valid_001:
   expected_result:
     - "is duplicate"
     - "test failed"
+
 
 valid_002:
   test_purpose: 验证match_http_status重复配置报"is duplicate"错误
@@ -2194,6 +1862,7 @@ valid_002:
     - "is duplicate"
     - "test failed"
 
+
 valid_003:
   test_purpose: 验证multi_condition关闭时配置match指令报错
   pre_condition:
@@ -2214,6 +1883,7 @@ valid_003:
   expected_result:
     - "multi_condition is false"
     - "test failed"
+
 
 valid_004:
   test_purpose: 验证response_add_http_header使用内置保护头(Server)报错
@@ -2240,6 +1910,7 @@ valid_004:
   expected_result:
     - "builtin response header"
     - "test failed"
+
 
 valid_005:
   test_purpose: 验证match_http_status无效范围(start>end)报错
@@ -2272,6 +1943,7 @@ valid_005:
 # 自定义规则模块 - 边界交叉用例
 # ============================================================
 
+
 edge_001:
   test_purpose: 验证match_source_ip IPv6地址(::1)匹配
   pre_condition:
@@ -2291,16 +1963,13 @@ edge_001:
         return 200 "no_match";
       }
     }
-  operate_commands:
-    - "nginx -t"
-    - "nginx -s reload"
-    - "curl -s http://[::1]:18100/"
-    - "curl -s http://127.0.0.1:18100/"
-  expected_result:
-    - "test is successful"
-    - "ipv6_matched"
-    - "no_match"
-
+  operate_steps:
+    - command: 'curl -s http://[::1]:18100/'
+      expected:
+        - 'ipv6_matched'
+    - command: 'curl -s http://127.0.0.1:18100/'
+      expected:
+        - 'no_match'
 edge_002:
   test_purpose: 验证URL编码query值解码后匹配与多Cookie AND关系
   pre_condition:
@@ -2321,22 +1990,13 @@ edge_002:
         return 200 "no_match";
       }
     }
-  operate_commands:
-    - "nginx -t"
-    - "nginx -s reload"
-    - "curl -s -b \"c1=v1; c2=v2\" \"http://127.0.0.1:18100/rule_urlenc_cookie?name=hello%40world\""
-    - "curl -s -b \"c1=v1\" \"http://127.0.0.1:18100/rule_urlenc_cookie?name=hello%40world\""
-  expected_result:
-    - "test is successful"
-    - "urlenc_cookie_matched"
-    - "no_match"
-
-
-
-# ============================================================
-# 用例评审补充 - 匹配不中场景与默认匹配
-# ============================================================
-
+  operate_steps:
+    - command: 'curl -s -b "c1=v1; c2=v2" "http://127.0.0.1:18100/rule_urlenc_cookie?name=hello%40world"'
+      expected:
+        - 'urlenc_cookie_matched'
+    - command: 'curl -s -b "c1=v1" "http://127.0.0.1:18100/rule_urlenc_cookie?name=hello%40world"'
+      expected:
+        - 'no_match'
 nomatch_host_001:
   test_purpose: 验证match_http_host匹配不中时回退到兜底规则
   pre_condition:
@@ -2355,16 +2015,12 @@ nomatch_host_001:
         return 200 "no_match";
       }
     }
-  operate_commands:
-    - "nginx -t"
-    - "nginx -s reload"
-    - "curl -s -H \"Host: nomatch.com\" http://127.0.0.1:18100/"
-  expected_result:
-    - "test is successful"
-    - "no_match"
-  unexpected_result:
-    - "host_matched"
-
+  operate_steps:
+    - command: 'curl -s -H "Host: nomatch.com" http://127.0.0.1:18100/'
+      expected:
+        - 'no_match'
+      unexpected:
+        - 'host_matched'
 nomatch_path_001:
   test_purpose: 验证match_http_path精确匹配不中时回退到兜底规则
   pre_condition:
@@ -2383,16 +2039,12 @@ nomatch_path_001:
         return 200 "no_match";
       }
     }
-  operate_commands:
-    - "nginx -t"
-    - "nginx -s reload"
-    - "curl -s http://127.0.0.1:18100/other/path"
-  expected_result:
-    - "test is successful"
-    - "no_match"
-  unexpected_result:
-    - "path_matched"
-
+  operate_steps:
+    - command: 'curl -s http://127.0.0.1:18100/other/path'
+      expected:
+        - 'no_match'
+      unexpected:
+        - 'path_matched'
 nocond_001:
   test_purpose: 验证location不配置任何match条件时匹配所有请求
   pre_condition:
@@ -2407,20 +2059,13 @@ nocond_001:
         return 200 "no_cond_matched";
       }
     }
-  operate_commands:
-    - "nginx -t"
-    - "nginx -s reload"
-    - "curl -s http://127.0.0.1:18100/anything"
-    - "curl -s http://127.0.0.1:18100/foo/bar"
-  expected_result:
-    - "test is successful"
-    - "no_cond_matched"
-
-
-# ============================================================
-# 用例评审补充 - 大小写敏感
-# ============================================================
-
+  operate_steps:
+    - command: 'curl -s http://127.0.0.1:18100/anything'
+      expected:
+        - 'no_cond_matched'
+    - command: 'curl -s http://127.0.0.1:18100/foo/bar'
+      expected:
+        - 'no_cond_matched'
 case_host_001:
   test_purpose: 验证match_http_host大小写不敏感(域名默认不区分大小写)
   pre_condition:
@@ -2439,14 +2084,10 @@ case_host_001:
         return 200 "no_match";
       }
     }
-  operate_commands:
-    - "nginx -t"
-    - "nginx -s reload"
-    - "curl -s -H \"Host: www.test.com\" http://127.0.0.1:18100/"
-  expected_result:
-    - "test is successful"
-    - "case_host_matched"
-
+  operate_steps:
+    - command: 'curl -s -H "Host: www.test.com" http://127.0.0.1:18100/'
+      expected:
+        - 'case_host_matched'
 case_header_001:
   test_purpose: 验证match_http_header精确值大小写不敏感及key大小写不敏感
   pre_condition:
@@ -2465,16 +2106,16 @@ case_header_001:
         return 200 "no_match";
       }
     }
-  operate_commands:
-    - "nginx -t"
-    - "nginx -s reload"
-    - "curl -s -H \"X-Key: valueex\" http://127.0.0.1:18100/"
-    - "curl -s -H \"x-key: ValueEx\" http://127.0.0.1:18100/"
-    - "curl -s -H \"X-KEY: valueex\" http://127.0.0.1:18100/"
-  expected_result:
-    - "test is successful"
-    - "header_case_matched"
-
+  operate_steps:
+    - command: 'curl -s -H "X-Key: valueex" http://127.0.0.1:18100/'
+      expected:
+        - 'header_case_matched'
+    - command: 'curl -s -H "x-key: ValueEx" http://127.0.0.1:18100/'
+      expected:
+        - 'header_case_matched'
+    - command: 'curl -s -H "X-KEY: valueex" http://127.0.0.1:18100/'
+      expected:
+        - 'header_case_matched'
 case_header_regex_001:
   test_purpose: 验证match_http_header正则~区分大小写(value及key正则均区分大小写)
   pre_condition:
@@ -2493,17 +2134,16 @@ case_header_regex_001:
         return 200 "no_match";
       }
     }
-  operate_commands:
-    - "nginx -t"
-    - "nginx -s reload"
-    - "curl -s -H \"X-Key: val_abc\" http://127.0.0.1:18100/"
-    - "curl -s -H \"X-Key: VAL_ABC\" http://127.0.0.1:18100/"
-    - "curl -s -H \"x-key: val_abc\" http://127.0.0.1:18100/"
-  expected_result:
-    - "test is successful"
-    - "regex_cs_matched"
-    - "no_match"
-
+  operate_steps:
+    - command: 'curl -s -H "X-Key: val_abc" http://127.0.0.1:18100/'
+      expected:
+        - 'regex_cs_matched'
+    - command: 'curl -s -H "X-Key: VAL_ABC" http://127.0.0.1:18100/'
+      expected:
+        - 'no_match'
+    - command: 'curl -s -H "x-key: val_abc" http://127.0.0.1:18100/'
+      expected:
+        - 'no_match'
 case_header_regex_002:
   test_purpose: 验证match_http_header正则~*大小写不敏感(大写请求可匹配)
   pre_condition:
@@ -2522,19 +2162,10 @@ case_header_regex_002:
         return 200 "no_match";
       }
     }
-  operate_commands:
-    - "nginx -t"
-    - "nginx -s reload"
-    - "curl -s -H \"X-Key: VAL_ABC\" http://127.0.0.1:18100/"
-  expected_result:
-    - "test is successful"
-    - "regex_ci_matched"
-
-
-# ============================================================
-# 用例评审补充 - source_ip 全类型覆盖
-# ============================================================
-
+  operate_steps:
+    - command: 'curl -s -H "X-Key: VAL_ABC" http://127.0.0.1:18100/'
+      expected:
+        - 'regex_ci_matched'
 ip_001:
   test_purpose: 验证match_source_ip 0.0.0.0/0匹配所有IPv4
   pre_condition:
@@ -2553,14 +2184,10 @@ ip_001:
         return 200 "no_match";
       }
     }
-  operate_commands:
-    - "nginx -t"
-    - "nginx -s reload"
-    - "curl -s http://127.0.0.1:18100/"
-  expected_result:
-    - "test is successful"
-    - "all_ip_matched"
-
+  operate_steps:
+    - command: 'curl -s http://127.0.0.1:18100/'
+      expected:
+        - 'all_ip_matched'
 ip_002:
   test_purpose: 验证match_source_ip精确IP(/32)匹配
   pre_condition:
@@ -2579,14 +2206,10 @@ ip_002:
         return 200 "no_match";
       }
     }
-  operate_commands:
-    - "nginx -t"
-    - "nginx -s reload"
-    - "curl -s http://127.0.0.1:18100/"
-  expected_result:
-    - "test is successful"
-    - "v4_32_matched"
-
+  operate_steps:
+    - command: 'curl -s http://127.0.0.1:18100/'
+      expected:
+        - 'v4_32_matched'
 ip_003:
   test_purpose: 验证match_source_ip IPv6 CIDR(/128)匹配
   pre_condition:
@@ -2606,19 +2229,10 @@ ip_003:
         return 200 "no_match";
       }
     }
-  operate_commands:
-    - "nginx -t"
-    - "nginx -s reload"
-    - "curl -s http://[::1]:18100/"
-  expected_result:
-    - "test is successful"
-    - "v6_128_matched"
-
-
-# ============================================================
-# 用例评审补充 - 多location/response_rule命中第一个
-# ============================================================
-
+  operate_steps:
+    - command: 'curl -s http://[::1]:18100/'
+      expected:
+        - 'v6_128_matched'
 multi_loc_001:
   test_purpose: 验证多个location配置相同match条件时命中第一个
   pre_condition:
@@ -2645,17 +2259,13 @@ multi_loc_001:
         return 200 "no_match";
       }
     }
-  operate_commands:
-    - "nginx -t"
-    - "nginx -s reload"
-    - "curl -s -H \"X-Key: val\" http://127.0.0.1:18100/anything"
-  expected_result:
-    - "test is successful"
-    - "loc1_hit"
-  unexpected_result:
-    - "loc2_hit"
-    - "loc3_hit"
-
+  operate_steps:
+    - command: 'curl -s -H "X-Key: val" http://127.0.0.1:18100/anything'
+      expected:
+        - 'loc1_hit'
+      unexpected:
+        - 'loc2_hit'
+        - 'loc3_hit'
 multi_rule_001:
   test_purpose: 验证8条规则每条一个条件不命中时命中最后一条(交叉组合)
   pre_condition:
@@ -2676,27 +2286,18 @@ multi_rule_001:
       location /r8 { match_http_host www.final.com; return 200 "r8_final"; }
       location /catch_all { return 200 "no_match"; }
     }
-  operate_commands:
-    - "nginx -t"
-    - "nginx -s reload"
-    - "curl -s -H \"Host: www.final.com\" http://127.0.0.1:18100/"
-  expected_result:
-    - "test is successful"
-    - "r8_final"
-  unexpected_result:
-    - "r1"
-    - "r2"
-    - "r3"
-    - "r4"
-    - "r5"
-    - "r6"
-    - "r7"
-
-
-# ============================================================
-# 用例评审补充 - keyval 正则key/重复key
-# ============================================================
-
+  operate_steps:
+    - command: 'curl -s -H "Host: www.final.com" http://127.0.0.1:18100/'
+      expected:
+        - 'r8_final'
+      unexpected:
+        - 'r1'
+        - 'r2'
+        - 'r3'
+        - 'r4'
+        - 'r5'
+        - 'r6'
+        - 'r7'
 header_keyregex_001:
   test_purpose: 验证match_http_header正则匹配key
   pre_condition:
@@ -2715,16 +2316,13 @@ header_keyregex_001:
         return 200 "no_match";
       }
     }
-  operate_commands:
-    - "nginx -t"
-    - "nginx -s reload"
-    - "curl -s -H \"X-Custom-Foo: anyvalue\" http://127.0.0.1:18100/"
-    - "curl -s -H \"X-Other: anyvalue\" http://127.0.0.1:18100/"
-  expected_result:
-    - "test is successful"
-    - "keyregex_matched"
-    - "no_match"
-
+  operate_steps:
+    - command: 'curl -s -H "X-Custom-Foo: anyvalue" http://127.0.0.1:18100/'
+      expected:
+        - 'keyregex_matched'
+    - command: 'curl -s -H "X-Other: anyvalue" http://127.0.0.1:18100/'
+      expected:
+        - 'no_match'
 header_samekey_001:
   test_purpose: 验证同一key不同value单条match_http_header为OR关系
   pre_condition:
@@ -2743,21 +2341,15 @@ header_samekey_001:
         return 200 "no_match";
       }
     }
-  operate_commands:
-    - "nginx -t"
-    - "nginx -s reload"
-    - "curl -s -H \"X-K: v1\" -H \"X-K: v2\" http://127.0.0.1:18100/"
-    - "curl -s -H \"X-K: v1\" http://127.0.0.1:18100/"
-  expected_result:
-    - "test is successful"
-    - "samekey_or_matched"
-    - "samekey_or_matched"
-
-
-# ============================================================
-# 用例评审补充 - request_method 枚举与非枚举
-# ============================================================
-
+  operate_steps:
+    - command: 'curl -s -H "X-K: v1" -H "X-K: v2" http://127.0.0.1:18100/'
+      expected:
+        - 'samekey_or_matched'
+        - 'samekey_or_matched'
+    - command: 'curl -s -H "X-K: v1" http://127.0.0.1:18100/'
+      expected:
+        - 'samekey_or_matched'
+        - 'samekey_or_matched'
 method_enum_001:
   test_purpose: 验证match_request_method枚举方法全覆盖(16种)+非枚举方法匹配不中
   pre_condition:
@@ -2776,51 +2368,247 @@ method_enum_001:
         return 200 "no_match";
       }
     }
-  operate_commands:
-    - "nginx -t"
-    - "nginx -s reload"
-    - "curl -s -X GET http://127.0.0.1:18100/"
-    - "curl -s -X HEAD http://127.0.0.1:18100/"
-    - "curl -s -X POST http://127.0.0.1:18100/"
-    - "curl -s -X PUT http://127.0.0.1:18100/"
-    - "curl -s -X DELETE http://127.0.0.1:18100/"
-    - "curl -s -X MKCOL http://127.0.0.1:18100/"
-    - "curl -s -X COPY http://127.0.0.1:18100/"
-    - "curl -s -X MOVE http://127.0.0.1:18100/"
-    - "curl -s -X OPTIONS http://127.0.0.1:18100/"
-    - "curl -s -X PROPFIND http://127.0.0.1:18100/"
-    - "curl -s -X PROPPATCH http://127.0.0.1:18100/"
-    - "curl -s -X LOCK http://127.0.0.1:18100/"
-    - "curl -s -X UNLOCK http://127.0.0.1:18100/"
-    - "curl -s -X PATCH http://127.0.0.1:18100/"
-    - "curl -s -X TRACE http://127.0.0.1:18100/"
-    - "curl -s -X CONNECT http://127.0.0.1:18100/"
-    - "curl -s -X INVALID http://127.0.0.1:18100/"
-  expected_result:
-    - "test is successful"
-    - "method_enum_matched"
-    - "method_enum_matched"
-    - "method_enum_matched"
-    - "method_enum_matched"
-    - "method_enum_matched"
-    - "method_enum_matched"
-    - "method_enum_matched"
-    - "method_enum_matched"
-    - "method_enum_matched"
-    - "method_enum_matched"
-    - "method_enum_matched"
-    - "method_enum_matched"
-    - "method_enum_matched"
-    - "method_enum_matched"
-    - "method_enum_matched"
-    - "method_enum_matched"
-    - "no_match"
-
-
-# ============================================================
-# 用例评审补充 - always 标志与 safe_status
-# ============================================================
-
+  operate_steps:
+    - command: 'curl -s -X GET http://127.0.0.1:18100/'
+      expected:
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+    - command: 'curl -s -I http://127.0.0.1:18100/'
+    - command: 'curl -s -X POST http://127.0.0.1:18100/'
+      expected:
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+    - command: 'curl -s -X PUT http://127.0.0.1:18100/'
+      expected:
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+    - command: 'curl -s -X DELETE http://127.0.0.1:18100/'
+      expected:
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+    - command: 'curl -s -X MKCOL http://127.0.0.1:18100/'
+      expected:
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+    - command: 'curl -s -X COPY http://127.0.0.1:18100/'
+      expected:
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+    - command: 'curl -s -X MOVE http://127.0.0.1:18100/'
+      expected:
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+    - command: 'curl -s -X OPTIONS http://127.0.0.1:18100/'
+      expected:
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+    - command: 'curl -s -X PROPFIND http://127.0.0.1:18100/'
+      expected:
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+    - command: 'curl -s -X PROPPATCH http://127.0.0.1:18100/'
+      expected:
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+    - command: 'curl -s -X LOCK http://127.0.0.1:18100/'
+      expected:
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+    - command: 'curl -s -X UNLOCK http://127.0.0.1:18100/'
+      expected:
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+    - command: 'curl -s -X PATCH http://127.0.0.1:18100/'
+      expected:
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+        - 'method_enum_matched'
+    - command: 'curl -s -X TRACE http://127.0.0.1:18100/'
+    - command: 'curl -s -X CONNECT http://127.0.0.1:18100/'
+    - command: 'curl -s -X INVALID http://127.0.0.1:18100/'
+      expected:
+        - 'no_match'
 always_safe_001:
   test_purpose: 验证response_add_http_header在所有safe状态码下不带always均添加响应头
   pre_condition:
@@ -2849,24 +2637,47 @@ always_safe_001:
         response_add_http_header X-Safe-Code added;
       }
     }
-  operate_commands:
-    - "nginx -t"
-    - "nginx -s reload"
-    - "curl -s -v http://127.0.0.1:18100/proxy/200 2>&1"
-    - "curl -s -v http://127.0.0.1:18100/proxy/201 2>&1"
-    - "curl -s -v http://127.0.0.1:18100/proxy/204 2>&1"
-    - "curl -s -v http://127.0.0.1:18100/proxy/206 2>&1"
-    - "curl -s -v http://127.0.0.1:18100/proxy/301 2>&1"
-    - "curl -s -v http://127.0.0.1:18100/proxy/302 2>&1"
-    - "curl -s -v http://127.0.0.1:18100/proxy/303 2>&1"
-    - "curl -s -v http://127.0.0.1:18100/proxy/304 2>&1"
-    - "curl -s -v http://127.0.0.1:18100/proxy/307 2>&1"
-    - "curl -s -v http://127.0.0.1:18100/proxy/308 2>&1"
-  expected_result:
-    - "test is successful"
-    - "X-Safe-Code"
-    - "added"
-
+  operate_steps:
+    - command: 'curl -s -v http://127.0.0.1:18100/proxy/200 2>&1'
+      expected:
+        - 'X-Safe-Code'
+        - 'added'
+    - command: 'curl -s -v http://127.0.0.1:18100/proxy/201 2>&1'
+      expected:
+        - 'X-Safe-Code'
+        - 'added'
+    - command: 'curl -s -v http://127.0.0.1:18100/proxy/204 2>&1'
+      expected:
+        - 'X-Safe-Code'
+        - 'added'
+    - command: 'curl -s -v http://127.0.0.1:18100/proxy/206 2>&1'
+      expected:
+        - 'X-Safe-Code'
+        - 'added'
+    - command: 'curl -s -v http://127.0.0.1:18100/proxy/301 2>&1'
+      expected:
+        - 'X-Safe-Code'
+        - 'added'
+    - command: 'curl -s -v http://127.0.0.1:18100/proxy/302 2>&1'
+      expected:
+        - 'X-Safe-Code'
+        - 'added'
+    - command: 'curl -s -v http://127.0.0.1:18100/proxy/303 2>&1'
+      expected:
+        - 'X-Safe-Code'
+        - 'added'
+    - command: 'curl -s -v http://127.0.0.1:18100/proxy/304 2>&1'
+      expected:
+        - 'X-Safe-Code'
+        - 'added'
+    - command: 'curl -s -v http://127.0.0.1:18100/proxy/307 2>&1'
+      expected:
+        - 'X-Safe-Code'
+        - 'added'
+    - command: 'curl -s -v http://127.0.0.1:18100/proxy/308 2>&1'
+      expected:
+        - 'X-Safe-Code'
+        - 'added'
 always_nosafe_001:
   test_purpose: 验证response_add_http_header非safe状态码(418)不带always不添加带always添加
   pre_condition:
@@ -2892,24 +2703,19 @@ always_nosafe_001:
         response_add_http_header X-Always-418 added_418_always always;
       }
     }
-  operate_commands:
-    - "nginx -t"
-    - "nginx -s reload"
-    - "curl -s -v http://127.0.0.1:18100/proxy_noalways 2>&1"
-    - "curl -s -v http://127.0.0.1:18100/proxy_always 2>&1"
-  expected_result:
-    - "test is successful"
-    - "418"
-    - "X-Always-418"
-    - "added_418_always"
-  unexpected_result:
-    - "X-Nosafe-418"
-
-
-# ============================================================
-# 用例评审补充 - response_rule 不命中/对return/rewrite
-# ============================================================
-
+  operate_steps:
+    - command: 'curl -s -v http://127.0.0.1:18100/proxy_noalways 2>&1'
+      expected:
+        - '418'
+      unexpected:
+        - 'X-Nosafe-418'
+    - command: 'curl -s -v http://127.0.0.1:18100/proxy_always 2>&1'
+      expected:
+        - '418'
+        - 'X-Always-418'
+        - 'added_418_always'
+      unexpected:
+        - 'X-Nosafe-418'
 resp_nomatch_001:
   test_purpose: 验证所有response_rule都不命中时动作不执行
   pre_condition:
@@ -2928,17 +2734,13 @@ resp_nomatch_001:
       response_rule r1 { match_http_status 404; response_add_http_header X-Never added; }
       response_rule r2 { match_http_status 500; response_add_http_header X-Never2 added2; }
     }
-  operate_commands:
-    - "nginx -t"
-    - "nginx -s reload"
-    - "curl -s -v http://127.0.0.1:18100/proxy 2>&1"
-  expected_result:
-    - "test is successful"
-    - "upstream_ok"
-  unexpected_result:
-    - "X-Never"
-    - "X-Never2"
-
+  operate_steps:
+    - command: 'curl -s -v http://127.0.0.1:18100/proxy 2>&1'
+      expected:
+        - 'upstream_ok'
+      unexpected:
+        - 'X-Never'
+        - 'X-Never2'
 resp_return_001:
   test_purpose: 验证response_rule对return直接响应生效(本地响应也触发)
   pre_condition:
@@ -2956,20 +2758,11 @@ resp_return_001:
         response_add_http_header X-No-Upstream added;
       }
     }
-  operate_commands:
-    - "nginx -t"
-    - "nginx -s reload"
-    - "curl -s -v http://127.0.0.1:18100/direct 2>&1"
-  expected_result:
-    - "test is successful"
-    - "X-No-Upstream"
-    - "direct_ok"
-
-
-# ============================================================
-# 用例评审补充 - 头可见性交叉(20-24)
-# ============================================================
-
+  operate_steps:
+    - command: 'curl -s -v http://127.0.0.1:18100/direct 2>&1'
+      expected:
+        - 'X-No-Upstream'
+        - 'direct_ok'
 cross_psh_add_001:
   test_purpose: 验证proxy_set_header增加的header不能被match_http_header命中(请求阶段)
   pre_condition:
@@ -2993,16 +2786,12 @@ cross_psh_add_001:
         response_add_http_header X-Matched yes;
       }
     }
-  operate_commands:
-    - "nginx -t"
-    - "nginx -s reload"
-    - "curl -s -v http://127.0.0.1:18100/p 2>&1"
-  expected_result:
-    - "test is successful"
-    - "up"
-  unexpected_result:
-    - "X-Matched"
-
+  operate_steps:
+    - command: 'curl -s -v http://127.0.0.1:18100/p 2>&1'
+      expected:
+        - 'up'
+      unexpected:
+        - 'X-Matched'
 cross_psh_del_001:
   test_purpose: 验证被proxy_set_header置空的header依然能命中match_http_header(原始请求头可见)
   pre_condition:
@@ -3026,14 +2815,10 @@ cross_psh_del_001:
         response_add_http_header X-Matched yes;
       }
     }
-  operate_commands:
-    - "nginx -t"
-    - "nginx -s reload"
-    - "curl -s -v -H \"X-Del-Orig: original_val\" http://127.0.0.1:18100/p 2>&1"
-  expected_result:
-    - "test is successful"
-    - "X-Matched"
-
+  operate_steps:
+    - command: 'curl -s -v -H "X-Del-Orig: original_val" http://127.0.0.1:18100/p 2>&1'
+      expected:
+        - 'X-Matched'
 cross_hide_001:
   test_purpose: 验证被proxy_hide_header隐藏的响应头不能命中match_response_http_header
   pre_condition:
@@ -3057,16 +2842,11 @@ cross_hide_001:
         response_add_http_header X-Matched yes;
       }
     }
-  operate_commands:
-    - "nginx -t"
-    - "nginx -s reload"
-    - "curl -s -v http://127.0.0.1:18100/p 2>&1"
-  expected_result:
-    - "test is successful"
-  unexpected_result:
-    - "X-Matched"
-    - "X-Hidden"
-
+  operate_steps:
+    - command: 'curl -s -v http://127.0.0.1:18100/p 2>&1'
+      unexpected:
+        - 'X-Matched'
+        - 'X-Hidden'
 cross_add_001:
   test_purpose: 验证add_header增加的响应头不能被match_response_http_header命中(仅匹配上游头)
   pre_condition:
@@ -3090,17 +2870,13 @@ cross_add_001:
         response_add_http_header X-Matched yes;
       }
     }
-  operate_commands:
-    - "nginx -t"
-    - "nginx -s reload"
-    - "curl -s -v http://127.0.0.1:18100/p 2>&1"
-  expected_result:
-    - "test is successful"
-    - "X-Added-Native"
-    - "native_val"
-  unexpected_result:
-    - "X-Matched"
-
+  operate_steps:
+    - command: 'curl -s -v http://127.0.0.1:18100/p 2>&1'
+      expected:
+        - 'X-Added-Native'
+        - 'native_val'
+      unexpected:
+        - 'X-Matched'
 cross_del_match_001:
   test_purpose: 验证同一response_rule内先match_response_http_header后response_delete_http_header(命中后删除)
   pre_condition:
@@ -3122,21 +2898,12 @@ cross_del_match_001:
         response_add_http_header X-Matched-Then-Del yes;
       }
     }
-  operate_commands:
-    - "nginx -t"
-    - "nginx -s reload"
-    - "curl -s -v http://127.0.0.1:18100/p 2>&1"
-  expected_result:
-    - "test is successful"
-    - "X-Matched-Then-Del"
-  unexpected_result:
-    - "X-To-Del"
-
-
-# ============================================================
-# 用例评审补充 - 变量与日志
-# ============================================================
-
+  operate_steps:
+    - command: 'curl -s -v http://127.0.0.1:18100/p 2>&1'
+      expected:
+        - 'X-Matched-Then-Del'
+      unexpected:
+        - 'X-To-Del'
 var_log_001:
   test_purpose: 验证$custom_rule_response_rule_name变量在response_add_http_header中正常输出
   pre_condition:
@@ -3156,20 +2923,11 @@ var_log_001:
         response_add_http_header X-Resp-Rule $custom_rule_response_rule_name;
       }
     }
-  operate_commands:
-    - "nginx -t"
-    - "nginx -s reload"
-    - "curl -s -v http://127.0.0.1:18100/p 2>&1"
-  expected_result:
-    - "test is successful"
-    - "X-Resp-Rule"
-    - "myrule"
-
-
-# ============================================================
-# 用例评审补充 - 错误配置语法校验
-# ============================================================
-
+  operate_steps:
+    - command: 'curl -s -v http://127.0.0.1:18100/p 2>&1'
+      expected:
+        - 'X-Resp-Rule'
+        - 'myrule'
 valid_006:
   test_purpose: 验证match_request_method非枚举值报错
   pre_condition:
@@ -3191,6 +2949,7 @@ valid_006:
   expected_result:
     - "invalid value"
     - "test failed"
+
 
 valid_007:
   test_purpose: 验证match_source_ip非法IP格式报错
@@ -3214,6 +2973,7 @@ valid_007:
     - "invalid network"
     - "test failed"
 
+
 valid_008:
   test_purpose: 验证response_rule配置在location块内报错(上下文不允许)
   pre_condition:
@@ -3235,6 +2995,7 @@ valid_008:
   expected_result:
     - "not allowed here"
     - "test failed"
+
 
 valid_009:
   test_purpose: 验证match_http_status状态码小于100报错
@@ -3259,6 +3020,7 @@ valid_009:
     - "invalid status"
     - "test failed"
 
+
 valid_010:
   test_purpose: 验证match_http_status状态码大于599报错
   pre_condition:
@@ -3281,6 +3043,7 @@ valid_010:
   expected_result:
     - "invalid status"
     - "test failed"
+
 
 valid_011:
   test_purpose: 验证response_add_http_header使用内置保护头(Content-Length)报错
@@ -3305,6 +3068,7 @@ valid_011:
     - "builtin response header"
     - "test failed"
 
+
 valid_012:
   test_purpose: 验证response_delete_http_header使用内置保护头(Content-Type)报错
   pre_condition:
@@ -3327,6 +3091,7 @@ valid_012:
   expected_result:
     - "builtin response header"
     - "test failed"
+
 
 valid_013:
   test_purpose: 验证response_delete_http_header无参数报错
@@ -3351,6 +3116,7 @@ valid_013:
     - "invalid number of arguments"
     - "test failed"
 
+
 valid_014:
   test_purpose: 验证match_http_host无参数报错
   pre_condition:
@@ -3369,6 +3135,7 @@ valid_014:
   expected_result:
     - "invalid number of arguments"
     - "test failed"
+
 
 valid_015:
   test_purpose: 验证match_http_path无参数报错
@@ -3389,6 +3156,7 @@ valid_015:
     - "invalid number of arguments"
     - "test failed"
 
+
 valid_016:
   test_purpose: 验证match_source_ip无参数报错
   pre_condition:
@@ -3407,6 +3175,7 @@ valid_016:
   expected_result:
     - "invalid number of arguments"
     - "test failed"
+
 
 valid_017:
   test_purpose: 验证match_request_method无参数报错
@@ -3427,6 +3196,7 @@ valid_017:
     - "invalid number of arguments"
     - "test failed"
 
+
 valid_018:
   test_purpose: 验证response_rule无名称参数报错
   pre_condition:
@@ -3446,6 +3216,7 @@ valid_018:
   expected_result:
     - "invalid number of arguments"
     - "test failed"
+
 
 valid_019:
   test_purpose: 验证match_http_status无参数报错
@@ -3469,6 +3240,7 @@ valid_019:
   expected_result:
     - "invalid number of arguments"
     - "test failed"
+
 
 valid_020:
   test_purpose: 验证multi_condition关闭时配置response_rule报错
@@ -3496,6 +3268,7 @@ valid_020:
 # ============================================================
 # 用例评审补充 - 规模边界 (#7)
 # ============================================================
+
 
 scale_50_001:
   test_purpose: 验证50条规则每条一个条件不命中时命中最后一条(规模边界)
@@ -3560,23 +3333,12 @@ scale_50_001:
       location /r_final { match_http_host www.final.com; return 200 "r_final_hit"; }
       location /catch_all { return 200 "no_match"; }
     }
-  operate_commands:
-    - "nginx -t"
-    - "nginx -s reload"
-    - "curl -s -H \"Host: www.final.com\" http://127.0.0.1:18100/"
-  expected_result:
-    - "test is successful"
-    - "r_final_hit"
-  unexpected_result:
-    - "no_match"
-
-
-# ============================================================
-# ============================================================
-# 用例评审补充 - 响应头增删8种组合独立场景 (#15)
-# 3维(上游有无/原生增删/自定义增删)2x2x2=8种,每种独立验证
-# ============================================================
-
+  operate_steps:
+    - command: 'curl -s -H "Host: www.final.com" http://127.0.0.1:18100/'
+      expected:
+        - 'r_final_hit'
+      unexpected:
+        - 'no_match'
 cross_eight_001:
   test_purpose: 组合1-上游有+原生增+自定义增(三者叠加)
   pre_condition:
@@ -3602,17 +3364,13 @@ cross_eight_001:
         response_add_http_header X-H "custom_val";
       }
     }
-  operate_commands:
-    - "nginx -t"
-    - "nginx -s reload"
-    - "curl -s -v http://127.0.0.1:18100/p 2>&1"
-  expected_result:
-    - "test is successful"
-    - "up"
-    - "X-H: up_val"
-    - "X-H: native_val"
-    - "X-H: custom_val"
-
+  operate_steps:
+    - command: 'curl -s -v http://127.0.0.1:18100/p 2>&1'
+      expected:
+        - 'up'
+        - 'X-H: up_val'
+        - 'X-H: native_val'
+        - 'X-H: custom_val'
 cross_eight_002:
   test_purpose: 组合2-上游有+原生增+自定义删(删上游保留原生)
   pre_condition:
@@ -3638,18 +3396,14 @@ cross_eight_002:
         response_delete_http_header X-H;
       }
     }
-  operate_commands:
-    - "nginx -t"
-    - "nginx -s reload"
-    - "curl -s -v http://127.0.0.1:18100/p 2>&1"
-  expected_result:
-    - "test is successful"
-    - "up"
-    - "X-H: native_val"
-  unexpected_result:
-    - "up_val"
-    - "custom_val"
-
+  operate_steps:
+    - command: 'curl -s -v http://127.0.0.1:18100/p 2>&1'
+      expected:
+        - 'up'
+        - 'X-H: native_val'
+      unexpected:
+        - 'up_val'
+        - 'custom_val'
 cross_eight_003:
   test_purpose: 组合3-上游有+原生删+自定义增(隐藏上游新增自定义)
   pre_condition:
@@ -3675,18 +3429,14 @@ cross_eight_003:
         response_add_http_header X-H "custom_val";
       }
     }
-  operate_commands:
-    - "nginx -t"
-    - "nginx -s reload"
-    - "curl -s -v http://127.0.0.1:18100/p 2>&1"
-  expected_result:
-    - "test is successful"
-    - "up"
-    - "X-H: custom_val"
-  unexpected_result:
-    - "up_val"
-    - "native_val"
-
+  operate_steps:
+    - command: 'curl -s -v http://127.0.0.1:18100/p 2>&1'
+      expected:
+        - 'up'
+        - 'X-H: custom_val'
+      unexpected:
+        - 'up_val'
+        - 'native_val'
 cross_eight_004:
   test_purpose: 组合4-上游有+原生删+自定义删(全删无X-H)
   pre_condition:
@@ -3712,16 +3462,12 @@ cross_eight_004:
         response_delete_http_header X-H;
       }
     }
-  operate_commands:
-    - "nginx -t"
-    - "nginx -s reload"
-    - "curl -s -v http://127.0.0.1:18100/p 2>&1"
-  expected_result:
-    - "test is successful"
-    - "up"
-  unexpected_result:
-    - "X-H:"
-
+  operate_steps:
+    - command: 'curl -s -v http://127.0.0.1:18100/p 2>&1'
+      expected:
+        - 'up'
+      unexpected:
+        - 'X-H:'
 cross_eight_005:
   test_purpose: 组合5-上游无+原生增+自定义增(叠加两值)
   pre_condition:
@@ -3746,16 +3492,12 @@ cross_eight_005:
         response_add_http_header X-H "custom_val";
       }
     }
-  operate_commands:
-    - "nginx -t"
-    - "nginx -s reload"
-    - "curl -s -v http://127.0.0.1:18100/p 2>&1"
-  expected_result:
-    - "test is successful"
-    - "up"
-    - "X-H: native_val"
-    - "X-H: custom_val"
-
+  operate_steps:
+    - command: 'curl -s -v http://127.0.0.1:18100/p 2>&1'
+      expected:
+        - 'up'
+        - 'X-H: native_val'
+        - 'X-H: custom_val'
 cross_eight_006:
   test_purpose: 组合6-上游无+原生增+自定义删(保留原生)
   pre_condition:
@@ -3780,18 +3522,14 @@ cross_eight_006:
         response_delete_http_header X-H;
       }
     }
-  operate_commands:
-    - "nginx -t"
-    - "nginx -s reload"
-    - "curl -s -v http://127.0.0.1:18100/p 2>&1"
-  expected_result:
-    - "test is successful"
-    - "up"
-    - "X-H: native_val"
-  unexpected_result:
-    - "up_val"
-    - "custom_val"
-
+  operate_steps:
+    - command: 'curl -s -v http://127.0.0.1:18100/p 2>&1'
+      expected:
+        - 'up'
+        - 'X-H: native_val'
+      unexpected:
+        - 'up_val'
+        - 'custom_val'
 cross_eight_007:
   test_purpose: 组合7-上游无+原生删+自定义增(仅自定义)
   pre_condition:
@@ -3816,18 +3554,14 @@ cross_eight_007:
         response_add_http_header X-H "custom_val";
       }
     }
-  operate_commands:
-    - "nginx -t"
-    - "nginx -s reload"
-    - "curl -s -v http://127.0.0.1:18100/p 2>&1"
-  expected_result:
-    - "test is successful"
-    - "up"
-    - "X-H: custom_val"
-  unexpected_result:
-    - "up_val"
-    - "native_val"
-
+  operate_steps:
+    - command: 'curl -s -v http://127.0.0.1:18100/p 2>&1'
+      expected:
+        - 'up'
+        - 'X-H: custom_val'
+      unexpected:
+        - 'up_val'
+        - 'native_val'
 cross_eight_008:
   test_purpose: 组合8-上游无+原生删+自定义删(全无X-H)
   pre_condition:
@@ -3852,24 +3586,12 @@ cross_eight_008:
         response_delete_http_header X-H;
       }
     }
-  operate_commands:
-    - "nginx -t"
-    - "nginx -s reload"
-    - "curl -s -v http://127.0.0.1:18100/p 2>&1"
-  expected_result:
-    - "test is successful"
-    - "up"
-  unexpected_result:
-    - "X-H:"
-
-
-# 用例评审补充 - 规模交叉组合综合用例(#17/#18合并)
-# 单值条件(host/path/method/source_ip/status)一指令多值OR,
-# 多值条件(header/cookie/query/response_http_header)50条AND,
-# path覆盖精确/前缀/^~/正则/大小写不敏感5种类型,
-# response_rule 9种条件交叉,50条规则前49各一条件不中仅第50全中
-# ============================================================
-
+  operate_steps:
+    - command: 'curl -s -v http://127.0.0.1:18100/p 2>&1'
+      expected:
+        - 'up'
+      unexpected:
+        - 'X-H:'
 cross_combined_50_001:
   test_purpose: 验证单值多值条件交叉+5种path匹配类型+response_rule9条件规模组合仅最后命中
   pre_condition:
@@ -4685,20 +4407,11 @@ cross_combined_50_001:
         response_add_http_header X-Final yes;
       }
     }
-  operate_commands:
-    - "nginx -t"
-    - "nginx -s reload"
-    - "curl -s -v -H 'Host: www.final.com' -H 'H1: v1' -H 'H2: v2' -H 'H3: v3' -H 'H4: v4' -H 'H5: v5' -H 'H6: v6' -H 'H7: v7' -H 'H8: v8' -H 'H9: v9' -H 'H10: v10' -H 'H11: v11' -H 'H12: v12' -H 'H13: v13' -H 'H14: v14' -H 'H15: v15' -H 'H16: v16' -H 'H17: v17' -H 'H18: v18' -H 'H19: v19' -H 'H20: v20' -H 'H21: v21' -H 'H22: v22' -H 'H23: v23' -H 'H24: v24' -H 'H25: v25' -H 'H26: v26' -H 'H27: v27' -H 'H28: v28' -H 'H29: v29' -H 'H30: v30' -H 'H31: v31' -H 'H32: v32' -H 'H33: v33' -H 'H34: v34' -H 'H35: v35' -H 'H36: v36' -H 'H37: v37' -H 'H38: v38' -H 'H39: v39' -H 'H40: v40' -H 'H41: v41' -H 'H42: v42' -H 'H43: v43' -H 'H44: v44' -H 'H45: v45' -H 'H46: v46' -H 'H47: v47' -H 'H48: v48' -H 'H49: v49' -H 'H50: v50' -b 'c1=cv1;c2=cv2;c3=cv3;c4=cv4;c5=cv5;c6=cv6;c7=cv7;c8=cv8;c9=cv9;c10=cv10;c11=cv11;c12=cv12;c13=cv13;c14=cv14;c15=cv15;c16=cv16;c17=cv17;c18=cv18;c19=cv19;c20=cv20;c21=cv21;c22=cv22;c23=cv23;c24=cv24;c25=cv25;c26=cv26;c27=cv27;c28=cv28;c29=cv29;c30=cv30;c31=cv31;c32=cv32;c33=cv33;c34=cv34;c35=cv35;c36=cv36;c37=cv37;c38=cv38;c39=cv39;c40=cv40;c41=cv41;c42=cv42;c43=cv43;c44=cv44;c45=cv45;c46=cv46;c47=cv47;c48=cv48;c49=cv49;c50=cv50' 'http://127.0.0.1:18100/p?q1=qv1&q2=qv2&q3=qv3&q4=qv4&q5=qv5&q6=qv6&q7=qv7&q8=qv8&q9=qv9&q10=qv10&q11=qv11&q12=qv12&q13=qv13&q14=qv14&q15=qv15&q16=qv16&q17=qv17&q18=qv18&q19=qv19&q20=qv20&q21=qv21&q22=qv22&q23=qv23&q24=qv24&q25=qv25&q26=qv26&q27=qv27&q28=qv28&q29=qv29&q30=qv30&q31=qv31&q32=qv32&q33=qv33&q34=qv34&q35=qv35&q36=qv36&q37=qv37&q38=qv38&q39=qv39&q40=qv40&q41=qv41&q42=qv42&q43=qv43&q44=qv44&q45=qv45&q46=qv46&q47=qv47&q48=qv48&q49=qv49&q50=qv50' 2>&1"
-  expected_result:
-    - "test is successful"
-    - "X-Final"
-    - "yes"
-
-
-# ============================================================
-# 用例评审补充 - 多location原生path回退命中(#25)
-# ============================================================
-
+  operate_steps:
+    - command: 'curl -s -v -H ''Host: www.final.com'' -H ''H1: v1'' -H ''H2: v2'' -H ''H3: v3'' -H ''H4: v4'' -H ''H5: v5'' -H ''H6: v6'' -H ''H7: v7'' -H ''H8: v8'' -H ''H9: v9'' -H ''H10: v10'' -H ''H11: v11'' -H ''H12: v12'' -H ''H13: v13'' -H ''H14: v14'' -H ''H15: v15'' -H ''H16: v16'' -H ''H17: v17'' -H ''H18: v18'' -H ''H19: v19'' -H ''H20: v20'' -H ''H21: v21'' -H ''H22: v22'' -H ''H23: v23'' -H ''H24: v24'' -H ''H25: v25'' -H ''H26: v26'' -H ''H27: v27'' -H ''H28: v28'' -H ''H29: v29'' -H ''H30: v30'' -H ''H31: v31'' -H ''H32: v32'' -H ''H33: v33'' -H ''H34: v34'' -H ''H35: v35'' -H ''H36: v36'' -H ''H37: v37'' -H ''H38: v38'' -H ''H39: v39'' -H ''H40: v40'' -H ''H41: v41'' -H ''H42: v42'' -H ''H43: v43'' -H ''H44: v44'' -H ''H45: v45'' -H ''H46: v46'' -H ''H47: v47'' -H ''H48: v48'' -H ''H49: v49'' -H ''H50: v50'' -b ''c1=cv1;c2=cv2;c3=cv3;c4=cv4;c5=cv5;c6=cv6;c7=cv7;c8=cv8;c9=cv9;c10=cv10;c11=cv11;c12=cv12;c13=cv13;c14=cv14;c15=cv15;c16=cv16;c17=cv17;c18=cv18;c19=cv19;c20=cv20;c21=cv21;c22=cv22;c23=cv23;c24=cv24;c25=cv25;c26=cv26;c27=cv27;c28=cv28;c29=cv29;c30=cv30;c31=cv31;c32=cv32;c33=cv33;c34=cv34;c35=cv35;c36=cv36;c37=cv37;c38=cv38;c39=cv39;c40=cv40;c41=cv41;c42=cv42;c43=cv43;c44=cv44;c45=cv45;c46=cv46;c47=cv47;c48=cv48;c49=cv49;c50=cv50'' ''http://127.0.0.1:18100/p?q1=qv1&q2=qv2&q3=qv3&q4=qv4&q5=qv5&q6=qv6&q7=qv7&q8=qv8&q9=qv9&q10=qv10&q11=qv11&q12=qv12&q13=qv13&q14=qv14&q15=qv15&q16=qv16&q17=qv17&q18=qv18&q19=qv19&q20=qv20&q21=qv21&q22=qv22&q23=qv23&q24=qv24&q25=qv25&q26=qv26&q27=qv27&q28=qv28&q29=qv29&q30=qv30&q31=qv31&q32=qv32&q33=qv33&q34=qv34&q35=qv35&q36=qv36&q37=qv37&q38=qv38&q39=qv39&q40=qv40&q41=qv41&q42=qv42&q43=qv43&q44=qv44&q45=qv45&q46=qv46&q47=qv47&q48=qv48&q49=qv49&q50=qv50'' 2>&1'
+      expected:
+        - 'X-Final'
+        - 'yes'
 native_path_fallback_001:
   test_purpose: 验证match条件不命中时回退到原生location path匹配命中第二个location
   pre_condition:
@@ -4722,21 +4435,13 @@ native_path_fallback_001:
         return 200 "loc3_hit";
       }
     }
-  operate_commands:
-    - "nginx -t"
-    - "nginx -s reload"
-    - "curl -s http://127.0.0.1:18100/path2"
-    - "curl -s -H \"X-Key: val\" http://127.0.0.1:18100/path2"
-  expected_result:
-    - "test is successful"
-    - "loc2_hit"
-    - "loc1_hit"
-
-
-# ============================================================
-# 用例评审补充 - 无条件location优先于全条件location
-# ============================================================
-
+  operate_steps:
+    - command: 'curl -s http://127.0.0.1:18100/path2'
+      expected:
+        - 'loc2_hit'
+    - command: 'curl -s -H "X-Key: val" http://127.0.0.1:18100/path2'
+      expected:
+        - 'loc1_hit'
 nocond_first_001:
   test_purpose: 验证第一个location不配置任何匹配条件时优先于第二个全条件location命中
   pre_condition:
@@ -4761,22 +4466,17 @@ nocond_first_001:
         return 200 "loc2_all_cond_hit";
       }
     }
-  operate_commands:
-    - "nginx -t"
-    - "nginx -s reload"
-    - "curl -s -H \"Host: www.test.com\" -H \"X-Auth: token\" -b \"session=abc\" \"http://127.0.0.1:18100/rule_all?v1=ok\""
-    - "curl -s http://127.0.0.1:18100/anything"
-  expected_result:
-    - "test is successful"
-    - "loc1_no_cond_hit"
-  unexpected_result:
-    - "loc2_all_cond_hit"
-
-
-# ============================================================
-# 用例评审补充 - path大小写敏感
-# ============================================================
-
+  operate_steps:
+    - command: 'curl -s -H "Host: www.test.com" -H "X-Auth: token" -b "session=abc" "http://127.0.0.1:18100/rule_all?v1=ok"'
+      expected:
+        - 'loc1_no_cond_hit'
+      unexpected:
+        - 'loc2_all_cond_hit'
+    - command: 'curl -s http://127.0.0.1:18100/anything'
+      expected:
+        - 'loc1_no_cond_hit'
+      unexpected:
+        - 'loc2_all_cond_hit'
 case_path_exact_001:
   test_purpose: 验证match_http_path精确匹配(=)区分大小写
   pre_condition:
@@ -4795,16 +4495,13 @@ case_path_exact_001:
         return 200 "no_match";
       }
     }
-  operate_commands:
-    - "nginx -t"
-    - "nginx -s reload"
-    - "curl -s http://127.0.0.1:18100/Exact/Path"
-    - "curl -s http://127.0.0.1:18100/exact/path"
-  expected_result:
-    - "test is successful"
-    - "exact_case_matched"
-    - "no_match"
-
+  operate_steps:
+    - command: 'curl -s http://127.0.0.1:18100/Exact/Path'
+      expected:
+        - 'exact_case_matched'
+    - command: 'curl -s http://127.0.0.1:18100/exact/path'
+      expected:
+        - 'no_match'
 case_path_regex_001:
   test_purpose: 验证match_http_path正则~区分大小写(大写请求不匹配小写正则)
   pre_condition:
@@ -4823,16 +4520,13 @@ case_path_regex_001:
         return 200 "no_match";
       }
     }
-  operate_commands:
-    - "nginx -t"
-    - "nginx -s reload"
-    - "curl -s http://127.0.0.1:18100/page.html"
-    - "curl -s http://127.0.0.1:18100/page.HTML"
-  expected_result:
-    - "test is successful"
-    - "path_regex_cs_matched"
-    - "no_match"
-
+  operate_steps:
+    - command: 'curl -s http://127.0.0.1:18100/page.html'
+      expected:
+        - 'path_regex_cs_matched'
+    - command: 'curl -s http://127.0.0.1:18100/page.HTML'
+      expected:
+        - 'no_match'
 case_path_regex_002:
   test_purpose: 验证match_http_path正则~*大小写不敏感(大写请求可匹配)
   pre_condition:
@@ -4851,19 +4545,10 @@ case_path_regex_002:
         return 200 "no_match";
       }
     }
-  operate_commands:
-    - "nginx -t"
-    - "nginx -s reload"
-    - "curl -s http://127.0.0.1:18100/page.HTML"
-  expected_result:
-    - "test is successful"
-    - "path_regex_ci_matched"
-
-
-# ============================================================
-# 用例评审补充 - 剩余关键字匹配不中场景
-# ============================================================
-
+  operate_steps:
+    - command: 'curl -s http://127.0.0.1:18100/page.HTML'
+      expected:
+        - 'path_regex_ci_matched'
 nomatch_header_001:
   test_purpose: 验证match_http_header匹配不中时回退到兜底规则
   pre_condition:
@@ -4882,16 +4567,12 @@ nomatch_header_001:
         return 200 "no_match";
       }
     }
-  operate_commands:
-    - "nginx -t"
-    - "nginx -s reload"
-    - "curl -s -H \"X-Key: wrong_val\" http://127.0.0.1:18100/"
-  expected_result:
-    - "test is successful"
-    - "no_match"
-  unexpected_result:
-    - "header_matched"
-
+  operate_steps:
+    - command: 'curl -s -H "X-Key: wrong_val" http://127.0.0.1:18100/'
+      expected:
+        - 'no_match'
+      unexpected:
+        - 'header_matched'
 nomatch_cookie_001:
   test_purpose: 验证match_cookie匹配不中时回退到兜底规则
   pre_condition:
@@ -4910,16 +4591,12 @@ nomatch_cookie_001:
         return 200 "no_match";
       }
     }
-  operate_commands:
-    - "nginx -t"
-    - "nginx -s reload"
-    - "curl -s -b \"token=wrong_val\" http://127.0.0.1:18100/"
-  expected_result:
-    - "test is successful"
-    - "no_match"
-  unexpected_result:
-    - "cookie_matched"
-
+  operate_steps:
+    - command: 'curl -s -b "token=wrong_val" http://127.0.0.1:18100/'
+      expected:
+        - 'no_match'
+      unexpected:
+        - 'cookie_matched'
 nomatch_method_001:
   test_purpose: 验证match_request_method匹配不中时回退到兜底规则
   pre_condition:
@@ -4938,16 +4615,12 @@ nomatch_method_001:
         return 200 "no_match";
       }
     }
-  operate_commands:
-    - "nginx -t"
-    - "nginx -s reload"
-    - "curl -s -X PUT http://127.0.0.1:18100/"
-  expected_result:
-    - "test is successful"
-    - "no_match"
-  unexpected_result:
-    - "method_matched"
-
+  operate_steps:
+    - command: 'curl -s -X PUT http://127.0.0.1:18100/'
+      expected:
+        - 'no_match'
+      unexpected:
+        - 'method_matched'
 nomatch_ip_001:
   test_purpose: 验证match_source_ip匹配不中时回退到兜底规则
   pre_condition:
@@ -4966,16 +4639,12 @@ nomatch_ip_001:
         return 200 "no_match";
       }
     }
-  operate_commands:
-    - "nginx -t"
-    - "nginx -s reload"
-    - "curl -s http://127.0.0.1:18100/"
-  expected_result:
-    - "test is successful"
-    - "no_match"
-  unexpected_result:
-    - "ip_matched"
-
+  operate_steps:
+    - command: 'curl -s http://127.0.0.1:18100/'
+      expected:
+        - 'no_match'
+      unexpected:
+        - 'ip_matched'
 nomatch_qs_001:
   test_purpose: 验证match_query_string匹配不中时回退到兜底规则
   pre_condition:
@@ -4994,16 +4663,12 @@ nomatch_qs_001:
         return 200 "no_match";
       }
     }
-  operate_commands:
-    - "nginx -t"
-    - "nginx -s reload"
-    - "curl -s \"http://127.0.0.1:18100/?key=wrong_val\""
-  expected_result:
-    - "test is successful"
-    - "no_match"
-  unexpected_result:
-    - "qs_matched"
-
+  operate_steps:
+    - command: 'curl -s "http://127.0.0.1:18100/?key=wrong_val"'
+      expected:
+        - 'no_match'
+      unexpected:
+        - 'qs_matched'
 nomatch_resp_header_001:
   test_purpose: 验证match_response_http_header匹配不中时response_rule不执行动作
   pre_condition:
@@ -5027,16 +4692,12 @@ nomatch_resp_header_001:
         response_add_http_header X-Matched yes;
       }
     }
-  operate_commands:
-    - "nginx -t"
-    - "nginx -s reload"
-    - "curl -s -v http://127.0.0.1:18100/proxy 2>&1"
-  expected_result:
-    - "test is successful"
-    - "upstream_ok"
-  unexpected_result:
-    - "X-Matched"
-
+  operate_steps:
+    - command: 'curl -s -v http://127.0.0.1:18100/proxy 2>&1'
+      expected:
+        - 'upstream_ok'
+      unexpected:
+        - 'X-Matched'
 nomatch_status_001:
   test_purpose: 验证match_http_status匹配不中时response_rule不执行动作
   pre_condition:
@@ -5059,22 +4720,12 @@ nomatch_status_001:
         response_add_http_header X-Matched yes;
       }
     }
-  operate_commands:
-    - "nginx -t"
-    - "nginx -s reload"
-    - "curl -s -v http://127.0.0.1:18100/proxy 2>&1"
-  expected_result:
-    - "test is successful"
-    - "upstream_ok"
-  unexpected_result:
-    - "X-Matched"
-
-
-# ============================================================
-# 用例评审补充 - cookie/query_string/response_header 大小写敏感
-# (match_http_path 已由 case_path_exact_001/regex_001/regex_002 覆盖)
-# ============================================================
-
+  operate_steps:
+    - command: 'curl -s -v http://127.0.0.1:18100/proxy 2>&1'
+      expected:
+        - 'upstream_ok'
+      unexpected:
+        - 'X-Matched'
 case_cookie_001:
   test_purpose: 验证match_cookie精确值大小写不敏感及key大小写不敏感
   pre_condition:
@@ -5093,15 +4744,13 @@ case_cookie_001:
         return 200 "no_match";
       }
     }
-  operate_commands:
-    - "nginx -t"
-    - "nginx -s reload"
-    - "curl -s -b \"token=valueex\" http://127.0.0.1:18100/"
-    - "curl -s -b \"TOKEN=valueex\" http://127.0.0.1:18100/"
-  expected_result:
-    - "test is successful"
-    - "cookie_case_matched"
-
+  operate_steps:
+    - command: 'curl -s -b "token=valueex" http://127.0.0.1:18100/'
+      expected:
+        - 'cookie_case_matched'
+    - command: 'curl -s -b "TOKEN=valueex" http://127.0.0.1:18100/'
+      expected:
+        - 'cookie_case_matched'
 case_cookie_regex_001:
   test_purpose: 验证match_cookie正则~区分大小写(大写请求不匹配小写正则)
   pre_condition:
@@ -5120,16 +4769,13 @@ case_cookie_regex_001:
         return 200 "no_match";
       }
     }
-  operate_commands:
-    - "nginx -t"
-    - "nginx -s reload"
-    - "curl -s -b \"t=val_abc\" http://127.0.0.1:18100/"
-    - "curl -s -b \"t=VAL_ABC\" http://127.0.0.1:18100/"
-  expected_result:
-    - "test is successful"
-    - "cookie_regex_cs_matched"
-    - "no_match"
-
+  operate_steps:
+    - command: 'curl -s -b "t=val_abc" http://127.0.0.1:18100/'
+      expected:
+        - 'cookie_regex_cs_matched'
+    - command: 'curl -s -b "t=VAL_ABC" http://127.0.0.1:18100/'
+      expected:
+        - 'no_match'
 case_cookie_regex_002:
   test_purpose: 验证match_cookie正则~*大小写不敏感(大写请求可匹配)
   pre_condition:
@@ -5148,14 +4794,10 @@ case_cookie_regex_002:
         return 200 "no_match";
       }
     }
-  operate_commands:
-    - "nginx -t"
-    - "nginx -s reload"
-    - "curl -s -b \"t=VAL_ABC\" http://127.0.0.1:18100/"
-  expected_result:
-    - "test is successful"
-    - "cookie_regex_ci_matched"
-
+  operate_steps:
+    - command: 'curl -s -b "t=VAL_ABC" http://127.0.0.1:18100/'
+      expected:
+        - 'cookie_regex_ci_matched'
 case_qs_001:
   test_purpose: 验证match_query_string精确值大小写不敏感及key大小写不敏感
   pre_condition:
@@ -5174,15 +4816,13 @@ case_qs_001:
         return 200 "no_match";
       }
     }
-  operate_commands:
-    - "nginx -t"
-    - "nginx -s reload"
-    - "curl -s \"http://127.0.0.1:18100/?key=valueex\""
-    - "curl -s \"http://127.0.0.1:18100/?KEY=valueex\""
-  expected_result:
-    - "test is successful"
-    - "qs_case_matched"
-
+  operate_steps:
+    - command: 'curl -s "http://127.0.0.1:18100/?key=valueex"'
+      expected:
+        - 'qs_case_matched'
+    - command: 'curl -s "http://127.0.0.1:18100/?KEY=valueex"'
+      expected:
+        - 'qs_case_matched'
 case_qs_regex_001:
   test_purpose: 验证match_query_string正则~区分大小写(大写请求不匹配小写正则)
   pre_condition:
@@ -5201,16 +4841,13 @@ case_qs_regex_001:
         return 200 "no_match";
       }
     }
-  operate_commands:
-    - "nginx -t"
-    - "nginx -s reload"
-    - "curl -s \"http://127.0.0.1:18100/?k=val_abc\""
-    - "curl -s \"http://127.0.0.1:18100/?k=VAL_ABC\""
-  expected_result:
-    - "test is successful"
-    - "qs_regex_cs_matched"
-    - "no_match"
-
+  operate_steps:
+    - command: 'curl -s "http://127.0.0.1:18100/?k=val_abc"'
+      expected:
+        - 'qs_regex_cs_matched'
+    - command: 'curl -s "http://127.0.0.1:18100/?k=VAL_ABC"'
+      expected:
+        - 'no_match'
 case_qs_regex_002:
   test_purpose: 验证match_query_string正则~*大小写不敏感(大写请求可匹配)
   pre_condition:
@@ -5229,14 +4866,10 @@ case_qs_regex_002:
         return 200 "no_match";
       }
     }
-  operate_commands:
-    - "nginx -t"
-    - "nginx -s reload"
-    - "curl -s \"http://127.0.0.1:18100/?k=VAL_ABC\""
-  expected_result:
-    - "test is successful"
-    - "qs_regex_ci_matched"
-
+  operate_steps:
+    - command: 'curl -s "http://127.0.0.1:18100/?k=VAL_ABC"'
+      expected:
+        - 'qs_regex_ci_matched'
 case_resp_header_001:
   test_purpose: 验证match_response_http_header精确值大小写不敏感及key大小写不敏感
   pre_condition:
@@ -5260,15 +4893,11 @@ case_resp_header_001:
         response_add_http_header X-Matched yes;
       }
     }
-  operate_commands:
-    - "nginx -t"
-    - "nginx -s reload"
-    - "curl -s -v http://127.0.0.1:18100/proxy 2>&1"
-  expected_result:
-    - "test is successful"
-    - "X-Matched"
-    - "yes"
-
+  operate_steps:
+    - command: 'curl -s -v http://127.0.0.1:18100/proxy 2>&1'
+      expected:
+        - 'X-Matched'
+        - 'yes'
 case_resp_header_regex_001:
   test_purpose: 验证match_response_http_header正则~区分大小写及~*大小写不敏感
   pre_condition:
@@ -5296,21 +4925,12 @@ case_resp_header_regex_001:
         response_add_http_header X-Ci-Yes yes;
       }
     }
-  operate_commands:
-    - "nginx -t"
-    - "nginx -s reload"
-    - "curl -s -v http://127.0.0.1:18100/proxy 2>&1"
-  expected_result:
-    - "test is successful"
-    - "X-Ci-Yes"
-  unexpected_result:
-    - "X-Cs-No"
-
-
-# ============================================================
-# 用例评审补充 - source_ip IPv6 /0 网段
-# ============================================================
-
+  operate_steps:
+    - command: 'curl -s -v http://127.0.0.1:18100/proxy 2>&1'
+      expected:
+        - 'X-Ci-Yes'
+      unexpected:
+        - 'X-Cs-No'
 ip_004:
   test_purpose: 验证match_source_ip IPv6 ::/0网段匹配所有IPv6(不匹配IPv4)
   pre_condition:
@@ -5330,21 +4950,13 @@ ip_004:
         return 200 "no_match";
       }
     }
-  operate_commands:
-    - "nginx -t"
-    - "nginx -s reload"
-    - "curl -s http://[::1]:18100/"
-    - "curl -s http://127.0.0.1:18100/"
-  expected_result:
-    - "test is successful"
-    - "v6_all_matched"
-    - "no_match"
-
-# ============================================================
-# 用例评审补充 - location关键字在response_rule下一一对应
-# 7种请求方向关键字(host/path/header/cookie/method/source_ip/query)
-# 在response_rule上下文中的匹配与不中场景
-# ============================================================
+  operate_steps:
+    - command: 'curl -s http://[::1]:18100/'
+      expected:
+        - 'v6_all_matched'
+    - command: 'curl -s http://127.0.0.1:18100/'
+      expected:
+        - 'no_match'
 resp_host_001:
   test_purpose: 验证response_rule内match_http_host精确匹配
   pre_condition:
@@ -5365,15 +4977,11 @@ resp_host_001:
         response_add_http_header X-Matched yes;
       }
     }
-  operate_commands:
-    - "nginx -t"
-    - "nginx -s reload"
-    - "curl -s -v -H \"Host: www.test.com\" http://127.0.0.1:18100/proxy 2>&1"
-  expected_result:
-    - "test is successful"
-    - "X-Matched"
-    - "yes"
-
+  operate_steps:
+    - command: 'curl -s -v -H "Host: www.test.com" http://127.0.0.1:18100/proxy 2>&1'
+      expected:
+        - 'X-Matched'
+        - 'yes'
 resp_host_002:
   test_purpose: 验证response_rule内match_http_host前缀通配符匹配
   pre_condition:
@@ -5394,15 +5002,11 @@ resp_host_002:
         response_add_http_header X-Matched yes;
       }
     }
-  operate_commands:
-    - "nginx -t"
-    - "nginx -s reload"
-    - "curl -s -v -H \"Host: sub.example.com\" http://127.0.0.1:18100/proxy 2>&1"
-  expected_result:
-    - "test is successful"
-    - "X-Matched"
-    - "yes"
-
+  operate_steps:
+    - command: 'curl -s -v -H "Host: sub.example.com" http://127.0.0.1:18100/proxy 2>&1'
+      expected:
+        - 'X-Matched'
+        - 'yes'
 resp_host_003:
   test_purpose: 验证response_rule内match_http_host后缀通配符匹配
   pre_condition:
@@ -5423,15 +5027,11 @@ resp_host_003:
         response_add_http_header X-Matched yes;
       }
     }
-  operate_commands:
-    - "nginx -t"
-    - "nginx -s reload"
-    - "curl -s -v -H \"Host: www.example.org\" http://127.0.0.1:18100/proxy 2>&1"
-  expected_result:
-    - "test is successful"
-    - "X-Matched"
-    - "yes"
-
+  operate_steps:
+    - command: 'curl -s -v -H "Host: www.example.org" http://127.0.0.1:18100/proxy 2>&1'
+      expected:
+        - 'X-Matched'
+        - 'yes'
 resp_host_004:
   test_purpose: 验证response_rule内match_http_host正则匹配
   pre_condition:
@@ -5452,15 +5052,11 @@ resp_host_004:
         response_add_http_header X-Matched yes;
       }
     }
-  operate_commands:
-    - "nginx -t"
-    - "nginx -s reload"
-    - "curl -s -v -H \"Host: www123.test.com\" http://127.0.0.1:18100/proxy 2>&1"
-  expected_result:
-    - "test is successful"
-    - "X-Matched"
-    - "yes"
-
+  operate_steps:
+    - command: 'curl -s -v -H "Host: www123.test.com" http://127.0.0.1:18100/proxy 2>&1'
+      expected:
+        - 'X-Matched'
+        - 'yes'
 resp_host_005:
   test_purpose: 验证response_rule内match_http_host多值OR关系
   pre_condition:
@@ -5481,15 +5077,11 @@ resp_host_005:
         response_add_http_header X-Matched yes;
       }
     }
-  operate_commands:
-    - "nginx -t"
-    - "nginx -s reload"
-    - "curl -s -v -H \"Host: www.first.com\" http://127.0.0.1:18100/proxy 2>&1"
-  expected_result:
-    - "test is successful"
-    - "X-Matched"
-    - "yes"
-
+  operate_steps:
+    - command: 'curl -s -v -H "Host: www.first.com" http://127.0.0.1:18100/proxy 2>&1'
+      expected:
+        - 'X-Matched'
+        - 'yes'
 resp_host_nomatch_001:
   test_purpose: 验证response_rule内match_http_host匹配不中不执行动作
   pre_condition:
@@ -5510,16 +5102,12 @@ resp_host_nomatch_001:
         response_add_http_header X-Matched yes;
       }
     }
-  operate_commands:
-    - "nginx -t"
-    - "nginx -s reload"
-    - "curl -s -v -H \"Host: nomatch.com\" http://127.0.0.1:18100/proxy 2>&1"
-  expected_result:
-    - "test is successful"
-    - "up"
-  unexpected_result:
-    - "X-Matched"
-
+  operate_steps:
+    - command: 'curl -s -v -H "Host: nomatch.com" http://127.0.0.1:18100/proxy 2>&1'
+      expected:
+        - 'up'
+      unexpected:
+        - 'X-Matched'
 resp_path_001:
   test_purpose: 验证response_rule内match_http_path精确匹配(=)
   pre_condition:
@@ -5540,15 +5128,11 @@ resp_path_001:
         response_add_http_header X-Matched yes;
       }
     }
-  operate_commands:
-    - "nginx -t"
-    - "nginx -s reload"
-    - "curl -s -v http://127.0.0.1:18100/proxy 2>&1"
-  expected_result:
-    - "test is successful"
-    - "X-Matched"
-    - "yes"
-
+  operate_steps:
+    - command: 'curl -s -v http://127.0.0.1:18100/proxy 2>&1'
+      expected:
+        - 'X-Matched'
+        - 'yes'
 resp_path_002:
   test_purpose: 验证response_rule内match_http_path前缀匹配
   pre_condition:
@@ -5569,15 +5153,11 @@ resp_path_002:
         response_add_http_header X-Matched yes;
       }
     }
-  operate_commands:
-    - "nginx -t"
-    - "nginx -s reload"
-    - "curl -s -v http://127.0.0.1:18100/proxy/sub 2>&1"
-  expected_result:
-    - "test is successful"
-    - "X-Matched"
-    - "yes"
-
+  operate_steps:
+    - command: 'curl -s -v http://127.0.0.1:18100/proxy/sub 2>&1'
+      expected:
+        - 'X-Matched'
+        - 'yes'
 resp_path_003:
   test_purpose: 验证response_rule内match_http_path优先前缀匹配(^~)
   pre_condition:
@@ -5598,15 +5178,11 @@ resp_path_003:
         response_add_http_header X-Matched yes;
       }
     }
-  operate_commands:
-    - "nginx -t"
-    - "nginx -s reload"
-    - "curl -s -v http://127.0.0.1:18100/proxy/file 2>&1"
-  expected_result:
-    - "test is successful"
-    - "X-Matched"
-    - "yes"
-
+  operate_steps:
+    - command: 'curl -s -v http://127.0.0.1:18100/proxy/file 2>&1'
+      expected:
+        - 'X-Matched'
+        - 'yes'
 resp_path_004:
   test_purpose: 验证response_rule内match_http_path正则匹配(~)
   pre_condition:
@@ -5627,15 +5203,11 @@ resp_path_004:
         response_add_http_header X-Matched yes;
       }
     }
-  operate_commands:
-    - "nginx -t"
-    - "nginx -s reload"
-    - "curl -s -v http://127.0.0.1:18100/proxy/page.html 2>&1"
-  expected_result:
-    - "test is successful"
-    - "X-Matched"
-    - "yes"
-
+  operate_steps:
+    - command: 'curl -s -v http://127.0.0.1:18100/proxy/page.html 2>&1'
+      expected:
+        - 'X-Matched'
+        - 'yes'
 resp_path_005:
   test_purpose: 验证response_rule内match_http_path大小写不敏感正则(~*)
   pre_condition:
@@ -5656,15 +5228,11 @@ resp_path_005:
         response_add_http_header X-Matched yes;
       }
     }
-  operate_commands:
-    - "nginx -t"
-    - "nginx -s reload"
-    - "curl -s -v http://127.0.0.1:18100/proxy/image.JPG 2>&1"
-  expected_result:
-    - "test is successful"
-    - "X-Matched"
-    - "yes"
-
+  operate_steps:
+    - command: 'curl -s -v http://127.0.0.1:18100/proxy/image.JPG 2>&1'
+      expected:
+        - 'X-Matched'
+        - 'yes'
 resp_path_006:
   test_purpose: 验证response_rule内match_http_path多值OR关系
   pre_condition:
@@ -5685,15 +5253,11 @@ resp_path_006:
         response_add_http_header X-Matched yes;
       }
     }
-  operate_commands:
-    - "nginx -t"
-    - "nginx -s reload"
-    - "curl -s -v http://127.0.0.1:18100/proxy 2>&1"
-  expected_result:
-    - "test is successful"
-    - "X-Matched"
-    - "yes"
-
+  operate_steps:
+    - command: 'curl -s -v http://127.0.0.1:18100/proxy 2>&1'
+      expected:
+        - 'X-Matched'
+        - 'yes'
 resp_path_nomatch_001:
   test_purpose: 验证response_rule内match_http_path匹配不中不执行动作
   pre_condition:
@@ -5714,16 +5278,12 @@ resp_path_nomatch_001:
         response_add_http_header X-Matched yes;
       }
     }
-  operate_commands:
-    - "nginx -t"
-    - "nginx -s reload"
-    - "curl -s -v http://127.0.0.1:18100/proxy 2>&1"
-  expected_result:
-    - "test is successful"
-    - "up"
-  unexpected_result:
-    - "X-Matched"
-
+  operate_steps:
+    - command: 'curl -s -v http://127.0.0.1:18100/proxy 2>&1'
+      expected:
+        - 'up'
+      unexpected:
+        - 'X-Matched'
 resp_header_001:
   test_purpose: 验证response_rule内match_http_header精确匹配
   pre_condition:
@@ -5744,15 +5304,11 @@ resp_header_001:
         response_add_http_header X-Matched yes;
       }
     }
-  operate_commands:
-    - "nginx -t"
-    - "nginx -s reload"
-    - "curl -s -v -H \"X-Test-Key: test_value\" http://127.0.0.1:18100/proxy 2>&1"
-  expected_result:
-    - "test is successful"
-    - "X-Matched"
-    - "yes"
-
+  operate_steps:
+    - command: 'curl -s -v -H "X-Test-Key: test_value" http://127.0.0.1:18100/proxy 2>&1'
+      expected:
+        - 'X-Matched'
+        - 'yes'
 resp_header_002:
   test_purpose: 验证response_rule内match_http_header正则匹配
   pre_condition:
@@ -5773,15 +5329,11 @@ resp_header_002:
         response_add_http_header X-Matched yes;
       }
     }
-  operate_commands:
-    - "nginx -t"
-    - "nginx -s reload"
-    - "curl -s -v -H \"X-Test-Key: val_123\" http://127.0.0.1:18100/proxy 2>&1"
-  expected_result:
-    - "test is successful"
-    - "X-Matched"
-    - "yes"
-
+  operate_steps:
+    - command: 'curl -s -v -H "X-Test-Key: val_123" http://127.0.0.1:18100/proxy 2>&1'
+      expected:
+        - 'X-Matched'
+        - 'yes'
 resp_header_003:
   test_purpose: 验证response_rule内match_http_header多条AND关系
   pre_condition:
@@ -5803,15 +5355,11 @@ resp_header_003:
         response_add_http_header X-Matched yes;
       }
     }
-  operate_commands:
-    - "nginx -t"
-    - "nginx -s reload"
-    - "curl -s -v -H \"X-Group-A: val_a\" -H \"X-Group-B: val_b\" http://127.0.0.1:18100/proxy 2>&1"
-  expected_result:
-    - "test is successful"
-    - "X-Matched"
-    - "yes"
-
+  operate_steps:
+    - command: 'curl -s -v -H "X-Group-A: val_a" -H "X-Group-B: val_b" http://127.0.0.1:18100/proxy 2>&1'
+      expected:
+        - 'X-Matched'
+        - 'yes'
 resp_header_nomatch_001:
   test_purpose: 验证response_rule内match_http_header匹配不中不执行动作
   pre_condition:
@@ -5832,16 +5380,12 @@ resp_header_nomatch_001:
         response_add_http_header X-Matched yes;
       }
     }
-  operate_commands:
-    - "nginx -t"
-    - "nginx -s reload"
-    - "curl -s -v -H \"X-Test-Key: wrong\" http://127.0.0.1:18100/proxy 2>&1"
-  expected_result:
-    - "test is successful"
-    - "up"
-  unexpected_result:
-    - "X-Matched"
-
+  operate_steps:
+    - command: 'curl -s -v -H "X-Test-Key: wrong" http://127.0.0.1:18100/proxy 2>&1'
+      expected:
+        - 'up'
+      unexpected:
+        - 'X-Matched'
 resp_cookie_001:
   test_purpose: 验证response_rule内match_cookie精确匹配
   pre_condition:
@@ -5862,15 +5406,11 @@ resp_cookie_001:
         response_add_http_header X-Matched yes;
       }
     }
-  operate_commands:
-    - "nginx -t"
-    - "nginx -s reload"
-    - "curl -s -v -b \"token=abc123\" http://127.0.0.1:18100/proxy 2>&1"
-  expected_result:
-    - "test is successful"
-    - "X-Matched"
-    - "yes"
-
+  operate_steps:
+    - command: 'curl -s -v -b "token=abc123" http://127.0.0.1:18100/proxy 2>&1'
+      expected:
+        - 'X-Matched'
+        - 'yes'
 resp_cookie_002:
   test_purpose: 验证response_rule内match_cookie正则匹配
   pre_condition:
@@ -5891,15 +5431,11 @@ resp_cookie_002:
         response_add_http_header X-Matched yes;
       }
     }
-  operate_commands:
-    - "nginx -t"
-    - "nginx -s reload"
-    - "curl -s -v -b \"session=sess_abc123\" http://127.0.0.1:18100/proxy 2>&1"
-  expected_result:
-    - "test is successful"
-    - "X-Matched"
-    - "yes"
-
+  operate_steps:
+    - command: 'curl -s -v -b "session=sess_abc123" http://127.0.0.1:18100/proxy 2>&1'
+      expected:
+        - 'X-Matched'
+        - 'yes'
 resp_cookie_003:
   test_purpose: 验证response_rule内match_cookie多条AND关系
   pre_condition:
@@ -5921,15 +5457,11 @@ resp_cookie_003:
         response_add_http_header X-Matched yes;
       }
     }
-  operate_commands:
-    - "nginx -t"
-    - "nginx -s reload"
-    - "curl -s -v -b \"c1=v1; c2=v2\" http://127.0.0.1:18100/proxy 2>&1"
-  expected_result:
-    - "test is successful"
-    - "X-Matched"
-    - "yes"
-
+  operate_steps:
+    - command: 'curl -s -v -b "c1=v1; c2=v2" http://127.0.0.1:18100/proxy 2>&1'
+      expected:
+        - 'X-Matched'
+        - 'yes'
 resp_cookie_nomatch_001:
   test_purpose: 验证response_rule内match_cookie匹配不中不执行动作
   pre_condition:
@@ -5950,16 +5482,12 @@ resp_cookie_nomatch_001:
         response_add_http_header X-Matched yes;
       }
     }
-  operate_commands:
-    - "nginx -t"
-    - "nginx -s reload"
-    - "curl -s -v -b \"token=wrong\" http://127.0.0.1:18100/proxy 2>&1"
-  expected_result:
-    - "test is successful"
-    - "up"
-  unexpected_result:
-    - "X-Matched"
-
+  operate_steps:
+    - command: 'curl -s -v -b "token=wrong" http://127.0.0.1:18100/proxy 2>&1'
+      expected:
+        - 'up'
+      unexpected:
+        - 'X-Matched'
 resp_method_001:
   test_purpose: 验证response_rule内match_request_method单方法匹配
   pre_condition:
@@ -5980,15 +5508,11 @@ resp_method_001:
         response_add_http_header X-Matched yes;
       }
     }
-  operate_commands:
-    - "nginx -t"
-    - "nginx -s reload"
-    - "curl -s -v http://127.0.0.1:18100/proxy 2>&1"
-  expected_result:
-    - "test is successful"
-    - "X-Matched"
-    - "yes"
-
+  operate_steps:
+    - command: 'curl -s -v http://127.0.0.1:18100/proxy 2>&1'
+      expected:
+        - 'X-Matched'
+        - 'yes'
 resp_method_002:
   test_purpose: 验证response_rule内match_request_method多方法OR关系
   pre_condition:
@@ -6009,15 +5533,11 @@ resp_method_002:
         response_add_http_header X-Matched yes;
       }
     }
-  operate_commands:
-    - "nginx -t"
-    - "nginx -s reload"
-    - "curl -s -v -X POST http://127.0.0.1:18100/proxy 2>&1"
-  expected_result:
-    - "test is successful"
-    - "X-Matched"
-    - "yes"
-
+  operate_steps:
+    - command: 'curl -s -v -X POST http://127.0.0.1:18100/proxy 2>&1'
+      expected:
+        - 'X-Matched'
+        - 'yes'
 resp_method_nomatch_001:
   test_purpose: 验证response_rule内match_request_method匹配不中不执行动作
   pre_condition:
@@ -6038,16 +5558,12 @@ resp_method_nomatch_001:
         response_add_http_header X-Matched yes;
       }
     }
-  operate_commands:
-    - "nginx -t"
-    - "nginx -s reload"
-    - "curl -s -v -X DELETE http://127.0.0.1:18100/proxy 2>&1"
-  expected_result:
-    - "test is successful"
-    - "up"
-  unexpected_result:
-    - "X-Matched"
-
+  operate_steps:
+    - command: 'curl -s -v -X DELETE http://127.0.0.1:18100/proxy 2>&1'
+      expected:
+        - 'up'
+      unexpected:
+        - 'X-Matched'
 resp_ip_001:
   test_purpose: 验证response_rule内match_source_ip精确IPv4匹配
   pre_condition:
@@ -6068,15 +5584,11 @@ resp_ip_001:
         response_add_http_header X-Matched yes;
       }
     }
-  operate_commands:
-    - "nginx -t"
-    - "nginx -s reload"
-    - "curl -s -v http://127.0.0.1:18100/proxy 2>&1"
-  expected_result:
-    - "test is successful"
-    - "X-Matched"
-    - "yes"
-
+  operate_steps:
+    - command: 'curl -s -v http://127.0.0.1:18100/proxy 2>&1'
+      expected:
+        - 'X-Matched'
+        - 'yes'
 resp_ip_002:
   test_purpose: 验证response_rule内match_source_ip CIDR匹配
   pre_condition:
@@ -6097,15 +5609,11 @@ resp_ip_002:
         response_add_http_header X-Matched yes;
       }
     }
-  operate_commands:
-    - "nginx -t"
-    - "nginx -s reload"
-    - "curl -s -v http://127.0.0.1:18100/proxy 2>&1"
-  expected_result:
-    - "test is successful"
-    - "X-Matched"
-    - "yes"
-
+  operate_steps:
+    - command: 'curl -s -v http://127.0.0.1:18100/proxy 2>&1'
+      expected:
+        - 'X-Matched'
+        - 'yes'
 resp_ip_003:
   test_purpose: 验证response_rule内match_source_ip 0.0.0.0/0匹配所有IPv4
   pre_condition:
@@ -6126,15 +5634,11 @@ resp_ip_003:
         response_add_http_header X-Matched yes;
       }
     }
-  operate_commands:
-    - "nginx -t"
-    - "nginx -s reload"
-    - "curl -s -v http://127.0.0.1:18100/proxy 2>&1"
-  expected_result:
-    - "test is successful"
-    - "X-Matched"
-    - "yes"
-
+  operate_steps:
+    - command: 'curl -s -v http://127.0.0.1:18100/proxy 2>&1'
+      expected:
+        - 'X-Matched'
+        - 'yes'
 resp_ip_004:
   test_purpose: 验证response_rule内match_source_ip精确IPv4(/32)匹配
   pre_condition:
@@ -6155,15 +5659,11 @@ resp_ip_004:
         response_add_http_header X-Matched yes;
       }
     }
-  operate_commands:
-    - "nginx -t"
-    - "nginx -s reload"
-    - "curl -s -v http://127.0.0.1:18100/proxy 2>&1"
-  expected_result:
-    - "test is successful"
-    - "X-Matched"
-    - "yes"
-
+  operate_steps:
+    - command: 'curl -s -v http://127.0.0.1:18100/proxy 2>&1'
+      expected:
+        - 'X-Matched'
+        - 'yes'
 resp_ip_005:
   test_purpose: 验证response_rule内match_source_ip IPv6精确(/128)匹配
   pre_condition:
@@ -6185,15 +5685,11 @@ resp_ip_005:
         response_add_http_header X-Matched yes;
       }
     }
-  operate_commands:
-    - "nginx -t"
-    - "nginx -s reload"
-    - "curl -s -v http://[::1]:18100/proxy 2>&1"
-  expected_result:
-    - "test is successful"
-    - "X-Matched"
-    - "yes"
-
+  operate_steps:
+    - command: 'curl -s -v http://[::1]:18100/proxy 2>&1'
+      expected:
+        - 'X-Matched'
+        - 'yes'
 resp_ip_006:
   test_purpose: 验证response_rule内match_source_ip IPv6 ::/0匹配所有IPv6
   pre_condition:
@@ -6215,15 +5711,11 @@ resp_ip_006:
         response_add_http_header X-Matched yes;
       }
     }
-  operate_commands:
-    - "nginx -t"
-    - "nginx -s reload"
-    - "curl -s -v http://[::1]:18100/proxy 2>&1"
-  expected_result:
-    - "test is successful"
-    - "X-Matched"
-    - "yes"
-
+  operate_steps:
+    - command: 'curl -s -v http://[::1]:18100/proxy 2>&1'
+      expected:
+        - 'X-Matched'
+        - 'yes'
 resp_ip_nomatch_001:
   test_purpose: 验证response_rule内match_source_ip匹配不中不执行动作
   pre_condition:
@@ -6244,16 +5736,12 @@ resp_ip_nomatch_001:
         response_add_http_header X-Matched yes;
       }
     }
-  operate_commands:
-    - "nginx -t"
-    - "nginx -s reload"
-    - "curl -s -v http://127.0.0.1:18100/proxy 2>&1"
-  expected_result:
-    - "test is successful"
-    - "up"
-  unexpected_result:
-    - "X-Matched"
-
+  operate_steps:
+    - command: 'curl -s -v http://127.0.0.1:18100/proxy 2>&1'
+      expected:
+        - 'up'
+      unexpected:
+        - 'X-Matched'
 resp_qs_001:
   test_purpose: 验证response_rule内match_query_string精确匹配
   pre_condition:
@@ -6274,15 +5762,11 @@ resp_qs_001:
         response_add_http_header X-Matched yes;
       }
     }
-  operate_commands:
-    - "nginx -t"
-    - "nginx -s reload"
-    - "curl -s -v \"http://127.0.0.1:18100/proxy?key=test_value\" 2>&1"
-  expected_result:
-    - "test is successful"
-    - "X-Matched"
-    - "yes"
-
+  operate_steps:
+    - command: 'curl -s -v "http://127.0.0.1:18100/proxy?key=test_value" 2>&1'
+      expected:
+        - 'X-Matched'
+        - 'yes'
 resp_qs_002:
   test_purpose: 验证response_rule内match_query_string正则匹配
   pre_condition:
@@ -6303,15 +5787,11 @@ resp_qs_002:
         response_add_http_header X-Matched yes;
       }
     }
-  operate_commands:
-    - "nginx -t"
-    - "nginx -s reload"
-    - "curl -s -v \"http://127.0.0.1:18100/proxy?id=12345\" 2>&1"
-  expected_result:
-    - "test is successful"
-    - "X-Matched"
-    - "yes"
-
+  operate_steps:
+    - command: 'curl -s -v "http://127.0.0.1:18100/proxy?id=12345" 2>&1'
+      expected:
+        - 'X-Matched'
+        - 'yes'
 resp_qs_003:
   test_purpose: 验证response_rule内match_query_string多条AND关系
   pre_condition:
@@ -6333,15 +5813,11 @@ resp_qs_003:
         response_add_http_header X-Matched yes;
       }
     }
-  operate_commands:
-    - "nginx -t"
-    - "nginx -s reload"
-    - "curl -s -v \"http://127.0.0.1:18100/proxy?page=1&lang=en\" 2>&1"
-  expected_result:
-    - "test is successful"
-    - "X-Matched"
-    - "yes"
-
+  operate_steps:
+    - command: 'curl -s -v "http://127.0.0.1:18100/proxy?page=1&lang=en" 2>&1'
+      expected:
+        - 'X-Matched'
+        - 'yes'
 resp_qs_nomatch_001:
   test_purpose: 验证response_rule内match_query_string匹配不中不执行动作
   pre_condition:
@@ -6362,21 +5838,12 @@ resp_qs_nomatch_001:
         response_add_http_header X-Matched yes;
       }
     }
-  operate_commands:
-    - "nginx -t"
-    - "nginx -s reload"
-    - "curl -s -v \"http://127.0.0.1:18100/proxy?key=wrong\" 2>&1"
-  expected_result:
-    - "test is successful"
-    - "up"
-  unexpected_result:
-    - "X-Matched"
-
-
-# ============================================================
-# 用例评审补充 - keyval 正则同key不同value(AND)
-# ============================================================
-
+  operate_steps:
+    - command: 'curl -s -v "http://127.0.0.1:18100/proxy?key=wrong" 2>&1'
+      expected:
+        - 'up'
+      unexpected:
+        - 'X-Matched'
 header_regex_samekey_001:
   test_purpose: 验证match_http_header正则key同模式不同value多条AND关系
   pre_condition:
@@ -6396,16 +5863,13 @@ header_regex_samekey_001:
         return 200 "no_match";
       }
     }
-  operate_commands:
-    - "nginx -t"
-    - "nginx -s reload"
-    - "curl -s -H \"X-K: v1\" -H \"X-K: v2\" http://127.0.0.1:18100/"
-    - "curl -s -H \"X-K: v1\" http://127.0.0.1:18100/"
-  expected_result:
-    - "test is successful"
-    - "header_regex_samekey_matched"
-    - "no_match"
-
+  operate_steps:
+    - command: 'curl -s -H "X-K: v1" -H "X-K: v2" http://127.0.0.1:18100/'
+      expected:
+        - 'header_regex_samekey_matched'
+    - command: 'curl -s -H "X-K: v1" http://127.0.0.1:18100/'
+      expected:
+        - 'no_match'
 cookie_regex_samekey_001:
   test_purpose: 验证match_cookie正则key同模式不同value多条AND关系
   pre_condition:
@@ -6425,16 +5889,13 @@ cookie_regex_samekey_001:
         return 200 "no_match";
       }
     }
-  operate_commands:
-    - "nginx -t"
-    - "nginx -s reload"
-    - "curl -s -b \"t=v1; t=v2\" http://127.0.0.1:18100/"
-    - "curl -s -b \"t=v1\" http://127.0.0.1:18100/"
-  expected_result:
-    - "test is successful"
-    - "cookie_regex_samekey_matched"
-    - "no_match"
-
+  operate_steps:
+    - command: 'curl -s -b "t=v1; t=v2" http://127.0.0.1:18100/'
+      expected:
+        - 'cookie_regex_samekey_matched'
+    - command: 'curl -s -b "t=v1" http://127.0.0.1:18100/'
+      expected:
+        - 'no_match'
 qs_regex_samekey_001:
   test_purpose: 验证match_query_string正则key同模式不同value多条AND关系
   pre_condition:
@@ -6454,21 +5915,13 @@ qs_regex_samekey_001:
         return 200 "no_match";
       }
     }
-  operate_commands:
-    - "nginx -t"
-    - "nginx -s reload"
-    - "curl -s \"http://127.0.0.1:18100/?k=v1&k=v2\""
-    - "curl -s \"http://127.0.0.1:18100/?k=v1\""
-  expected_result:
-    - "test is successful"
-    - "qs_regex_samekey_matched"
-    - "no_match"
-
-
-# ============================================================
-# 用例评审补充 - match_response_http_header 正则key/重复key
-# ============================================================
-
+  operate_steps:
+    - command: 'curl -s "http://127.0.0.1:18100/?k=v1&k=v2"'
+      expected:
+        - 'qs_regex_samekey_matched'
+    - command: 'curl -s "http://127.0.0.1:18100/?k=v1"'
+      expected:
+        - 'no_match'
 resp_header_regex_key_001:
   test_purpose: 验证match_response_http_header正则匹配key
   pre_condition:
@@ -6492,15 +5945,11 @@ resp_header_regex_key_001:
         response_add_http_header X-Matched yes;
       }
     }
-  operate_commands:
-    - "nginx -t"
-    - "nginx -s reload"
-    - "curl -s -v http://127.0.0.1:18100/proxy 2>&1"
-  expected_result:
-    - "test is successful"
-    - "X-Matched"
-    - "yes"
-
+  operate_steps:
+    - command: 'curl -s -v http://127.0.0.1:18100/proxy 2>&1'
+      expected:
+        - 'X-Matched'
+        - 'yes'
 resp_header_samekey_001:
   test_purpose: 验证match_response_http_header同key不同value多条AND关系
   pre_condition:
@@ -6526,15 +5975,11 @@ resp_header_samekey_001:
         response_add_http_header X-Matched yes;
       }
     }
-  operate_commands:
-    - "nginx -t"
-    - "nginx -s reload"
-    - "curl -s -v http://127.0.0.1:18100/proxy 2>&1"
-  expected_result:
-    - "test is successful"
-    - "X-Matched"
-    - "yes"
-
+  operate_steps:
+    - command: 'curl -s -v http://127.0.0.1:18100/proxy 2>&1'
+      expected:
+        - 'X-Matched'
+        - 'yes'
 resp_header_samekey_002:
   test_purpose: 验证match_response_http_header同key不同value仅一个值时AND不命中
   pre_condition:
@@ -6559,16 +6004,12 @@ resp_header_samekey_002:
         response_add_http_header X-Matched yes;
       }
     }
-  operate_commands:
-    - "nginx -t"
-    - "nginx -s reload"
-    - "curl -s -v http://127.0.0.1:18100/proxy 2>&1"
-  expected_result:
-    - "test is successful"
-    - "up"
-  unexpected_result:
-    - "X-Matched"
-
+  operate_steps:
+    - command: 'curl -s -v http://127.0.0.1:18100/proxy 2>&1'
+      expected:
+        - 'up'
+      unexpected:
+        - 'X-Matched'
 resp_header_regex_samekey_001:
   test_purpose: 验证match_response_http_header正则key同模式不同value多条AND关系
   pre_condition:
@@ -6594,20 +6035,11 @@ resp_header_regex_samekey_001:
         response_add_http_header X-Matched yes;
       }
     }
-  operate_commands:
-    - "nginx -t"
-    - "nginx -s reload"
-    - "curl -s -v http://127.0.0.1:18100/proxy 2>&1"
-  expected_result:
-    - "test is successful"
-    - "X-Matched"
-    - "yes"
-
-
-# ============================================================
-# 用例评审补充 - response_rule与rewrite组合场景
-# ============================================================
-
+  operate_steps:
+    - command: 'curl -s -v http://127.0.0.1:18100/proxy 2>&1'
+      expected:
+        - 'X-Matched'
+        - 'yes'
 resp_rewrite_001:
   test_purpose: 验证rewrite改写URI后proxy_pass仍触发response_rule添加响应头
   pre_condition:
@@ -6633,16 +6065,12 @@ resp_rewrite_001:
         response_add_http_header X-Rewrite-Rule added;
       }
     }
-  operate_commands:
-    - "nginx -t"
-    - "nginx -s reload"
-    - "curl -s -v http://127.0.0.1:18100/proxy/ 2>&1"
-  expected_result:
-    - "test is successful"
-    - "X-Rewrite-Rule"
-    - "added"
-    - "upstream_ok"
-
+  operate_steps:
+    - command: 'curl -s -v http://127.0.0.1:18100/proxy/ 2>&1'
+      expected:
+        - 'X-Rewrite-Rule'
+        - 'added'
+        - 'upstream_ok'
 resp_rewrite_002:
   test_purpose: 验证rewrite改写URI后response_rule的match_http_path按改写后路径匹配
   pre_condition:
@@ -6670,21 +6098,12 @@ resp_rewrite_002:
         response_add_http_header X-Path-Nomatch yes;
       }
     }
-  operate_commands:
-    - "nginx -t"
-    - "nginx -s reload"
-    - "curl -s -v http://127.0.0.1:18100/proxy/ 2>&1"
-  expected_result:
-    - "test is successful"
-    - "X-Path-Matched"
-  unexpected_result:
-    - "X-Path-Nomatch"
-
-
-# ============================================================
-# 用例评审补充 - proxy_set_header转发变量与转发日志场景
-# ============================================================
-
+  operate_steps:
+    - command: 'curl -s -v http://127.0.0.1:18100/proxy/ 2>&1'
+      expected:
+        - 'X-Path-Matched'
+      unexpected:
+        - 'X-Path-Nomatch'
 proxy_set_header_var_001:
   test_purpose: 验证proxy_set_header转发$custom_rule_request_rule_name变量到上游并回显
   pre_condition:
@@ -6710,17 +6129,13 @@ proxy_set_header_var_001:
         response_add_http_header X-Resp-Rule $custom_rule_response_rule_name;
       }
     }
-  operate_commands:
-    - "nginx -t"
-    - "nginx -s reload"
-    - "curl -s -v http://127.0.0.1:18100/myrule 2>&1"
-  expected_result:
-    - "test is successful"
-    - "X-Echo-Fwd"
-    - "/myrule"
-    - "X-Resp-Rule"
-    - "myresprule"
-
+  operate_steps:
+    - command: 'curl -s -v http://127.0.0.1:18100/myrule 2>&1'
+      expected:
+        - 'X-Echo-Fwd'
+        - '/myrule'
+        - 'X-Resp-Rule'
+        - 'myresprule'
 fwd_log_001:
   test_purpose: 验证转发日志access_log输出$custom_rule_request_rule_name与$custom_rule_response_rule_name变量
   pre_condition:
@@ -6744,22 +6159,15 @@ fwd_log_001:
         response_add_http_header X-Test yes;
       }
     }
-  operate_commands:
-    - "nginx -t"
-    - "nginx -s reload"
-    - "curl -s http://127.0.0.1:18100/myrule"
-    - "tail -1 /ulb/alb-test/access_fwd.log"
-  expected_result:
-    - "test is successful"
-    - "up"
-    - "127.0.0.1"
-    - "/myrule"
-    - "myresprule"
-
-# ============================================================
-# 用例评审补充 - multi_condition关闭时各关键字报错(#10补全)
-# ============================================================
-
+  operate_steps:
+    - command: 'curl -s http://127.0.0.1:18100/myrule'
+      expected:
+        - 'up'
+    - command: 'tail -1 /ulb/alb-test/access_fwd.log'
+      expected:
+        - '127.0.0.1'
+        - '/myrule'
+        - 'myresprule'
 valid_off_path_001:
   test_purpose: 验证multi_condition关闭时配置match_http_path报错
   pre_condition:
@@ -6777,6 +6185,7 @@ valid_off_path_001:
   expected_result:
     - "multi_condition is false"
     - "test failed"
+
 
 valid_off_header_001:
   test_purpose: 验证multi_condition关闭时配置match_http_header报错
@@ -6796,6 +6205,7 @@ valid_off_header_001:
     - "multi_condition is false"
     - "test failed"
 
+
 valid_off_cookie_001:
   test_purpose: 验证multi_condition关闭时配置match_cookie报错
   pre_condition:
@@ -6813,6 +6223,7 @@ valid_off_cookie_001:
   expected_result:
     - "multi_condition is false"
     - "test failed"
+
 
 valid_off_method_001:
   test_purpose: 验证multi_condition关闭时配置match_request_method报错
@@ -6832,6 +6243,7 @@ valid_off_method_001:
     - "multi_condition is false"
     - "test failed"
 
+
 valid_off_ip_001:
   test_purpose: 验证multi_condition关闭时配置match_source_ip报错
   pre_condition:
@@ -6849,6 +6261,7 @@ valid_off_ip_001:
   expected_result:
     - "multi_condition is false"
     - "test failed"
+
 
 valid_off_qs_001:
   test_purpose: 验证multi_condition关闭时配置match_query_string报错
@@ -6872,6 +6285,7 @@ valid_off_qs_001:
 # 用例评审补充 - multi_condition非枚举值报错
 # ============================================================
 
+
 valid_mc_maybe_001:
   test_purpose: 验证multi_condition非枚举值(maybe)报错
   pre_condition:
@@ -6890,6 +6304,7 @@ valid_mc_maybe_001:
   expected_result:
     - "invalid value"
     - "test failed"
+
 
 valid_mc_yes_001:
   test_purpose: 验证multi_condition非枚举值(yes)报错
@@ -6910,6 +6325,7 @@ valid_mc_yes_001:
     - "invalid value"
     - "test failed"
 
+
 valid_mc_noargs_001:
   test_purpose: 验证multi_condition无参数报错
   pre_condition:
@@ -6929,6 +6345,7 @@ valid_mc_noargs_001:
     - "invalid number of arguments"
     - "test failed"
 
+
 valid_mc_multiargs_001:
   test_purpose: 验证multi_condition多参数报错
   pre_condition:
@@ -6947,6 +6364,7 @@ valid_mc_multiargs_001:
   expected_result:
     - "invalid number of arguments"
     - "test failed"
+
 
 valid_mc_dup_001:
   test_purpose: 验证multi_condition重复配置报错
@@ -6975,6 +6393,7 @@ valid_mc_dup_001:
 #    $custom_rule_response_rule_name关闭时返回空
 # ============================================================
 
+
 var_off_001:
   test_purpose: 验证multi_condition关闭时$custom_rule_response_rule_name返回空而request_rule_name返回location名
   pre_condition:
@@ -6991,18 +6410,14 @@ var_off_001:
         return 200 "ok";
       }
     }
-  operate_commands:
-    - "nginx -t"
-    - "nginx -s reload"
-    - "curl -s -v http://127.0.0.1:18100/test 2>&1"
-  expected_result:
-    - "test is successful"
-    - "ok"
-    - "X-Req-Rule"
-    - "/test"
-  unexpected_result:
-    - "X-Resp-Rule"
-
+  operate_steps:
+    - command: 'curl -s -v http://127.0.0.1:18100/test 2>&1'
+      expected:
+        - 'ok'
+        - 'X-Req-Rule'
+        - '/test'
+      unexpected:
+        - 'X-Resp-Rule'
 var_off_log_001:
   test_purpose: 验证multi_condition关闭时转发日志中response_rule_name为空request_rule_name为location名
   pre_condition:
@@ -7017,21 +6432,14 @@ var_off_log_001:
       listen 18100;
       location /test { return 200 "ok"; }
     }
-  operate_commands:
-    - "nginx -t"
-    - "nginx -s reload"
-    - "curl -s http://127.0.0.1:18100/test"
-    - "tail -1 /ulb/alb-test/access_v.log"
-  expected_result:
-    - "test is successful"
-    - "ok"
-    - "req=[/test]"
-    - "resp=[-]"
-
-# ============================================================
-# 用例评审补充 - 唯一关键字不可重复(location/response_rule双场景)
-# ============================================================
-
+  operate_steps:
+    - command: 'curl -s http://127.0.0.1:18100/test'
+      expected:
+        - 'ok'
+    - command: 'tail -1 /ulb/alb-test/access_v.log'
+      expected:
+        - 'req=[/test]'
+        - 'resp=[-]'
 valid_dup_path_loc_001:
   test_purpose: 验证location内match_http_path重复配置报错
   pre_condition:
@@ -7050,6 +6458,7 @@ valid_dup_path_loc_001:
   expected_result:
     - "is duplicate"
     - "test failed"
+
 
 valid_dup_method_loc_001:
   test_purpose: 验证location内match_request_method重复配置报错
@@ -7070,6 +6479,7 @@ valid_dup_method_loc_001:
     - "is duplicate"
     - "test failed"
 
+
 valid_dup_ip_loc_001:
   test_purpose: 验证location内match_source_ip重复配置报错
   pre_condition:
@@ -7088,6 +6498,7 @@ valid_dup_ip_loc_001:
   expected_result:
     - "is duplicate"
     - "test failed"
+
 
 valid_dup_host_resp_001:
   test_purpose: 验证response_rule内match_http_host重复配置报错
@@ -7112,6 +6523,7 @@ valid_dup_host_resp_001:
     - "is duplicate"
     - "test failed"
 
+
 valid_dup_path_resp_001:
   test_purpose: 验证response_rule内match_http_path重复配置报错
   pre_condition:
@@ -7135,6 +6547,7 @@ valid_dup_path_resp_001:
     - "is duplicate"
     - "test failed"
 
+
 valid_dup_method_resp_001:
   test_purpose: 验证response_rule内match_request_method重复配置报错
   pre_condition:
@@ -7157,6 +6570,7 @@ valid_dup_method_resp_001:
   expected_result:
     - "is duplicate"
     - "test failed"
+
 
 valid_dup_ip_resp_001:
   test_purpose: 验证response_rule内match_source_ip重复配置报错
@@ -7186,6 +6600,7 @@ valid_dup_ip_resp_001:
 # response_rule专属关键字不可配置在location块内
 # ============================================================
 
+
 valid_ctx_status_loc_001:
   test_purpose: 验证match_http_status配置在location块内报错(仅response_rule允许)
   pre_condition:
@@ -7204,6 +6619,7 @@ valid_ctx_status_loc_001:
   expected_result:
     - "not allowed here"
     - "test failed"
+
 
 valid_ctx_resphdr_loc_001:
   test_purpose: 验证match_response_http_header配置在location块内报错(仅response_rule允许)
@@ -7224,6 +6640,7 @@ valid_ctx_resphdr_loc_001:
     - "not allowed here"
     - "test failed"
 
+
 valid_ctx_respadd_loc_001:
   test_purpose: 验证response_add_http_header配置在location块内报错(仅response_rule允许)
   pre_condition:
@@ -7242,6 +6659,7 @@ valid_ctx_respadd_loc_001:
   expected_result:
     - "not allowed here"
     - "test failed"
+
 
 valid_ctx_respdel_loc_001:
   test_purpose: 验证response_delete_http_header配置在location块内报错(仅response_rule允许)
@@ -7266,6 +6684,7 @@ valid_ctx_respdel_loc_001:
 # 用例评审补充 - 作用范围非法/参数数量为0/参数格式校验
 # ============================================================
 
+
 valid_ctx_mc_loc_001:
   test_purpose: 验证multi_condition配置在location块内报错(仅http允许)
   pre_condition:
@@ -7283,6 +6702,7 @@ valid_ctx_mc_loc_001:
   expected_result:
     - "not allowed here"
     - "test failed"
+
 
 valid_ctx_mc_srv_001:
   test_purpose: 验证multi_condition配置在server块内报错(仅http允许)
@@ -7303,6 +6723,7 @@ valid_ctx_mc_srv_001:
     - "not allowed here"
     - "test failed"
 
+
 valid_noargs_header_001:
   test_purpose: 验证match_http_header无参数报错
   pre_condition:
@@ -7321,6 +6742,7 @@ valid_noargs_header_001:
   expected_result:
     - "invalid number of arguments"
     - "test failed"
+
 
 valid_noargs_cookie_001:
   test_purpose: 验证match_cookie无参数报错
@@ -7341,6 +6763,7 @@ valid_noargs_cookie_001:
     - "invalid number of arguments"
     - "test failed"
 
+
 valid_noargs_qs_001:
   test_purpose: 验证match_query_string无参数报错
   pre_condition:
@@ -7359,6 +6782,7 @@ valid_noargs_qs_001:
   expected_result:
     - "invalid number of arguments"
     - "test failed"
+
 
 valid_noargs_resphdr_001:
   test_purpose: 验证match_response_http_header无参数报错
@@ -7383,6 +6807,7 @@ valid_noargs_resphdr_001:
     - "invalid number of arguments"
     - "test failed"
 
+
 valid_noargs_respadd_001:
   test_purpose: 验证response_add_http_header无参数报错
   pre_condition:
@@ -7406,6 +6831,7 @@ valid_noargs_respadd_001:
     - "invalid number of arguments"
     - "test failed"
 
+
 valid_regex_header_001:
   test_purpose: 验证match_http_header正则表达式非法报错
   pre_condition:
@@ -7424,6 +6850,7 @@ valid_regex_header_001:
   expected_result:
     - "pcre2_compile"
     - "test failed"
+
 
 valid_regex_path_001:
   test_purpose: 验证match_http_path正则表达式非法报错
@@ -7444,6 +6871,7 @@ valid_regex_path_001:
     - "pcre2_compile"
     - "test failed"
 
+
 valid_regex_host_001:
   test_purpose: 验证match_http_host正则表达式非法报错
   pre_condition:
@@ -7462,6 +6890,7 @@ valid_regex_host_001:
   expected_result:
     - "pcre2_compile"
     - "test failed"
+
 
 valid_regex_cookie_001:
   test_purpose: 验证match_cookie正则表达式非法报错
@@ -7482,6 +6911,7 @@ valid_regex_cookie_001:
     - "pcre2_compile"
     - "test failed"
 
+
 valid_regex_qs_001:
   test_purpose: 验证match_query_string正则表达式非法报错
   pre_condition:
@@ -7500,6 +6930,7 @@ valid_regex_qs_001:
   expected_result:
     - "pcre2_compile"
     - "test failed"
+
 
 valid_regex_resphdr_001:
   test_purpose: 验证match_response_http_header正则表达式非法报错
@@ -7524,6 +6955,7 @@ valid_regex_resphdr_001:
     - "pcre2_compile"
     - "test failed"
 
+
 valid_method_nonenum_001:
   test_purpose: 验证match_request_method配置单个非枚举值报错
   pre_condition:
@@ -7542,6 +6974,7 @@ valid_method_nonenum_001:
   expected_result:
     - "invalid value"
     - "test failed"
+
 
 valid_ipv4_mask33_001:
   test_purpose: 验证match_source_ip IPv4掩码超32报错
@@ -7562,6 +6995,7 @@ valid_ipv4_mask33_001:
     - "invalid network"
     - "test failed"
 
+
 valid_ipv4_maskabc_001:
   test_purpose: 验证match_source_ip IPv4掩码非数字报错
   pre_condition:
@@ -7580,6 +7014,7 @@ valid_ipv4_maskabc_001:
   expected_result:
     - "invalid network"
     - "test failed"
+
 
 valid_ipv4_maskneg_001:
   test_purpose: 验证match_source_ip IPv4掩码负数报错
@@ -7600,6 +7035,7 @@ valid_ipv4_maskneg_001:
     - "invalid network"
     - "test failed"
 
+
 valid_ipv6_mask129_001:
   test_purpose: 验证match_source_ip IPv6掩码超128报错
   pre_condition:
@@ -7619,6 +7055,7 @@ valid_ipv6_mask129_001:
     - "invalid network"
     - "test failed"
 
+
 valid_ipv6_fmt_001:
   test_purpose: 验证match_source_ip IPv6格式非法报错
   pre_condition:
@@ -7637,6 +7074,7 @@ valid_ipv6_fmt_001:
   expected_result:
     - "invalid network"
     - "test failed"
+
 
 valid_ipv6_maskabc_001:
   test_purpose: 验证match_source_ip IPv6掩码非数字报错
@@ -7661,6 +7099,7 @@ valid_ipv6_maskabc_001:
 # 用例评审补充 - keyval参数数量必须为偶数(奇数报错)
 # ============================================================
 
+
 valid_odd_header_001:
   test_purpose: 验证match_http_header参数为奇数(3个)报not in pairs
   pre_condition:
@@ -7679,6 +7118,7 @@ valid_odd_header_001:
   expected_result:
     - "not in pairs"
     - "test failed"
+
 
 valid_odd_cookie_001:
   test_purpose: 验证match_cookie参数为奇数(3个)报not in pairs
@@ -7699,6 +7139,7 @@ valid_odd_cookie_001:
     - "not in pairs"
     - "test failed"
 
+
 valid_odd_qs_001:
   test_purpose: 验证match_query_string参数为奇数(3个)报not in pairs
   pre_condition:
@@ -7717,6 +7158,7 @@ valid_odd_qs_001:
   expected_result:
     - "not in pairs"
     - "test failed"
+
 
 valid_odd_resphdr_001:
   test_purpose: 验证match_response_http_header参数为奇数(3个)报not in pairs
@@ -7741,6 +7183,7 @@ valid_odd_resphdr_001:
     - "not in pairs"
     - "test failed"
 
+
 valid_odd_header5_001:
   test_purpose: 验证match_http_header参数为奇数(5个)报not in pairs
   pre_condition:
@@ -7759,6 +7202,7 @@ valid_odd_header5_001:
   expected_result:
     - "not in pairs"
     - "test failed"
+
 
 valid_odd_respadd_1_001:
   test_purpose: 验证response_add_http_header仅key(1个参数)报错
@@ -7782,6 +7226,7 @@ valid_odd_respadd_1_001:
   expected_result:
     - "invalid number of arguments"
     - "test failed"
+
 
 valid_odd_respadd_3_001:
   test_purpose: 验证response_add_http_header参数为奇数(3个非always)报invalid parameter
@@ -7813,6 +7258,7 @@ valid_odd_respadd_3_001:
 # Accept-Ranges/WWW-Authenticate/Expires/ETag/Cache-Control/Link
 # ============================================================
 
+
 valid_respadd_always_case_001:
   test_purpose: 验证response_add_http_header的always参数大小写敏感(Always非法)
   pre_condition:
@@ -7835,6 +7281,7 @@ valid_respadd_always_case_001:
   expected_result:
     - "invalid parameter"
     - "test failed"
+
 
 valid_respadd_always_extra_001:
   test_purpose: 验证response_add_http_header的always后多余参数报错
@@ -7859,6 +7306,7 @@ valid_respadd_always_extra_001:
     - "invalid number of arguments"
     - "test failed"
 
+
 valid_respdel_always_case_001:
   test_purpose: 验证response_delete_http_header的always参数大小写敏感(Always非法)
   pre_condition:
@@ -7881,6 +7329,7 @@ valid_respdel_always_case_001:
   expected_result:
     - "invalid parameter"
     - "test failed"
+
 
 valid_respdel_always_extra_001:
   test_purpose: 验证response_delete_http_header的always后多余参数报错
@@ -7905,6 +7354,7 @@ valid_respdel_always_extra_001:
     - "invalid number of arguments"
     - "test failed"
 
+
 valid_respadd_forbidden_contentencoding_001:
   test_purpose: 验证response_add_http_header内置保护头(Content-Encoding)报错
   pre_condition:
@@ -7927,6 +7377,7 @@ valid_respadd_forbidden_contentencoding_001:
   expected_result:
     - "builtin response header"
     - "test failed"
+
 
 valid_respadd_forbidden_location_001:
   test_purpose: 验证response_add_http_header内置保护头(Location)报错
@@ -7951,6 +7402,7 @@ valid_respadd_forbidden_location_001:
     - "builtin response header"
     - "test failed"
 
+
 valid_respadd_forbidden_refresh_001:
   test_purpose: 验证response_add_http_header内置保护头(Refresh)报错
   pre_condition:
@@ -7973,6 +7425,7 @@ valid_respadd_forbidden_refresh_001:
   expected_result:
     - "builtin response header"
     - "test failed"
+
 
 valid_respadd_forbidden_lastmodified_001:
   test_purpose: 验证response_add_http_header内置保护头(Last-Modified)报错
@@ -7997,6 +7450,7 @@ valid_respadd_forbidden_lastmodified_001:
     - "builtin response header"
     - "test failed"
 
+
 valid_respadd_forbidden_contentrange_001:
   test_purpose: 验证response_add_http_header内置保护头(Content-Range)报错
   pre_condition:
@@ -8019,6 +7473,7 @@ valid_respadd_forbidden_contentrange_001:
   expected_result:
     - "builtin response header"
     - "test failed"
+
 
 valid_respdel_forbidden_acceptranges_001:
   test_purpose: 验证response_delete_http_header内置保护头(Accept-Ranges)报错
@@ -8043,6 +7498,7 @@ valid_respdel_forbidden_acceptranges_001:
     - "builtin response header"
     - "test failed"
 
+
 valid_respdel_forbidden_wwwauthenticate_001:
   test_purpose: 验证response_delete_http_header内置保护头(WWW-Authenticate)报错
   pre_condition:
@@ -8065,6 +7521,7 @@ valid_respdel_forbidden_wwwauthenticate_001:
   expected_result:
     - "builtin response header"
     - "test failed"
+
 
 valid_respdel_forbidden_expires_001:
   test_purpose: 验证response_delete_http_header内置保护头(Expires)报错
@@ -8089,6 +7546,7 @@ valid_respdel_forbidden_expires_001:
     - "builtin response header"
     - "test failed"
 
+
 valid_respdel_forbidden_etag_001:
   test_purpose: 验证response_delete_http_header内置保护头(ETag)报错
   pre_condition:
@@ -8111,6 +7569,7 @@ valid_respdel_forbidden_etag_001:
   expected_result:
     - "builtin response header"
     - "test failed"
+
 
 valid_respdel_forbidden_cachecontrol_001:
   test_purpose: 验证response_delete_http_header内置保护头(Cache-Control)报错
@@ -8135,6 +7594,7 @@ valid_respdel_forbidden_cachecontrol_001:
     - "builtin response header"
     - "test failed"
 
+
 valid_respdel_forbidden_link_001:
   test_purpose: 验证response_delete_http_header内置保护头(Link)报错
   pre_condition:
@@ -8157,3 +7617,4 @@ valid_respdel_forbidden_link_001:
   expected_result:
     - "builtin response header"
     - "test failed"
+
