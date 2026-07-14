@@ -8,6 +8,7 @@ from comms.nginx_operate import (
     reload_nginx,
     backup_nginx_config,
     restore_nginx_config,
+    ensure_local_dns,
 )
 from comms.log_utils import logger
 
@@ -20,6 +21,12 @@ def global_fixture():
     - 所有用例执行完成后，恢复Nginx原始配置
     """
     logger.info("测试会话开始")
+
+    # 前置操作：配置测试域名 DNS 解析（match_http_host 用例以域名形式请求）
+    try:
+        ensure_local_dns()
+    except Exception as e:
+        logger.warning(f"测试域名 DNS 配置失败: {str(e)}（match_http_host 域名形式用例可能无法解析）")
 
     # 前置操作：备份配置
     try:

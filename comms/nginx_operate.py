@@ -15,6 +15,48 @@ from .log_utils import logger
 
 _backup_file_path = None
 
+# match_http_host 测试用域名，需通过 /etc/hosts 解析到 127.0.0.1 以支持域名形式请求
+_TEST_HOST_DOMAINS = [
+    "www.test.com",
+    "sub.example.com",
+    "www.example.org",
+    "www123.test.com",
+    "www.first.com",
+    "www.second.com",
+    "www.third.com",
+    "www.final.com",
+    "other.com",
+    "nomatch.com",
+]
+
+_DNS_MARKER = "# ===== nginx_autotest test domains ====="
+_DNS_MARKER_END = "# ===== nginx_autotest test domains end ====="
+
+
+def ensure_local_dns(domains=None):
+    """
+    确保 /etc/hosts 中包含测试域名的 127.0.0.1 解析，支持 match_http_host 用例以域名形式请求。
+    幂等：已存在则不重复添加。
+    """
+    domains = domains or _TEST_HOST_DOMAINS
+    hosts_path = Path("/etc/hosts")
+    if not hosts_path.exists():
+        logger.warning("/etc/hosts 不存在，跳过 DNS 配置")
+        return
+    content = hosts_path.read_text(encoding="utf-8", errors="replace")
+    if _DNS_MARKER in content:
+        # 已配置，无需重复（域名列表变更时需手动清理）
+        return
+    lines = [_DNS_MARKER]
+    for d in domains:
+        lines.append(f"127.0.0.1 {d}")
+    lines.append(_DNS_MARKER_END)
+    block = "\n".join(lines) + "\n"
+    with hosts_path.open("a", encoding="utf-8") as f:
+        f.write("\n" + block)
+    logger.info(f"已添加测试域名 DNS 解析到 /etc/hosts: {', '.join(domains)}")
+
+
 
 def _is_docker_mode():
     try:
