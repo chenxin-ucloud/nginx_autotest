@@ -5903,7 +5903,7 @@ resp_header_regex_samekey_001:
         - 'X-Matched'
         - 'yes'
 resp_rewrite_001:
-  test_purpose: 验证rewrite改写URI后proxy_pass仍触发response_rule添加响应头
+  test_purpose: 验证rewrite改写路径后location命中改写前路径response_rule命中改写后路径
   pre_condition:
     - Nginx配置文件路径已知
     - 已备份原始配置文件
@@ -5912,60 +5912,57 @@ resp_rewrite_001:
     multi_condition on;
     server {
       listen 18101;
-      location / {
-        add_header X-Up "upval";
-        return 200 "upstream_ok";
-      }
+      location / { return 200 "up"; }
     }
     server {
       listen 18100;
       location /proxy {
-        rewrite ^/proxy(.*)$ $1 break;
+        match_http_path =/proxy;
+        add_header X-Loc-Pre yes;
+        rewrite ^/proxy$ /target break;
         proxy_pass http://127.0.0.1:18101;
       }
-      response_rule rr {
-        response_add_http_header X-Rewrite-Rule added;
-      }
+      response_rule r_pre { match_http_path =/proxy; response_add_http_header X-Pre yes; }
+      response_rule r_post { match_http_path =/target; response_add_http_header X-Post yes; }
     }
   operate_steps:
-    - command: 'curl -s -v http://127.0.0.1:18100/proxy/ 2>&1'
+    - command: 'curl -s -v http://127.0.0.1:18100/proxy 2>&1'
       expected:
-        - 'X-Rewrite-Rule'
-        - 'added'
-        - 'upstream_ok'
-resp_rewrite_002:
-  test_purpose: 验证rewrite改写URI后response_rule的match_http_path按改写后路径匹配
-  pre_condition:
-    - Nginx配置文件路径已知
-    - 已备份原始配置文件
-    - Nginx服务已启动
-  config_content: |
-    multi_condition on;
-    server {
-      listen 18101;
-      location / { return 200 "upstream_ok"; }
-    }
-    server {
-      listen 18100;
-      location /proxy {
-        rewrite ^/proxy(.*)$ $1 break;
-        proxy_pass http://127.0.0.1:18101;
-      }
-      response_rule rr_match {
-        match_http_path /;
-        response_add_http_header X-Path-Matched yes;
-      }
-      response_rule rr_nomatch {
-        match_http_path /proxy;
-        response_add_http_header X-Path-Nomatch yes;
-      }
-    }
-  operate_steps:
-    - command: 'curl -s -v http://127.0.0.1:18100/proxy/ 2>&1'
-      expected:
-        - 'X-Path-Matched'
+        - 'X-Loc-Pre'
+        - 'yes'
+        - 'X-Post'
       unexpected:
-        - 'X-Path-Nomatch'
+        - 'X-Pre'
+
+resp_rewrite_002:
+  test_purpose: 验证rewrite改写路径后域名不变location与response_rule均命中原域名
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    multi_condition on;
+    server {
+      listen 18101;
+      location / { return 200 "up"; }
+    }
+    server {
+      listen 18100;
+      location /proxy {
+        match_http_host www.test.com;
+        add_header X-Loc-Host yes;
+        rewrite ^/proxy$ /target break;
+        proxy_pass http://127.0.0.1:18101;
+      }
+      response_rule r_host { match_http_host www.test.com; response_add_http_header X-Host yes; }
+    }
+  operate_steps:
+    - command: 'curl -s -v http://www.test.com:18100/proxy 2>&1'
+      expected:
+        - 'X-Loc-Host'
+        - 'yes'
+        - 'X-Host'
+
 proxy_set_header_var_001:
   test_purpose: 验证proxy_set_header转发$custom_rule_request_rule_name变量到上游并回显
   pre_condition:
