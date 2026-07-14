@@ -4887,11 +4887,22 @@ resp_host_005:
         response_add_http_header X-Matched yes;
       }
     }
+    
   operate_steps:
     - command: 'curl -s -v http://www.first.com:18100/proxy 2>&1'
       expected:
         - 'X-Matched'
         - 'yes'
+    - command: 'curl -s -v http://www.second.com:18100/proxy 2>&1'
+      expected:
+        - 'X-Matched'
+        - 'yes'
+    - command: 'curl -s -v http://nomatch.com:18100/proxy 2>&1'
+      expected:
+        - 'up'
+      unexpected:
+        - 'X-Matched'
+
 resp_host_nomatch_001:
   test_purpose: 验证response_rule内match_http_host匹配不中不执行动作
   pre_condition:
@@ -5063,11 +5074,20 @@ resp_path_006:
         response_add_http_header X-Matched yes;
       }
     }
+    
   operate_steps:
     - command: 'curl -s -v http://127.0.0.1:18100/proxy 2>&1'
       expected:
         - 'X-Matched'
         - 'yes'
+    - command: 'curl -s -v http://127.0.0.1:18100/other 2>&1'
+      expected:
+        - 'X-Matched'
+        - 'yes'
+    - command: 'curl -s -v http://127.0.0.1:18100/nomatch 2>&1'
+      unexpected:
+        - 'X-Matched'
+
 resp_path_nomatch_001:
   test_purpose: 验证response_rule内match_http_path匹配不中不执行动作
   pre_condition:
@@ -5114,11 +5134,18 @@ resp_header_001:
         response_add_http_header X-Matched yes;
       }
     }
+    
   operate_steps:
     - command: 'curl -s -v -H "X-Test-Key: test_value" http://127.0.0.1:18100/proxy 2>&1'
       expected:
         - 'X-Matched'
         - 'yes'
+    - command: 'curl -s -v -H "X-Test-Key: wrong_value" http://127.0.0.1:18100/proxy 2>&1'
+      expected:
+        - 'up'
+      unexpected:
+        - 'X-Matched'
+
 resp_header_002:
   test_purpose: 验证response_rule内match_http_header正则匹配
   pre_condition:
@@ -5216,11 +5243,18 @@ resp_cookie_001:
         response_add_http_header X-Matched yes;
       }
     }
+    
   operate_steps:
     - command: 'curl -s -v -b "token=abc123" http://127.0.0.1:18100/proxy 2>&1'
       expected:
         - 'X-Matched'
         - 'yes'
+    - command: 'curl -s -v -b "token=wrong" http://127.0.0.1:18100/proxy 2>&1'
+      expected:
+        - 'up'
+      unexpected:
+        - 'X-Matched'
+
 resp_cookie_002:
   test_purpose: 验证response_rule内match_cookie正则匹配
   pre_condition:
@@ -5343,11 +5377,22 @@ resp_method_002:
         response_add_http_header X-Matched yes;
       }
     }
+    
   operate_steps:
+    - command: 'curl -s -v http://127.0.0.1:18100/proxy 2>&1'
+      expected:
+        - 'X-Matched'
+        - 'yes'
     - command: 'curl -s -v -X POST http://127.0.0.1:18100/proxy 2>&1'
       expected:
         - 'X-Matched'
         - 'yes'
+    - command: 'curl -s -v -X DELETE http://127.0.0.1:18100/proxy 2>&1'
+      expected:
+        - 'up'
+      unexpected:
+        - 'X-Matched'
+
 resp_method_nomatch_001:
   test_purpose: 验证response_rule内match_request_method匹配不中不执行动作
   pre_condition:
@@ -5572,11 +5617,18 @@ resp_qs_001:
         response_add_http_header X-Matched yes;
       }
     }
+    
   operate_steps:
     - command: 'curl -s -v "http://127.0.0.1:18100/proxy?key=test_value" 2>&1'
       expected:
         - 'X-Matched'
         - 'yes'
+    - command: 'curl -s -v "http://127.0.0.1:18100/proxy?key=wrong" 2>&1'
+      expected:
+        - 'up'
+      unexpected:
+        - 'X-Matched'
+
 resp_qs_002:
   test_purpose: 验证response_rule内match_query_string正则匹配
   pre_condition:
