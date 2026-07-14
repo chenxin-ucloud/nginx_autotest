@@ -7480,3 +7480,149 @@ valid_respdel_forbidden_link_001:
     - "builtin response header"
     - "test failed"
 
+
+
+# ============================================================
+# 用例评审补充 - response_rule keyval OR关系(一条指令多KV)
+# ============================================================
+
+resp_header_or_001:
+  test_purpose: 验证response_rule内match_http_header一条指令多KV为OR关系
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    multi_condition on;
+    server {
+      listen 18101;
+      location / { return 200 "up"; }
+    }
+    server {
+      listen 18100;
+      location /proxy { proxy_pass http://127.0.0.1:18101; }
+      response_rule rr {
+        match_http_header X-Group-A val_a1 X-Group-A2 val_a2;
+        response_add_http_header X-Matched yes;
+      }
+    }
+  operate_steps:
+    - command: 'curl -s -v -H "X-Group-A: val_a1" http://127.0.0.1:18100/proxy 2>&1'
+      expected:
+        - 'X-Matched'
+        - 'yes'
+    - command: 'curl -s -v -H "X-Group-A2: val_a2" http://127.0.0.1:18100/proxy 2>&1'
+      expected:
+        - 'X-Matched'
+        - 'yes'
+    - command: 'curl -s -v -H "X-Other: x" http://127.0.0.1:18100/proxy 2>&1'
+      expected:
+        - 'up'
+      unexpected:
+        - 'X-Matched'
+
+resp_cookie_or_001:
+  test_purpose: 验证response_rule内match_cookie一条指令多KV为OR关系
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    multi_condition on;
+    server {
+      listen 18101;
+      location / { return 200 "up"; }
+    }
+    server {
+      listen 18100;
+      location /proxy { proxy_pass http://127.0.0.1:18101; }
+      response_rule rr {
+        match_cookie user_a val_a user_b val_b;
+        response_add_http_header X-Matched yes;
+      }
+    }
+  operate_steps:
+    - command: 'curl -s -v -b "user_a=val_a" http://127.0.0.1:18100/proxy 2>&1'
+      expected:
+        - 'X-Matched'
+        - 'yes'
+    - command: 'curl -s -v -b "user_b=val_b" http://127.0.0.1:18100/proxy 2>&1'
+      expected:
+        - 'X-Matched'
+        - 'yes'
+    - command: 'curl -s -v -b "other=x" http://127.0.0.1:18100/proxy 2>&1'
+      expected:
+        - 'up'
+      unexpected:
+        - 'X-Matched'
+
+resp_qs_or_001:
+  test_purpose: 验证response_rule内match_query_string一条指令多KV为OR关系
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    multi_condition on;
+    server {
+      listen 18101;
+      location / { return 200 "up"; }
+    }
+    server {
+      listen 18100;
+      location /proxy { proxy_pass http://127.0.0.1:18101; }
+      response_rule rr {
+        match_query_string page 1 page 2;
+        response_add_http_header X-Matched yes;
+      }
+    }
+  operate_steps:
+    - command: 'curl -s -v "http://127.0.0.1:18100/proxy?page=1" 2>&1'
+      expected:
+        - 'X-Matched'
+        - 'yes'
+    - command: 'curl -s -v "http://127.0.0.1:18100/proxy?page=2" 2>&1'
+      expected:
+        - 'X-Matched'
+        - 'yes'
+    - command: 'curl -s -v "http://127.0.0.1:18100/proxy?other=x" 2>&1'
+      expected:
+        - 'up'
+      unexpected:
+        - 'X-Matched'
+
+resp_resphdr_or_001:
+  test_purpose: 验证match_response_http_header一条指令多KV为OR关系(上游任一头匹配即命中)
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    multi_condition on;
+    server { listen 18101; location / { add_header X-Up1 "v1"; return 200 "up"; } }
+    server { listen 18102; location / { add_header X-Up2 "v2"; return 200 "up"; } }
+    server { listen 18103; location / { return 200 "up"; } }
+    server {
+      listen 18100;
+      location /proxy1 { match_http_path =/proxy1; proxy_pass http://127.0.0.1:18101/; }
+      location /proxy2 { match_http_path =/proxy2; proxy_pass http://127.0.0.1:18102/; }
+      location /proxy0 { match_http_path =/proxy0; proxy_pass http://127.0.0.1:18103/; }
+      response_rule rr {
+        match_response_http_header X-Up1 v1 X-Up2 v2;
+        response_add_http_header X-Matched yes;
+      }
+    }
+  operate_steps:
+    - command: 'curl -s -v http://127.0.0.1:18100/proxy1 2>&1'
+      expected:
+        - 'X-Matched'
+        - 'yes'
+    - command: 'curl -s -v http://127.0.0.1:18100/proxy2 2>&1'
+      expected:
+        - 'X-Matched'
+        - 'yes'
+    - command: 'curl -s -v http://127.0.0.1:18100/proxy0 2>&1'
+      expected:
+        - 'up'
+      unexpected:
+        - 'X-Matched'
