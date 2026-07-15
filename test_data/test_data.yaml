@@ -8370,3 +8370,227 @@ resp_qs_regex_samekey_001:
         - 'up'
       unexpected:
         - 'X-Matched'
+# ============================================================
+# 用例评审补充 - response_rule keyval case/key-only/odd场景
+# match_http_header/cookie/query_string 在response_rule上下文
+# ============================================================
+
+resp_header_case_001:
+  test_purpose: 验证response_rule内match_http_header精确值大小写不敏感及key大小写不敏感
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    multi_condition on;
+    server {
+      listen 18101;
+      location / { return 200 "up"; }
+    }
+    server {
+      listen 18100;
+      location /p { proxy_pass http://127.0.0.1:18101; }
+      response_rule r {
+        match_http_header X-Key ValueEx;
+        response_add_http_header X-Matched yes;
+      }
+    }
+  operate_steps:
+    - command: 'curl -s -v -H "X-Key: valueex" http://127.0.0.1:18100/p 2>&1'
+      expected:
+        - 'X-Matched'
+        - 'yes'
+    - command: 'curl -s -v -H "x-key: ValueEx" http://127.0.0.1:18100/p 2>&1'
+      expected:
+        - 'X-Matched'
+        - 'yes'
+resp_cookie_case_001:
+  test_purpose: 验证response_rule内match_cookie精确值大小写不敏感及key大小写不敏感
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    multi_condition on;
+    server {
+      listen 18101;
+      location / { return 200 "up"; }
+    }
+    server {
+      listen 18100;
+      location /p { proxy_pass http://127.0.0.1:18101; }
+      response_rule r {
+        match_cookie Token ValueEx;
+        response_add_http_header X-Matched yes;
+      }
+    }
+  operate_steps:
+    - command: 'curl -s -v -b "token=valueex" http://127.0.0.1:18100/p 2>&1'
+      expected:
+        - 'X-Matched'
+        - 'yes'
+    - command: 'curl -s -v -b "TOKEN=valueex" http://127.0.0.1:18100/p 2>&1'
+      expected:
+        - 'X-Matched'
+        - 'yes'
+resp_qs_case_001:
+  test_purpose: 验证response_rule内match_query_string精确值大小写不敏感及key大小写不敏感
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    multi_condition on;
+    server {
+      listen 18101;
+      location / { return 200 "up"; }
+    }
+    server {
+      listen 18100;
+      location /p { proxy_pass http://127.0.0.1:18101; }
+      response_rule r {
+        match_query_string Key ValueEx;
+        response_add_http_header X-Matched yes;
+      }
+    }
+  operate_steps:
+    - command: 'curl -s -v "http://127.0.0.1:18100/p?key=valueex" 2>&1'
+      expected:
+        - 'X-Matched'
+        - 'yes'
+    - command: 'curl -s -v "http://127.0.0.1:18100/p?KEY=valueex" 2>&1'
+      expected:
+        - 'X-Matched'
+        - 'yes'
+resp_header_keyonly_001:
+  test_purpose: 验证response_rule内match_http_header仅配置key不配置value报错
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    multi_condition on;
+    server {
+      listen 18101; location / { return 200 "ok"; }
+    }
+    server {
+      listen 18100;
+      location /p { proxy_pass http://127.0.0.1:18101; }
+      response_rule r { match_http_header X-Exists; }
+    }
+  operate_commands:
+    - "nginx -t"
+  expect_syntax_fail: true
+  expected_result:
+    - "invalid number of arguments"
+    - "test failed"
+resp_cookie_keyonly_001:
+  test_purpose: 验证response_rule内match_cookie仅配置key不配置value报错
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    multi_condition on;
+    server {
+      listen 18101; location / { return 200 "ok"; }
+    }
+    server {
+      listen 18100;
+      location /p { proxy_pass http://127.0.0.1:18101; }
+      response_rule r { match_cookie flag; }
+    }
+  operate_commands:
+    - "nginx -t"
+  expect_syntax_fail: true
+  expected_result:
+    - "invalid number of arguments"
+    - "test failed"
+resp_qs_keyonly_001:
+  test_purpose: 验证response_rule内match_query_string仅配置key不配置value报错
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    multi_condition on;
+    server {
+      listen 18101; location / { return 200 "ok"; }
+    }
+    server {
+      listen 18100;
+      location /p { proxy_pass http://127.0.0.1:18101; }
+      response_rule r { match_query_string debug; }
+    }
+  operate_commands:
+    - "nginx -t"
+  expect_syntax_fail: true
+  expected_result:
+    - "invalid number of arguments"
+    - "test failed"
+resp_header_odd_001:
+  test_purpose: 验证response_rule内match_http_header参数为奇数(3个)报not in pairs
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    multi_condition on;
+    server {
+      listen 18101; location / { return 200 "ok"; }
+    }
+    server {
+      listen 18100;
+      location /p { proxy_pass http://127.0.0.1:18101; }
+      response_rule r { match_http_header X-A v1 X-B; }
+    }
+  operate_commands:
+    - "nginx -t"
+  expect_syntax_fail: true
+  expected_result:
+    - "not in pairs"
+    - "test failed"
+resp_cookie_odd_001:
+  test_purpose: 验证response_rule内match_cookie参数为奇数(3个)报not in pairs
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    multi_condition on;
+    server {
+      listen 18101; location / { return 200 "ok"; }
+    }
+    server {
+      listen 18100;
+      location /p { proxy_pass http://127.0.0.1:18101; }
+      response_rule r { match_cookie c1 v1 c2; }
+    }
+  operate_commands:
+    - "nginx -t"
+  expect_syntax_fail: true
+  expected_result:
+    - "not in pairs"
+    - "test failed"
+resp_qs_odd_001:
+  test_purpose: 验证response_rule内match_query_string参数为奇数(3个)报not in pairs
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    multi_condition on;
+    server {
+      listen 18101; location / { return 200 "ok"; }
+    }
+    server {
+      listen 18100;
+      location /p { proxy_pass http://127.0.0.1:18101; }
+      response_rule r { match_query_string k1 v1 k2; }
+    }
+  operate_commands:
+    - "nginx -t"
+  expect_syntax_fail: true
+  expected_result:
+    - "not in pairs"
+    - "test failed"
