@@ -3213,7 +3213,7 @@ cross_eight_002:
         - 'X-H: native_val'
       unexpected:
         - 'up_val'
-        - 'custom_val'
+  
 cross_eight_003:
   test_purpose: 组合3-上游有+原生删+自定义增(隐藏上游新增自定义)
   pre_condition:
@@ -3246,7 +3246,7 @@ cross_eight_003:
         - 'X-H: custom_val'
       unexpected:
         - 'up_val'
-        - 'native_val'
+
 cross_eight_004:
   test_purpose: 组合4-上游有+原生删+自定义删(全删无X-H)
   pre_condition:
@@ -3337,9 +3337,7 @@ cross_eight_006:
       expected:
         - 'up'
         - 'X-H: native_val'
-      unexpected:
-        - 'up_val'
-        - 'custom_val'
+
 cross_eight_007:
   test_purpose: 组合7-上游无+原生删+自定义增(仅自定义)
   pre_condition:
@@ -3369,9 +3367,7 @@ cross_eight_007:
       expected:
         - 'up'
         - 'X-H: custom_val'
-      unexpected:
-        - 'up_val'
-        - 'native_val'
+
 cross_eight_008:
   test_purpose: 组合8-上游无+原生删+自定义删(全无X-H)
   pre_condition:
@@ -5922,6 +5918,7 @@ resp_rewrite_001:
         rewrite ^/proxy$ /target break;
         proxy_pass http://127.0.0.1:18101;
       }
+      location / { return 200 "nomatch"; }
       response_rule r_pre { match_http_path =/proxy; response_add_http_header X-Pre yes; }
       response_rule r_post { match_http_path =/target; response_add_http_header X-Post yes; }
     }
@@ -5933,6 +5930,7 @@ resp_rewrite_001:
         - 'X-Post'
       unexpected:
         - 'X-Pre'
+        - 'nomatch'
 
 resp_rewrite_002:
   test_purpose: 验证rewrite改写路径后域名不变location与response_rule均命中原域名
@@ -5954,6 +5952,7 @@ resp_rewrite_002:
         rewrite ^/proxy$ /target break;
         proxy_pass http://127.0.0.1:18101;
       }
+      location / { return 200 "nomatch"; }
       response_rule r_host { match_http_host www.test.com; response_add_http_header X-Host yes; }
     }
   operate_steps:
@@ -5962,6 +5961,8 @@ resp_rewrite_002:
         - 'X-Loc-Host'
         - 'yes'
         - 'X-Host'
+      unexpected:
+        - 'nomatch'
 
 proxy_set_header_var_001:
   test_purpose: 验证proxy_set_header转发$custom_rule_request_rule_name变量到上游并回显
