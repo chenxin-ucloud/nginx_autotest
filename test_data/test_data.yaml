@@ -11447,3 +11447,172 @@ valid_resp_off_qs_001:
   expected_result:
     - "multi_condition is off"
     - "test failed"
+# ============================================================
+# 用例评审补充 - location专属场景response_rule对齐(可对应部分)
+# ============================================================
+
+resp_host_case_001:
+  test_purpose: 验证response_rule内match_http_host大小写不敏感(域名默认不区分大小写)
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    multi_condition on;
+    server { listen 18101; location / { return 200 "up"; } }
+    server { listen 18100; location /p { proxy_pass http://127.0.0.1:18101; }
+      response_rule r { match_http_host www.Test.COM; response_add_http_header X-Matched yes; }
+    }
+  operate_steps:
+    - command: 'curl -s -v http://www.test.com:18100/p 2>&1'
+      expected:
+        - 'X-Matched'
+        - 'yes'
+resp_path_case_exact_001:
+  test_purpose: 验证response_rule内match_http_path精确匹配(=)区分大小写
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    multi_condition on;
+    server { listen 18101; location / { return 200 "up"; } }
+    server { listen 18100; location /p { proxy_pass http://127.0.0.1:18101; }
+      response_rule r { match_http_path =/Exact/Path; response_add_http_header X-Matched yes; }
+    }
+  operate_steps:
+    - command: 'curl -s -v http://127.0.0.1:18100/Exact/Path 2>&1'
+      expected:
+        - 'X-Matched'
+        - 'yes'
+    - command: 'curl -s -v http://127.0.0.1:18100/exact/path 2>&1'
+      expected:
+        - 'up'
+      unexpected:
+        - 'X-Matched'
+resp_path_case_regex_001:
+  test_purpose: 验证response_rule内match_http_path正则~区分大小写(大写请求不匹配)
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    multi_condition on;
+    server { listen 18101; location / { return 200 "up"; } }
+    server { listen 18100; location /p { proxy_pass http://127.0.0.1:18101; }
+      response_rule r { match_http_path ~\.html$; response_add_http_header X-Matched yes; }
+    }
+  operate_steps:
+    - command: 'curl -s -v http://127.0.0.1:18100/p/page.html 2>&1'
+      expected:
+        - 'X-Matched'
+        - 'yes'
+    - command: 'curl -s -v http://127.0.0.1:18100/p/page.HTML 2>&1'
+      expected:
+        - 'up'
+      unexpected:
+        - 'X-Matched'
+resp_combined_001:
+  test_purpose: 验证response_rule内全部9种匹配条件AND关系(全部满足时命中)
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    multi_condition on;
+    server { listen 18101; location / { add_header X-Up "upval"; return 200 "up"; } }
+    server { listen 18100; location /p { proxy_pass http://127.0.0.1:18101; }
+      response_rule r {
+        match_http_host www.test.com;
+        match_http_path /p;
+        match_http_header X-Auth token;
+        match_cookie session abc;
+        match_request_method GET;
+        match_source_ip 127.0.0.1;
+        match_query_string v1 ok;
+        match_http_status 200;
+        match_response_http_header X-Up upval;
+        response_add_http_header X-Matched yes;
+      }
+    }
+  operate_steps:
+    - command: 'curl -s -v -H "X-Auth: token" -b "session=abc" ''http://www.test.com:18100/p?v1=ok'' 2>&1'
+      expected:
+        - 'X-Matched'
+        - 'yes'
+resp_combined_002:
+  test_purpose: 验证response_rule内全部9种匹配条件部分不匹配时不命中(AND关系验证)
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    multi_condition on;
+    server { listen 18101; location / { add_header X-Up "upval"; return 200 "up"; } }
+    server { listen 18100; location /p { proxy_pass http://127.0.0.1:18101; }
+      response_rule r {
+        match_http_host www.test.com;
+        match_http_path /p;
+        match_http_header X-Auth token;
+        match_cookie session abc;
+        match_request_method GET;
+        match_source_ip 127.0.0.1;
+        match_query_string v1 ok;
+        match_http_status 200;
+        match_response_http_header X-Up upval;
+        response_add_http_header X-Matched yes;
+      }
+    }
+  operate_steps:
+    - command: 'curl -s -v -H "X-Auth: wrong" -b "session=abc" ''http://www.test.com:18100/p?v1=ok'' 2>&1'
+      expected:
+        - 'up'
+      unexpected:
+        - 'X-Matched'
+resp_method_enum_001:
+  test_purpose: 验证response_rule内match_request_method枚举方法全覆盖(16种)+非枚举方法匹配不中
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    multi_condition on;
+    server { listen 18101; location / { return 200 "up"; } }
+    server { listen 18100; location /p { proxy_pass http://127.0.0.1:18101; }
+      response_rule r { match_request_method GET HEAD POST PUT DELETE MKCOL COPY MOVE OPTIONS PROPFIND PROPPATCH LOCK UNLOCK PATCH TRACE CONNECT; response_add_http_header X-Matched yes; }
+    }
+  operate_steps:
+    - command: 'curl -s -v http://127.0.0.1:18100/p 2>&1'
+      expected:
+        - 'X-Matched'
+        - 'yes'
+    - command: 'curl -s -v -X OPTIONS http://127.0.0.1:18100/p 2>&1'
+      expected:
+        - 'X-Matched'
+        - 'yes'
+    - command: 'curl -s -v -X DELETE http://127.0.0.1:18100/p 2>&1'
+      expected:
+        - 'X-Matched'
+        - 'yes'
+resp_edge_001:
+  test_purpose: 验证response_rule内URL编码query值解码后匹配与多Cookie AND关系
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    multi_condition on;
+    server { listen 18101; location / { return 200 "up"; } }
+    server { listen 18100; location /p { proxy_pass http://127.0.0.1:18101; }
+      response_rule r { match_query_string name hello@world; match_cookie c1 v1; match_cookie c2 v2; response_add_http_header X-Matched yes; }
+    }
+  operate_steps:
+    - command: 'curl -s -v -b "c1=v1; c2=v2" ''http://127.0.0.1:18100/p?name=hello%40world'' 2>&1'
+      expected:
+        - 'X-Matched'
+        - 'yes'
+    - command: 'curl -s -v -b "c1=v1" ''http://127.0.0.1:18100/p?name=hello%40world'' 2>&1'
+      expected:
+        - 'up'
+      unexpected:
+        - 'X-Matched'
