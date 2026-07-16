@@ -11296,3 +11296,154 @@ resp_resphdr_or_regex_001:
       expected:
         - 'X-Matched'
         - 'yes'
+# ============================================================
+# 用例评审补充 - response_rule off测试点(7种匹配条件一一对应location)
+# ============================================================
+
+valid_resp_off_host_001:
+  test_purpose: 验证multi_condition关闭时response_rule内match_http_host报错
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    server {
+      listen 18101; location / { return 200 "ok"; }
+    }
+    server {
+      listen 18100;
+      location /p { proxy_pass http://127.0.0.1:18101; }
+      response_rule r { match_http_host a.com; }
+    }
+  operate_commands:
+    - "nginx -t"
+  expect_syntax_fail: true
+  expected_result:
+    - "multi_condition is off"
+    - "test failed"
+valid_resp_off_path_001:
+  test_purpose: 验证multi_condition关闭时response_rule内match_http_path报错
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    server {
+      listen 18101; location / { return 200 "ok"; }
+    }
+    server {
+      listen 18100;
+      location /p { proxy_pass http://127.0.0.1:18101; }
+      response_rule r { match_http_path /a; }
+    }
+  operate_commands:
+    - "nginx -t"
+  expect_syntax_fail: true
+  expected_result:
+    - "multi_condition is off"
+    - "test failed"
+valid_resp_off_header_001:
+  test_purpose: 验证multi_condition关闭时response_rule内match_http_header报错
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    server {
+      listen 18101; location / { return 200 "ok"; }
+    }
+    server {
+      listen 18100;
+      location /p { proxy_pass http://127.0.0.1:18101; }
+      response_rule r { match_http_header X-A v; }
+    }
+  operate_commands:
+    - "nginx -t"
+  expect_syntax_fail: true
+  expected_result:
+    - "multi_condition is off"
+    - "test failed"
+valid_resp_off_cookie_001:
+  test_purpose: 验证multi_condition关闭时response_rule内match_cookie报错
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    server {
+      listen 18101; location / { return 200 "ok"; }
+    }
+    server {
+      listen 18100;
+      location /p { proxy_pass http://127.0.0.1:18101; }
+      response_rule r { match_cookie c v; }
+    }
+  operate_commands:
+    - "nginx -t"
+  expect_syntax_fail: true
+  expected_result:
+    - "multi_condition is off"
+    - "test failed"
+valid_resp_off_method_001:
+  test_purpose: 验证multi_condition关闭时response_rule内match_request_method报错
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    server {
+      listen 18101; location / { return 200 "ok"; }
+    }
+    server {
+      listen 18100;
+      location /p { proxy_pass http://127.0.0.1:18101; }
+      response_rule r { match_request_method GET; }
+    }
+  operate_commands:
+    - "nginx -t"
+  expect_syntax_fail: true
+  expected_result:
+    - "multi_condition is off"
+    - "test failed"
+valid_resp_off_ip_001:
+  test_purpose: 验证multi_condition关闭时response_rule内match_source_ip报错
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    server {
+      listen 18101; location / { return 200 "ok"; }
+    }
+    server {
+      listen 18100;
+      location /p { proxy_pass http://127.0.0.1:18101; }
+      response_rule r { match_source_ip 1.1.1.1; }
+    }
+  operate_commands:
+    - "nginx -t"
+  expect_syntax_fail: true
+  expected_result:
+    - "multi_condition is off"
+    - "test failed"
+valid_resp_off_qs_001:
+  test_purpose: 验证multi_condition关闭时response_rule内match_query_string报错
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    server {
+      listen 18101; location / { return 200 "ok"; }
+    }
+    server {
+      listen 18100;
+      location /p { proxy_pass http://127.0.0.1:18101; }
+      response_rule r { match_query_string k v; }
+    }
+  operate_commands:
+    - "nginx -t"
+  expect_syntax_fail: true
+  expected_result:
+    - "multi_condition is off"
+    - "test failed"
