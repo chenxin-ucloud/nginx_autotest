@@ -12683,19 +12683,19 @@ loc_header_or_regex_001:
     server {
       listen 18100;
       location /r {
-        match_http_header H1 ~^val_.*$ H2 ~^test_.*$;
+        match_http_header X-Hdr ~^val_.*$ X-Hdr ~^test_.*$;
         return 200 "matched";
       }
       location /catch_all { return 200 "no_match"; }
     }
   operate_steps:
-    - command: 'curl -s -H "H1: val_abc" http://127.0.0.1:18100/r'
+    - command: 'curl -s -H "X-Hdr: val_abc" http://127.0.0.1:18100/r'
       expected:
         - 'matched'
-    - command: 'curl -s -H "H2: test_xyz" http://127.0.0.1:18100/r'
+    - command: 'curl -s -H "X-Hdr: test_xyz" http://127.0.0.1:18100/r'
       expected:
         - 'matched'
-    - command: 'curl -s -H "H1: other" http://127.0.0.1:18100/r'
+    - command: 'curl -s -H "X-Hdr: other" http://127.0.0.1:18100/r'
       expected:
         - 'no_match'
       unexpected:
@@ -12711,19 +12711,19 @@ loc_cookie_or_regex_001:
     server {
       listen 18100;
       location /r {
-        match_cookie c1 ~^val_.*$ c2 ~^test_.*$;
+        match_cookie c ~^val_.*$ c ~^test_.*$;
         return 200 "matched";
       }
       location /catch_all { return 200 "no_match"; }
     }
   operate_steps:
-    - command: 'curl -s -b "c1=val_abc" http://127.0.0.1:18100/r'
+    - command: 'curl -s -b "c=val_abc" http://127.0.0.1:18100/r'
       expected:
         - 'matched'
-    - command: 'curl -s -b "c2=test_xyz" http://127.0.0.1:18100/r'
+    - command: 'curl -s -b "c=test_xyz" http://127.0.0.1:18100/r'
       expected:
         - 'matched'
-    - command: 'curl -s -b "c1=other" http://127.0.0.1:18100/r'
+    - command: 'curl -s -b "c=other" http://127.0.0.1:18100/r'
       expected:
         - 'no_match'
       unexpected:
@@ -12739,19 +12739,19 @@ loc_qs_or_regex_001:
     server {
       listen 18100;
       location /r {
-        match_query_string k1 ~^val_.*$ k2 ~^test_.*$;
+        match_query_string k ~^val_.*$ k ~^test_.*$;
         return 200 "matched";
       }
       location /catch_all { return 200 "no_match"; }
     }
   operate_steps:
-    - command: 'curl -s "http://127.0.0.1:18100/r?k1=val_abc"'
+    - command: 'curl -s "http://127.0.0.1:18100/r?k=val_abc"'
       expected:
         - 'matched'
-    - command: 'curl -s "http://127.0.0.1:18100/r?k2=test_xyz"'
+    - command: 'curl -s "http://127.0.0.1:18100/r?k=test_xyz"'
       expected:
         - 'matched'
-    - command: 'curl -s "http://127.0.0.1:18100/r?k1=other"'
+    - command: 'curl -s "http://127.0.0.1:18100/r?k=other"'
       expected:
         - 'no_match'
       unexpected:
@@ -12825,20 +12825,20 @@ resp_header_or_regex_001:
       listen 18100;
       location /p { proxy_pass http://127.0.0.1:18101; }
       response_rule r {
-        match_http_header H1 ~^val_.*$ H2 ~^test_.*$;
+        match_http_header X-Hdr ~^val_.*$ X-Hdr ~^test_.*$;
         response_add_http_header X-Matched yes;
       }
     }
   operate_steps:
-    - command: 'curl -s -v -H "H1: val_abc" http://127.0.0.1:18100/p 2>&1'
+    - command: 'curl -s -v -H "X-Hdr: val_abc" http://127.0.0.1:18100/p 2>&1'
       expected:
         - 'X-Matched'
         - 'yes'
-    - command: 'curl -s -v -H "H2: test_xyz" http://127.0.0.1:18100/p 2>&1'
+    - command: 'curl -s -v -H "X-Hdr: test_xyz" http://127.0.0.1:18100/p 2>&1'
       expected:
         - 'X-Matched'
         - 'yes'
-    - command: 'curl -s -v -H "H1: other" http://127.0.0.1:18100/p 2>&1'
+    - command: 'curl -s -v -H "X-Hdr: other" http://127.0.0.1:18100/p 2>&1'
       expected:
         - 'up'
       unexpected:
@@ -12860,20 +12860,20 @@ resp_cookie_or_regex_001:
       listen 18100;
       location /p { proxy_pass http://127.0.0.1:18101; }
       response_rule r {
-        match_cookie c1 ~^val_.*$ c2 ~^test_.*$;
+        match_cookie c ~^val_.*$ c ~^test_.*$;
         response_add_http_header X-Matched yes;
       }
     }
   operate_steps:
-    - command: 'curl -s -v -b "c1=val_abc" http://127.0.0.1:18100/p 2>&1'
+    - command: 'curl -s -v -b "c=val_abc" http://127.0.0.1:18100/p 2>&1'
       expected:
         - 'X-Matched'
         - 'yes'
-    - command: 'curl -s -v -b "c2=test_xyz" http://127.0.0.1:18100/p 2>&1'
+    - command: 'curl -s -v -b "c=test_xyz" http://127.0.0.1:18100/p 2>&1'
       expected:
         - 'X-Matched'
         - 'yes'
-    - command: 'curl -s -v -b "c1=other" http://127.0.0.1:18100/p 2>&1'
+    - command: 'curl -s -v -b "c=other" http://127.0.0.1:18100/p 2>&1'
       expected:
         - 'up'
       unexpected:
@@ -12895,20 +12895,20 @@ resp_qs_or_regex_001:
       listen 18100;
       location /p { proxy_pass http://127.0.0.1:18101; }
       response_rule r {
-        match_query_string k1 ~^val_.*$ k2 ~^test_.*$;
+        match_query_string k ~^val_.*$ k ~^test_.*$;
         response_add_http_header X-Matched yes;
       }
     }
   operate_steps:
-    - command: 'curl -s -v "http://127.0.0.1:18100/p?k1=val_abc" 2>&1'
+    - command: 'curl -s -v "http://127.0.0.1:18100/p?k=val_abc" 2>&1'
       expected:
         - 'X-Matched'
         - 'yes'
-    - command: 'curl -s -v "http://127.0.0.1:18100/p?k2=test_xyz" 2>&1'
+    - command: 'curl -s -v "http://127.0.0.1:18100/p?k=test_xyz" 2>&1'
       expected:
         - 'X-Matched'
         - 'yes'
-    - command: 'curl -s -v "http://127.0.0.1:18100/p?k1=other" 2>&1'
+    - command: 'curl -s -v "http://127.0.0.1:18100/p?k=other" 2>&1'
       expected:
         - 'up'
       unexpected:
@@ -12924,14 +12924,14 @@ resp_resphdr_or_regex_001:
     server {
       listen 18101;
       location / { return 200 "up";
-        add_header R1 "rv_abc";
+        add_header R "rv_abc";
       }
     }
     server {
       listen 18100;
       location /p { proxy_pass http://127.0.0.1:18101; }
       response_rule r {
-        match_response_http_header R1 ~^rv_.*$ R2 ~^rt_.*$;
+        match_response_http_header R ~^rv_.*$ R ~^rt_.*$;
         response_add_http_header X-Matched yes;
       }
     }
@@ -12940,6 +12940,255 @@ resp_resphdr_or_regex_001:
       expected:
         - 'X-Matched'
         - 'yes'
+# ============================================================
+# 用例评审补充 - OR+regex-key(同正则key不同精确值一条指令OR)
+# ============================================================
+
+loc_header_or_regex_key_001:
+  test_purpose: 验证match_http_header同正则key不同精确值一条指令OR(任一精确值即命中)
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    multi_condition on;
+    server {
+      listen 18100;
+      location /r {
+        match_http_header ~^X-Custom-.*$ val_a ~^X-Custom-.*$ val_b;
+        return 200 "matched";
+      }
+      location /catch_all { return 200 "no_match"; }
+    }
+  operate_steps:
+    - command: 'curl -s -H "X-Custom-A: val_a" http://127.0.0.1:18100/r'
+      expected:
+        - 'matched'
+    - command: 'curl -s -H "X-Custom-B: val_b" http://127.0.0.1:18100/r'
+      expected:
+        - 'matched'
+    - command: 'curl -s -H "X-Custom-A: other" http://127.0.0.1:18100/r'
+      expected:
+        - 'no_match'
+      unexpected:
+        - 'matched'
+
+loc_cookie_or_regex_key_001:
+  test_purpose: 验证match_cookie同正则key不同精确值一条指令OR(任一精确值即命中)
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    multi_condition on;
+    server {
+      listen 18100;
+      location /r {
+        match_cookie ~^ck.*$ val_a ~^ck.*$ val_b;
+        return 200 "matched";
+      }
+      location /catch_all { return 200 "no_match"; }
+    }
+  operate_steps:
+    - command: 'curl -s -b "ck1=val_a" http://127.0.0.1:18100/r'
+      expected:
+        - 'matched'
+    - command: 'curl -s -b "ck2=val_b" http://127.0.0.1:18100/r'
+      expected:
+        - 'matched'
+    - command: 'curl -s -b "ck1=other" http://127.0.0.1:18100/r'
+      expected:
+        - 'no_match'
+      unexpected:
+        - 'matched'
+
+loc_qs_or_regex_key_001:
+  test_purpose: 验证match_query_string同正则key不同精确值一条指令OR(任一精确值即命中)
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    multi_condition on;
+    server {
+      listen 18100;
+      location /r {
+        match_query_string ~^p.*$ val_a ~^p.*$ val_b;
+        return 200 "matched";
+      }
+      location /catch_all { return 200 "no_match"; }
+    }
+  operate_steps:
+    - command: 'curl -s "http://127.0.0.1:18100/r?p1=val_a"'
+      expected:
+        - 'matched'
+    - command: 'curl -s "http://127.0.0.1:18100/r?p2=val_b"'
+      expected:
+        - 'matched'
+    - command: 'curl -s "http://127.0.0.1:18100/r?p1=other"'
+      expected:
+        - 'no_match'
+      unexpected:
+        - 'matched'
+
+resp_header_or_regex_key_001:
+  test_purpose: 验证response_rule内match_http_header同正则key不同精确值一条指令OR
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    multi_condition on;
+    server {
+      listen 18101;
+      location / { return 200 "up";
+      }
+    }
+    server {
+      listen 18100;
+      location /p { proxy_pass http://127.0.0.1:18101; }
+      response_rule r {
+        match_http_header ~^X-Custom-.*$ val_a ~^X-Custom-.*$ val_b;
+        response_add_http_header X-Matched yes;
+      }
+    }
+  operate_steps:
+    - command: 'curl -s -v -H "X-Custom-A: val_a" http://127.0.0.1:18100/p 2>&1'
+      expected:
+        - 'X-Matched'
+        - 'yes'
+    - command: 'curl -s -v -H "X-Custom-B: val_b" http://127.0.0.1:18100/p 2>&1'
+      expected:
+        - 'X-Matched'
+        - 'yes'
+    - command: 'curl -s -v -H "X-Custom-A: other" http://127.0.0.1:18100/p 2>&1'
+      expected:
+        - 'up'
+      unexpected:
+        - 'X-Matched'
+
+resp_cookie_or_regex_key_001:
+  test_purpose: 验证response_rule内match_cookie同正则key不同精确值一条指令OR
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    multi_condition on;
+    server {
+      listen 18101;
+      location / { return 200 "up";
+      }
+    }
+    server {
+      listen 18100;
+      location /p { proxy_pass http://127.0.0.1:18101; }
+      response_rule r {
+        match_cookie ~^ck.*$ val_a ~^ck.*$ val_b;
+        response_add_http_header X-Matched yes;
+      }
+    }
+  operate_steps:
+    - command: 'curl -s -v -b "ck1=val_a" http://127.0.0.1:18100/p 2>&1'
+      expected:
+        - 'X-Matched'
+        - 'yes'
+    - command: 'curl -s -v -b "ck2=val_b" http://127.0.0.1:18100/p 2>&1'
+      expected:
+        - 'X-Matched'
+        - 'yes'
+    - command: 'curl -s -v -b "ck1=other" http://127.0.0.1:18100/p 2>&1'
+      expected:
+        - 'up'
+      unexpected:
+        - 'X-Matched'
+
+resp_qs_or_regex_key_001:
+  test_purpose: 验证response_rule内match_query_string同正则key不同精确值一条指令OR
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    multi_condition on;
+    server {
+      listen 18101;
+      location / { return 200 "up";
+      }
+    }
+    server {
+      listen 18100;
+      location /p { proxy_pass http://127.0.0.1:18101; }
+      response_rule r {
+        match_query_string ~^p.*$ val_a ~^p.*$ val_b;
+        response_add_http_header X-Matched yes;
+      }
+    }
+  operate_steps:
+    - command: 'curl -s -v "http://127.0.0.1:18100/p?p1=val_a" 2>&1'
+      expected:
+        - 'X-Matched'
+        - 'yes'
+    - command: 'curl -s -v "http://127.0.0.1:18100/p?p2=val_b" 2>&1'
+      expected:
+        - 'X-Matched'
+        - 'yes'
+    - command: 'curl -s -v "http://127.0.0.1:18100/p?p1=other" 2>&1'
+      expected:
+        - 'up'
+      unexpected:
+        - 'X-Matched'
+
+resp_resphdr_or_regex_key_001:
+  test_purpose: 验证match_response_http_header同正则key不同精确值一条指令OR(上游任一匹配即命中)
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    multi_condition on;
+    server {
+      listen 18101;
+      location / { return 200 "up";
+        add_header X-Custom-A v_a;
+      }
+    }
+    server {
+      listen 18102;
+      location / { return 200 "up";
+        add_header X-Custom-B v_b;
+      }
+    }
+    server {
+      listen 18103;
+      location / { return 200 "up";
+        add_header X-Custom-A other;
+      }
+    }
+    server {
+      listen 18100;
+      location /p1 { match_http_path =/p1; proxy_pass http://127.0.0.1:18101/; }
+      location /p2 { match_http_path =/p2; proxy_pass http://127.0.0.1:18102/; }
+      location /p0 { match_http_path =/p0; proxy_pass http://127.0.0.1:18103/; }
+      response_rule r {
+        match_response_http_header ~^X-Custom-.*$ v_a ~^X-Custom-.*$ v_b;
+        response_add_http_header X-Matched yes;
+      }
+    }
+  operate_steps:
+    - command: 'curl -s -v http://127.0.0.1:18100/p1 2>&1'
+      expected:
+        - 'X-Matched'
+        - 'yes'
+    - command: 'curl -s -v http://127.0.0.1:18100/p2 2>&1'
+      expected:
+        - 'X-Matched'
+        - 'yes'
+    - command: 'curl -s -v http://127.0.0.1:18100/p0 2>&1'
+      expected:
+        - 'up'
+      unexpected:
+        - 'X-Matched'
 # ============================================================
 # 用例评审补充 - response_rule off测试点(7种匹配条件一一对应location)
 # ============================================================
