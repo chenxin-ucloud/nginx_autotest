@@ -9225,6 +9225,32 @@ header_regex_samekey_001:
     - command: 'curl -s -H "X-K: v1" http://127.0.0.1:18100/'
       expected:
         - 'no_match'
+loc_cookie_regex_key_001:
+  test_purpose: 验证match_cookie正则匹配key
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    multi_condition on;
+    server {
+      listen 18100;
+      location /r {
+        match_cookie ~^tok-.*$ v1;
+        return 200 "matched";
+      }
+      location /catch_all { return 200 "no_match"; }
+    }
+  operate_steps:
+    - command: 'curl -s -b "tok-abc=v1" http://127.0.0.1:18100/r'
+      expected:
+        - 'matched'
+    - command: 'curl -s -b "other=v1" http://127.0.0.1:18100/r'
+      expected:
+        - 'no_match'
+      unexpected:
+        - 'matched'
+
 cookie_regex_samekey_001:
   test_purpose: 验证match_cookie正则key同模式不同value多条AND关系
   pre_condition:
@@ -9251,6 +9277,32 @@ cookie_regex_samekey_001:
     - command: 'curl -s -b "t=v1" http://127.0.0.1:18100/'
       expected:
         - 'no_match'
+loc_qs_regex_key_001:
+  test_purpose: 验证match_query_string正则匹配key
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    multi_condition on;
+    server {
+      listen 18100;
+      location /r {
+        match_query_string ~^param-.*$ v1;
+        return 200 "matched";
+      }
+      location /catch_all { return 200 "no_match"; }
+    }
+  operate_steps:
+    - command: 'curl -s "http://127.0.0.1:18100/r?param-abc=v1"'
+      expected:
+        - 'matched'
+    - command: 'curl -s "http://127.0.0.1:18100/r?other=v1"'
+      expected:
+        - 'no_match'
+      unexpected:
+        - 'matched'
+
 qs_regex_samekey_001:
   test_purpose: 验证match_query_string正则key同模式不同value多条AND关系
   pre_condition:
@@ -9525,6 +9577,25 @@ fwd_log_001:
         - '127.0.0.1'
         - '/myrule'
         - 'myresprule'
+valid_off_host_001:
+  test_purpose: 验证multi_condition关闭时配置match_http_host报错
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    server {
+      listen 18100;
+      location /a { match_http_host a.com; return 200 "ok"; }
+    }
+  operate_commands:
+    - "nginx -t"
+  expect_syntax_fail: true
+  expected_result:
+    - "multi_condition is false"
+    - "test failed"
+
+
 valid_off_path_001:
   test_purpose: 验证multi_condition关闭时配置match_http_path报错
   pre_condition:
@@ -12828,6 +12899,28 @@ resp_path_case_regex_001:
         - 'up'
       unexpected:
         - 'X-Matched'
+resp_path_case_regex_002:
+  test_purpose: 验证response_rule内match_http_path正则~*大小写不敏感(大写请求可匹配)
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    multi_condition on;
+    server { listen 18101; location / { return 200 "up"; } }
+    server { listen 18100; location /p { proxy_pass http://127.0.0.1:18101; }
+      response_rule r { match_http_path ~*\.html$; response_add_http_header X-Matched yes; }
+    }
+  operate_steps:
+    - command: 'curl -s -v http://127.0.0.1:18100/p/page.html 2>&1'
+      expected:
+        - 'X-Matched'
+        - 'yes'
+    - command: 'curl -s -v http://127.0.0.1:18100/p/page.HTML 2>&1'
+      expected:
+        - 'X-Matched'
+        - 'yes'
+
 resp_combined_001:
   test_purpose: 验证response_rule内全部9种匹配条件AND关系(全部满足时命中)
   pre_condition:
