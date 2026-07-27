@@ -7856,7 +7856,7 @@ cross_combined_loc_50_001:
       }
     }
   operate_steps:
-    - command: 'curl -s -H "Host: www.final.com" -H "X-T: v1" -H "X-T: v2" -H "X-T: v3" -H "X-T: v4" -H "X-T: v5" -H "X-T: v6" -H "X-T: v7" -H "X-T: v8" -H "X-T: v9" -H "X-T: v10" -H "X-T: v11" -H "X-T: v12" -H "X-T: v13" -H "X-T: v14" -H "X-T: v15" -H "X-T: v16" -H "X-T: v17" -H "X-T: v18" -H "X-T: v19" -H "X-T: v20" -H "X-T: v21" -H "X-T: v22" -H "X-T: v23" -H "X-T: v24" -H "X-T: v25" -H "X-T: v26" -H "X-T: v27" -H "X-T: v28" -H "X-T: v29" -H "X-T: v30" -H "X-T: v31" -H "X-T: v32" -H "X-T: v33" -H "X-T: v34" -H "X-T: v35" -H "X-T: v36" -H "X-T: v37" -H "X-T: v38" -H "X-T: v39" -H "X-T: v40" -H "X-T: v41" -H "X-T: v42" -H "X-T: v43" -H "X-T: v44" -H "X-T: v45" -H "X-T: v46" -H "X-T: v47" -H "X-T: v48" -H "X-T: v49" -H "X-T: val_50" -b "c=v1;c=v2;c=v3;c=v4;c=v5;c=v6;c=v7;c=v8;c=v9;c=v10;c=v11;c=v12;c=v13;c=v14;c=v15;c=v16;c=v17;c=v18;c=v19;c=v20;c=v21;c=v22;c=v23;c=v24;c=v25;c=v26;c=v27;c=v28;c=v29;c=v30;c=v31;c=v32;c=v33;c=v34;c=v35;c=v36;c=v37;c=v38;c=v39;c=v40;c=v41;c=v42;c=v43;c=v44;c=v45;c=v46;c=v47;c=v48;c=v49;c=val_50" "http://127.0.0.1:18100/m50?p=v1&p=v2&p=v3&p=v4&p=v5&p=v6&p=v7&p=v8&p=v9&p=v10&p=v11&p=v12&p=v13&p=v14&p=v15&p=v16&p=v17&p=v18&p=v19&p=v20&p=v21&p=v22&p=v23&p=v24&p=v25&p=v26&p=v27&p=v28&p=v29&p=v30&p=v31&p=v32&p=v33&p=v34&p=v35&p=v36&p=v37&p=v38&p=v39&p=v40&p=v41&p=v42&p=v43&p=v44&p=v45&p=v46&p=v47&p=v48&p=v49&p=val_50"'
+    - command: 'curl -s -H "X-T: val_50" -b "c=val_50" "http://www.final.com:18100/m50?p=val_50"'
       expected:
         - 'matched'
       unexpected:
