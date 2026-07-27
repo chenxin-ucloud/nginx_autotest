@@ -13148,7 +13148,15 @@ resp_method_enum_001:
       expected:
         - 'X-Matched'
         - 'yes'
-    - command: 'curl -s -v -X OPTIONS http://127.0.0.1:18100/p 2>&1'
+    - command: 'curl -s -I http://127.0.0.1:18100/p 2>&1'
+      expected:
+        - 'X-Matched'
+        - 'yes'
+    - command: 'curl -s -v -X POST http://127.0.0.1:18100/p 2>&1'
+      expected:
+        - 'X-Matched'
+        - 'yes'
+    - command: 'curl -s -v -X PUT http://127.0.0.1:18100/p 2>&1'
       expected:
         - 'X-Matched'
         - 'yes'
@@ -13156,6 +13164,53 @@ resp_method_enum_001:
       expected:
         - 'X-Matched'
         - 'yes'
+    - command: 'curl -s -v -X MKCOL http://127.0.0.1:18100/p 2>&1'
+      expected:
+        - 'X-Matched'
+        - 'yes'
+    - command: 'curl -s -v -X COPY http://127.0.0.1:18100/p 2>&1'
+      expected:
+        - 'X-Matched'
+        - 'yes'
+    - command: 'curl -s -v -X MOVE http://127.0.0.1:18100/p 2>&1'
+      expected:
+        - 'X-Matched'
+        - 'yes'
+    - command: 'curl -s -v -X OPTIONS http://127.0.0.1:18100/p 2>&1'
+      expected:
+        - 'X-Matched'
+        - 'yes'
+    - command: 'curl -s -v -X PROPFIND http://127.0.0.1:18100/p 2>&1'
+      expected:
+        - 'X-Matched'
+        - 'yes'
+    - command: 'curl -s -v -X PROPPATCH http://127.0.0.1:18100/p 2>&1'
+      expected:
+        - 'X-Matched'
+        - 'yes'
+    - command: 'curl -s -v -X LOCK http://127.0.0.1:18100/p 2>&1'
+      expected:
+        - 'X-Matched'
+        - 'yes'
+    - command: 'curl -s -v -X UNLOCK http://127.0.0.1:18100/p 2>&1'
+      expected:
+        - 'X-Matched'
+        - 'yes'
+    - command: 'curl -s -v -X PATCH http://127.0.0.1:18100/p 2>&1'
+      expected:
+        - 'X-Matched'
+        - 'yes'
+    - command: 'curl -s -v -X TRACE http://127.0.0.1:18100/p 2>&1'
+      expected:
+        - '405'
+    - command: 'curl -s -v -X CONNECT http://127.0.0.1:18100/p 2>&1'
+      expected:
+        - '405'
+    - command: 'curl -s -v -X INVALID http://127.0.0.1:18100/p 2>&1'
+      expected:
+        - 'up'
+      unexpected:
+        - 'X-Matched'
 resp_edge_001:
   test_purpose: 验证response_rule内URL编码query值解码后匹配与多Cookie AND关系
   pre_condition:
