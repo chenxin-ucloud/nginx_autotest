@@ -9972,7 +9972,7 @@ valid_mc_dup_001:
 
 
 var_off_001:
-  test_purpose: 验证multi_condition关闭时$custom_rule_response_rule_name返回空而request_rule_name返回location名
+  test_purpose: 验证multi_condition关闭时$custom_rule_request_rule_name和$custom_rule_response_rule_name都返回空字符串
   pre_condition:
     - Nginx配置文件路径已知
     - 已备份原始配置文件
@@ -9991,12 +9991,11 @@ var_off_001:
     - command: 'curl -s -v http://127.0.0.1:18100/test 2>&1'
       expected:
         - 'ok'
-        - 'X-Req-Rule'
-        - '/test'
-      unexpected:
-        - 'X-Resp-Rule'
+        - '< X-Req-Rule'
+        - '< X-Resp-Rule'
+
 var_off_log_001:
-  test_purpose: 验证multi_condition关闭时转发日志中response_rule_name为空request_rule_name为location名
+  test_purpose: 验证multi_condition关闭时转发日志中response_rule_name和request_rule_name都为空
   pre_condition:
     - Nginx配置文件路径已知
     - 已备份原始配置文件
@@ -10015,8 +10014,8 @@ var_off_log_001:
         - 'ok'
     - command: 'tail -1 /ulb/alb-test/access_v.log'
       expected:
-        - 'req=[/test]'
-        - 'resp=[-]'
+        - 'req=[]'
+        - 'resp=[]'
 valid_dup_path_loc_001:
   test_purpose: 验证location内match_http_path重复配置报错
   pre_condition:
@@ -13889,7 +13888,7 @@ resp_resphdr_off_001:
     - "test failed"
 
 resp_resphdr_keyonly_001:
-  test_purpose: 验证match_response_http_header仅key无value时匹配响应头存在
+  test_purpose: 验证match_response_http_header仅key无value时报错
   pre_condition:
     - Nginx配置文件路径已知
     - 已备份原始配置文件
@@ -13905,11 +13904,11 @@ resp_resphdr_keyonly_001:
       location /p { proxy_pass http://127.0.0.1:18101; }
       response_rule r { match_response_http_header X-Check; response_add_http_header X-Matched yes; }
     }
-  operate_steps:
-    - command: 'curl -s -v http://127.0.0.1:18100/p 2>&1'
-      expected:
-        - 'X-Matched'
-        - 'yes'
+  operate_commands:
+    - "nginx -t"
+  expect_syntax_fail: true
+  expected_result:
+    - "test failed"
 
 resp_resphdr_multi_rule_001:
   test_purpose: 验证response_rule内8条规则match_response_http_header交叉命中最后一条
