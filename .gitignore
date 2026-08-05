@@ -10,4 +10,4 @@ ngx_http_custom_rule_module/
 docs/
 Nginx白盒测试自动化框架设计文档（数据与脚本分离版）.md
 docs/
-tools/generate_xmind.py
+tools/
