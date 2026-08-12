@@ -1881,7 +1881,7 @@ valid_003:
     - "nginx -t"
   expect_syntax_fail: true
   expected_result:
-    - "multi_condition is false"
+    - "multi_condition is off"
     - "test failed"
 
 
@@ -7863,8 +7863,8 @@ cross_combined_loc_50_001:
         - 'rule6'
         - 'rule7'
         - 'no_match'
-cross_combined_loc_200_001:
-  test_purpose: 验证200条location规则仅最后一条命中(每规则50条件+50动作,7维度交叉组合)
+cross_combined_200_001:
+  test_purpose: 验证200条location规则+200条response_rule共存交叉组合仅最后一条命中(location直返+response代理匹配,每规则50条件+50动作)
   pre_condition:
     - Nginx配置文件路径已知
     - 已备份原始配置文件
@@ -7872,6 +7872,11 @@ cross_combined_loc_200_001:
   config_content: |
     multi_condition on;
     large_client_header_buffers 16 256k;
+    server {
+      listen 18101;
+      location / { match_http_host 127.0.0.1; add_header X-Upstream "correct_uv" always; return 200 "up"; }
+      location /__fb { return 200 "no_match"; }
+    }
     server {
       listen 18100;
       location /l1 {
@@ -19875,41 +19880,6 @@ cross_combined_loc_200_001:
         add_header X-Final "yes";
         return 200 "L200_MATCHED";
       }
-      location /fb { return 200 "no_match"; }
-    }
-    
-  operate_steps:
-    - command: 'curl -s -v -H ''Host: www.correct.com'' -H ''X-H: correct_hv'' -b ''c=correct_cv'' ''http://127.0.0.1:18100/correct?q=correct_qv'' 2>&1'
-      expected:
-        - 'L200_MATCHED'
-        - 'X-Final'
-        - 'yes'
-        - 'A50: v50'
-      unexpected:
-        - 'L1_MATCHED'
-        - 'no_match'
-
-
-cross_combined_resp_200_001:
-  test_purpose: 验证200条response_rule仅最后一条命中(每规则50条件+50动作,9维度交叉组合)
-  pre_condition:
-    - Nginx配置文件路径已知
-    - 已备份原始配置文件
-    - Nginx服务已启动
-  config_content: |
-    multi_condition on;
-    large_client_header_buffers 16 256k;
-    server {
-      listen 18101;
-      location / {
-        match_http_host 127.0.0.1;
-        add_header X-Upstream "correct_uv";
-        return 200 "up";
-      }
-      location /__fb { return 200 "no_match"; }
-    }
-    server {
-      listen 18100;
       location /proxy { proxy_pass http://127.0.0.1:18101; proxy_set_header Host 127.0.0.1; }
       response_rule rr1 {
         match_http_host www.w1.com www.w2.com www.w3.com www.w4.com www.w5.com;
@@ -32110,20 +32080,111 @@ cross_combined_resp_200_001:
         response_add_http_header R48 "v48" always;
         response_add_http_header R49 "v49" always;
         response_add_http_header R50 "v50" always;
-        response_add_http_header X-Final "yes" always;
+        response_add_http_header X-Final-Resp "yes" always;
       }
       location /fb { proxy_pass http://127.0.0.1:18101; proxy_set_header Host 127.0.0.1; }
     }
     
   operate_steps:
+    - command: 'curl -s -v -H ''Host: www.correct.com'' -H ''X-H: correct_hv'' -b ''c=correct_cv'' ''http://127.0.0.1:18100/correct?q=correct_qv'' 2>&1'
+      expected:
+        - 'L200_MATCHED'
+        - 'X-Final'
+        - 'yes'
+        - 'A50: v50'
+      unexpected:
+        - 'L1_MATCHED'
+        - 'no_match'
     - command: 'curl -s -v -H ''Host: www.correct.com'' -H ''X-H: correct_hv'' -b ''c=correct_cv'' ''http://127.0.0.1:18100/proxy?q=correct_qv'' 2>&1'
       expected:
         - 'up'
-        - 'X-Final'
+        - 'X-Final-Resp'
         - 'yes'
         - 'R50: v50'
       unexpected:
         - 'no_match'
+
+coexist_loc_resp_001:
+  test_purpose: 验证单server内自定义location与response_rule语法共存(参考dev自测配置),location匹配正常且互不干扰
+  pre_condition:
+    - Nginx配置文件路径已知
+    - 已备份原始配置文件
+    - Nginx服务已启动
+  config_content: |
+    multi_condition on;
+    server {
+      listen 18100;
+    
+      location /test {
+        match_http_host www.test.com;
+        match_http_path /test;
+        match_http_header X-Test-Header test;
+        match_cookie cookie1 cookie_test_1;
+        match_request_method GET;
+        match_source_ip 127.0.0.1;
+        match_query_string query_1 query_string_1;
+        add_header X-Loc "matched" always;
+        return 200 "location_matched";
+      }
+    
+      location /test2 {
+        match_http_host www.test2.com;
+        match_http_path /test2;
+        match_http_header X-Test-Header2 test2;
+        match_cookie cookie2 cookie_test_2;
+        match_request_method GET POST;
+        match_source_ip 127.0.0.1;
+        match_query_string query_2 query_string_2;
+        add_header X-Loc2 "matched2" always;
+        return 200 "location2_matched";
+      }
+    
+      location /fb { return 200 "fallback"; }
+    
+      response_rule rr1 {
+        match_http_host www.test.com;
+        match_http_path /test;
+        match_http_header X-Test-Header test;
+        match_cookie cookie1 cookie_test_1;
+        match_request_method GET;
+        match_source_ip 127.0.0.1;
+        match_query_string query_1 query_string_1;
+        match_http_status 200;
+        match_response_http_header X-Loc matched;
+        response_add_http_header X-Resp "matched" always;
+      }
+    
+      response_rule rr2 {
+        match_http_host www.test2.com;
+        match_http_path /test2;
+        match_http_header X-Test-Header2 test2;
+        match_cookie cookie2 cookie_test_2;
+        match_request_method GET POST;
+        match_source_ip 127.0.0.1;
+        match_query_string query_2 query_string_2;
+        match_http_status 200;
+        match_response_http_header X-Loc2 matched2;
+        response_add_http_header X-Resp2 "matched2" always;
+      }
+    }
+  operate_steps:
+    - command: 'curl -s -v -H ''Host: www.test.com'' -H ''X-Test-Header: test'' -b ''cookie1=cookie_test_1'' ''http://127.0.0.1:18100/test?query_1=query_string_1'' 2>&1'
+      expected:
+        - 'location_matched'
+        - 'X-Loc'
+        - 'matched'
+      unexpected:
+        - 'fallback'
+    - command: 'curl -s -v -H ''Host: www.test2.com'' -H ''X-Test-Header2: test2'' -b ''cookie2=cookie_test_2'' ''http://127.0.0.1:18100/test2?query_2=query_string_2'' 2>&1'
+      expected:
+        - 'location2_matched'
+        - 'X-Loc2'
+        - 'matched2'
+    - command: 'curl -s -H ''Host: www.wrong.com'' ''http://127.0.0.1:18100/test'' 2>&1'
+      expected:
+        - 'fallback'
+      unexpected:
+        - 'location_matched'
 
 native_path_fallback_001:
   test_purpose: 验证match条件不命中时回退到原生location path匹配命中第二个location
@@ -34003,7 +34064,7 @@ valid_off_host_001:
     - "nginx -t"
   expect_syntax_fail: true
   expected_result:
-    - "multi_condition is false"
+    - "multi_condition is off"
     - "test failed"
 
 
@@ -34022,7 +34083,7 @@ valid_off_path_001:
     - "nginx -t"
   expect_syntax_fail: true
   expected_result:
-    - "multi_condition is false"
+    - "multi_condition is off"
     - "test failed"
 
 
@@ -34041,7 +34102,7 @@ valid_off_header_001:
     - "nginx -t"
   expect_syntax_fail: true
   expected_result:
-    - "multi_condition is false"
+    - "multi_condition is off"
     - "test failed"
 
 
@@ -34060,7 +34121,7 @@ valid_off_cookie_001:
     - "nginx -t"
   expect_syntax_fail: true
   expected_result:
-    - "multi_condition is false"
+    - "multi_condition is off"
     - "test failed"
 
 
@@ -34079,7 +34140,7 @@ valid_off_method_001:
     - "nginx -t"
   expect_syntax_fail: true
   expected_result:
-    - "multi_condition is false"
+    - "multi_condition is off"
     - "test failed"
 
 
@@ -34098,7 +34159,7 @@ valid_off_ip_001:
     - "nginx -t"
   expect_syntax_fail: true
   expected_result:
-    - "multi_condition is false"
+    - "multi_condition is off"
     - "test failed"
 
 
@@ -34117,7 +34178,7 @@ valid_off_qs_001:
     - "nginx -t"
   expect_syntax_fail: true
   expected_result:
-    - "multi_condition is false"
+    - "multi_condition is off"
     - "test failed"
 
 # ============================================================
@@ -34234,7 +34295,7 @@ valid_mc_dup_001:
 
 
 var_off_001:
-  test_purpose: 验证multi_condition关闭时$custom_rule_request_rule_name和$custom_rule_response_rule_name都返回空字符串
+  test_purpose: 验证multi_condition关闭时$custom_rule_request_rule_name和$custom_rule_response_rule_name变量为空，add_header不添加对应响应头
   pre_condition:
     - Nginx配置文件路径已知
     - 已备份原始配置文件
@@ -34253,8 +34314,9 @@ var_off_001:
     - command: 'curl -s -v http://127.0.0.1:18100/test 2>&1'
       expected:
         - 'ok'
-        - '< X-Req-Rule'
-        - '< X-Resp-Rule'
+      unexpected:
+        - 'X-Req-Rule'
+        - 'X-Resp-Rule'
 
 var_off_log_001:
   test_purpose: 验证multi_condition关闭时转发日志中response_rule_name和request_rule_name都为空
@@ -37651,7 +37713,7 @@ resp_valid_003:
     - "nginx -t"
   expect_syntax_fail: true
   expected_result:
-    - "multi_condition is false"
+    - "multi_condition is off"
     - "test failed"
 
 resp_valid_006:
@@ -38146,7 +38208,7 @@ resp_resphdr_off_001:
     - "nginx -t"
   expect_syntax_fail: true
   expected_result:
-    - "multi_condition is false"
+    - "multi_condition is off"
     - "test failed"
 
 resp_resphdr_keyonly_001:
